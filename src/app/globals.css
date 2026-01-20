@@ -128,10 +128,6 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--nd-black);
-  background-image: url("/hero.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -153,16 +149,6 @@ body {
   object-fit: cover;
   z-index: -1;
   filter: grayscale(100%) contrast(1.1) brightness(0.6);
-}
-
-.nd-hero-fallback {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  display: none;
 }
 
 .nd-hero h1 {
@@ -305,14 +291,35 @@ body {
 .nd-pay-btn-icon {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
   margin-right: 6px;
+  flex-shrink: 0;
 }
 
 .nd-pay-btn-logo {
-  height: 28px;
-  width: 28px;
+  height: 20px;
+  width: 20px;
   object-fit: contain;
   display: block;
+}
+
+.nd-pay-btn-icon.cash {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.nd-pay-btn-icon.mp {
+  background: #ffffff;
+}
+
+.nd-pay-btn-icon.mp .nd-pay-btn-logo {
+  color: #009ee3;
 }
 
 .nd-price-actions {
@@ -622,9 +629,9 @@ body {
 }
 
 .nd-footer {
-  background: #000;
+  background: transparent;
   color: #ffffff;
-  border-top: 1px solid #333;
+  border-top: 0;
   padding: 50px 4vw 30px;
 }
 
@@ -632,7 +639,7 @@ body {
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  align-items: start;
+  align-items: center;
 }
 
 .nd-footer-brand {
@@ -647,6 +654,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.nd-footer-links {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  text-align: center;
 }
 
 .nd-footer-links a {
@@ -672,9 +687,38 @@ body {
   text-decoration: none;
   font-size: 1.2rem;
   transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .nd-footer-social a:hover {
+  color: #FFD700;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.nd-footer-social a svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nd-footer-social .nd-social-link.whatsapp {
+  color: #25D366;
+}
+
+.nd-footer-social .nd-social-link.instagram {
+  color: #E4405F;
+}
+
+.nd-footer-social .nd-social-link.tiktok {
+  color: #ffffff;
+}
+
+.nd-footer-social .nd-social-link.tiktok:hover {
   color: #FFD700;
 }
 
@@ -726,6 +770,11 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.nd-contact-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
 .nd-contact-card.whatsapp {
   border-color: rgba(37, 211, 102, 0.45);
 }
@@ -761,6 +810,7 @@ body {
   color: #ffffff;
   background: #1f1f1f;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 8px;
 }
 
 .nd-contact-btn.whatsapp {
@@ -778,6 +828,11 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
 }
 
+.nd-contact-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .nd-about-grid {
   display: grid;
   gap: 32px;
@@ -785,10 +840,16 @@ body {
   align-items: center;
 }
 
+.nd-about-text {
+  text-align: center;
+}
+
 .nd-about-text p {
   color: #d4d4d4;
   font-size: 1.1rem;
   line-height: 1.6;
+  max-width: 560px;
+  margin: 0 auto;
 }
 
 .nd-about-image {
@@ -801,7 +862,8 @@ body {
   backdrop-filter: blur(10px);
 }
 
-.nd-about-image img {
+.nd-about-image img,
+.nd-about-image video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -884,12 +946,7 @@ body {
     display: none !important;
   }
 
-  .nd-hero-fallback {
-    display: block;
-  }
-
   .nd-hero {
-    background-image: url("/hero.png") !important;
     background-attachment: scroll !important;
     background-position: center center;
     background-size: cover;

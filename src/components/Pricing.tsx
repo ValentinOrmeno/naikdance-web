@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { SiMercadopago } from "react-icons/si";
 
 const priceCards = [
   {
@@ -187,17 +188,21 @@ export default function Pricing() {
                   >
                     {action.kind === "mp" ? (
                       <>
-                        <span className="nd-pay-btn-icon" aria-hidden="true">
-                          <img
-                            className="nd-pay-btn-logo"
-                            src="/mercadopago.svg"
-                            alt=""
-                          />
+                        <span className="nd-pay-btn-icon mp" aria-hidden="true">
+                          <SiMercadopago className="nd-pay-btn-logo" />
                         </span>
                         <span className="nd-pay-btn-text">mercado pago</span>
                       </>
                     ) : (
-                      action.label
+                      <>
+                        <span
+                          className="nd-pay-btn-icon cash"
+                          aria-hidden="true"
+                        >
+                          $
+                        </span>
+                        <span className="nd-pay-btn-text">{action.label}</span>
+                      </>
                     )}
                   </a>
                 ))}
