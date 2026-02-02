@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { SiMercadopago } from "react-icons/si";
 
 const priceCards = [
@@ -136,80 +135,93 @@ const priceCards = [
 
 export default function Pricing() {
   return (
-    <section id="aranceles" className="nd-section nd-prices-section">
-      <h2 className="nd-section-title">
-        Aranceles <span>2026</span>
+    <section id="aranceles" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
+      <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-12 tracking-wide">
+        Aranceles <span className="text-naik-gold">2026</span>
       </h2>
-      <div className="nd-prices-grid">
-        {priceCards.map((card, index) => {
-          const style = {
-            "--reveal-delay": `${index * 120}ms`,
-          } as CSSProperties;
-          return (
-            <div
-              key={card.title}
-              className={`nd-price-card nd-reveal is-visible${
-                card.featured ? " featured" : ""
-              }`}
-              style={style}
-            >
-              <h3>{card.title}</h3>
-              <div className="nd-price-header-small">
-                <span>Efect.</span>
-                <span>Transf.</span>
-              </div>
-              {card.rows.map((row) => (
-                <div key={row.name} className="nd-price-row">
-                  <span className="nd-item-name">{row.name}</span>
-                  <div className="nd-price-split">
-                    <div className="nd-price-col cash">
-                      <span className="nd-price-amount cash">{row.cash}</span>
-                      <span className="nd-price-label">Efectivo</span>
-                    </div>
-                    <div className="nd-price-divider" />
-                    <div className="nd-price-col transfer">
-                      <span className="nd-price-amount transfer">
-                        {row.transfer}
-                      </span>
-                      <span className="nd-price-label">Transf.</span>
-                    </div>
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[1400px] mx-auto">
+        {priceCards.map((card) => (
+          <div
+            key={card.title}
+            className={`bg-naik-dark/70 border rounded-2xl p-6 flex flex-col gap-3 backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)] min-h-[480px] ${
+              card.featured
+                ? "border-naik-gold/45 shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:border-naik-gold hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
+                : "border-white/10 hover:border-naik-gold"
+            }`}
+          >
+            <h3 className="font-anton text-white text-xl md:text-2xl mt-0 mb-4 uppercase font-black border-b border-gray-700 pb-3 tracking-wide">
+              {card.title}
+            </h3>
+            
+            <div className="flex justify-end text-xs text-gray-400 uppercase mb-3 font-bold gap-6 tracking-wider">
+              <span>EFECT.</span>
+              <span>TRANSF.</span>
+            </div>
+
+            {card.rows.map((row) => (
+              <div key={row.name} className="mb-4 border-b border-gray-800 pb-4 last:border-b-0">
+                <span className="text-gray-300 font-bold text-sm uppercase tracking-wider block mb-3">
+                  {row.name}
+                </span>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 flex flex-col items-start gap-1">
+                    <span className="text-naik-gold font-black text-3xl leading-none tracking-tight">
+                      {row.cash}
+                    </span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
+                      EFECTIVO
+                    </span>
+                  </div>
+                  <div className="w-px h-12 bg-gray-700" />
+                  <div className="flex-1 flex flex-col items-start gap-1">
+                    <span className="text-white font-black text-2xl leading-none tracking-tight">
+                      {row.transfer}
+                    </span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
+                      TRANSF.
+                    </span>
                   </div>
                 </div>
-              ))}
-              <div className="nd-price-note">{card.note}</div>
-              <div className="nd-price-actions">
-                {card.actions.map((action) => (
-                  <a
-                    key={action.label}
-                    className={`nd-pay-btn ${action.kind}`}
-                    href={action.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {action.kind === "mp" ? (
-                      <>
-                        <span className="nd-pay-btn-icon mp" aria-hidden="true">
-                          <SiMercadopago className="nd-pay-btn-logo" />
-                        </span>
-                        <span className="nd-pay-btn-text">mercado pago</span>
-                      </>
-                    ) : (
-                      <>
-                        <span
-                          className="nd-pay-btn-icon cash"
-                          aria-hidden="true"
-                        >
-                          $
-                        </span>
-                        <span className="nd-pay-btn-text">{action.label}</span>
-                      </>
-                    )}
-                  </a>
-                ))}
               </div>
+            ))}
+
+            <div className="text-[11px] text-gray-500 text-center mt-2 italic mb-4">
+              {card.note}
             </div>
-          );
-        })}
+
+            <div className="flex flex-col gap-2 justify-center mt-auto items-center w-full">
+              {card.actions.map((action) => (
+                <a
+                  key={action.label}
+                  href={action.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-extrabold uppercase tracking-wide text-xs border transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)] min-h-[40px] w-[90%] ${
+                    action.kind === "mp"
+                      ? "bg-naik-blue border-naik-blue text-white lowercase text-sm"
+                      : "bg-transparent border-white/20 text-white"
+                  }`}
+                >
+                  {action.kind === "mp" ? (
+                    <>
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white">
+                        <SiMercadopago className="w-3 h-3 text-naik-blue" />
+                      </span>
+                      <span>mercado pago</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white text-black font-bold text-xs">
+                        $
+                      </span>
+                      <span>{action.label}</span>
+                    </>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

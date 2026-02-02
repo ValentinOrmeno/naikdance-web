@@ -1,13 +1,27 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css"; 
+import { Inter, Oswald } from "next/font/google";
+import "./globals.css";
 
-// Configuración de la fuente Inter (Google Fonts)
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Naik Dance Studio",
-  description: "Academia de danza urbana profesional",
+  title: "Naik Dance Studio | Academia de Danza Urbana en Moreno",
+  description: "Estudio de danza urbana en Moreno. Clases de Urbano, K-Pop, Reggaeton, Hip Hop y más. Donde la técnica, la energía y la comunidad van juntas.",
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -16,8 +30,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={inter.className}>{children}</body>
+    <html lang="es" className={`${inter.variable} ${oswald.variable}`}>
+      <body className="font-inter bg-naik-black text-white antialiased">
+        {children}
+      </body>
     </html>
   );
 }

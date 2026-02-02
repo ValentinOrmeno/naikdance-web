@@ -2,7 +2,9 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
 import Classes from '@/components/Classes';
+import Schedule from '@/components/Schedule';
 import Pricing from '@/components/Pricing';
+import TeachersGrid from '@/components/TeachersGrid';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 
@@ -15,7 +17,9 @@ export default function Home() {
       <Hero />
       <About />
       <Classes />
+      <Schedule />
       <Pricing />
+      <TeachersGrid />
       <Contact />
       <Footer />
     </main>

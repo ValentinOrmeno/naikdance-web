@@ -26,22 +26,22 @@ export default function About() {
   }, []);
 
   return (
-    <section id="nosotros" className="nd-section">
-      <div className="nd-about-grid">
-        <div className="nd-about-text">
-          <h2 className="nd-section-title">
-            Somos <span>Naik Dance</span>
+    <section id="nosotros" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
+      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 items-center max-w-7xl mx-auto">
+        <div className="text-center md:text-left">
+          <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-12 tracking-wide">
+            Somos <span className="text-naik-gold">Naik Dance</span>
           </h2>
-          <p>
-            Somos un estudio de danza urbana en Moreno donde la tecnica, la
-            energia y la comunidad van juntas. Entrenas, creces y te subis al
-            escenario con profes que te acompanian en cada paso.
+          <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto font-montserrat">
+            Somos un estudio de danza urbana en Moreno donde la técnica, la
+            energía y la comunidad van juntas. Entrenás, crecés y te subís al
+            escenario con profes que te acompañan en cada paso.
           </p>
         </div>
-        <div className="nd-about-image">
+        <div className="relative min-h-[280px] rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md">
           <video
             ref={videoRef}
-            className="nd-about-video"
+            className="w-full h-full object-cover"
             autoPlay
             muted
             playsInline
