@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Calendar, ChevronDown, Home } from 'lucide-react';
 
@@ -7,12 +7,58 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [selectedClass, setSelectedClass] = useState('');
   const [email, setEmail] = useState('');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  // Inicializar con valor estático para evitar hydration mismatch
+  const [currentMonth, setCurrentMonth] = useState('2026-02');
+
+  // Actualizar al mes actual en el cliente
+  useEffect(() => {
+    const now = new Date();
+    setCurrentMonth(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+  }, []);
+
+  // Obtener datos del mes actual
+  const monthData = useMemo(() => {
+    const availability = teacher.availability?.[currentMonth];
+    const [year, month] = currentMonth.split('-').map(Number);
+    const firstDay = new Date(year, month - 1, 1).getDay(); // 0=Domingo, 1=Lunes...
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    
+    return {
+      availability,
+      firstDay: firstDay === 0 ? 6 : firstDay - 1, // Convertir Domingo(0) a 6, Lunes(1) a 0
+      daysInMonth,
+      monthName: monthNames[month - 1],
+      year
+    };
+  }, [currentMonth, teacher.availability]);
+
+  const handlePrevMonth = () => {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const prevMonth = month === 1 ? 12 : month - 1;
+    const prevYear = month === 1 ? year - 1 : year;
+    setCurrentMonth(`${prevYear}-${String(prevMonth).padStart(2, '0')}`);
+    setSelectedDay(null);
+  };
+
+  const handleNextMonth = () => {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear = month === 12 ? year + 1 : year;
+    setCurrentMonth(`${nextYear}-${String(nextMonth).padStart(2, '0')}`);
+    setSelectedDay(null);
+  };
 
   const handleReserve = () => {
     if (!selectedClass) return alert('Por favor seleccioná una clase');
-    const fecha = selectedDay ? `${selectedDay}/02/2026` : 'A coordinar';
-    const message = `Hola NAIK! Quiero reservar clase.%0A%0A👤 *Staff:* ${teacher.name}%0A📅 *Fecha:* ${fecha}%0A🕒 *Clase:* ${selectedClass}%0A📧 *Email:* ${email}%0A%0APago con Mercado Pago.`;
-    window.open(`https://wa.me/5491100000000?text=${message}`, '_blank');
+    const [year, month] = currentMonth.split('-');
+    const fecha = selectedDay ? `${selectedDay}/${month}/${year}` : 'A coordinar';
+    const cuposInfo = monthData.availability 
+      ? `\n📊 Cupos: ${monthData.availability.cupos - monthData.availability.reservas}/${monthData.availability.cupos} disponibles`
+      : '';
+    const message = `Hola NAIK! Quiero reservar clase.%0A%0A👤 *Staff:* ${teacher.name}%0A📅 *Fecha:* ${fecha}%0A🕒 *Clase:* ${selectedClass}%0A📧 *Email:* ${email}${cuposInfo}`;
+    window.open(`https://wa.me/5491168582586?text=${message}`, '_blank');
   };
 
   return (
@@ -93,39 +139,76 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
               <div className="mt-8 bg-[#111] p-6 rounded-2xl border border-white/10">
                 <div className="flex justify-between items-center mb-6 text-white px-2">
-                   <ChevronLeft size={24} className="cursor-pointer text-gray-500 hover:text-[#FFD700] transition-colors"/>
-                   <span className="text-lg font-black uppercase tracking-widest text-[#FFD700]">Enero 2026</span>
-                   <ChevronRight size={24} className="cursor-pointer text-gray-500 hover:text-[#FFD700] transition-colors"/>
+                   <ChevronLeft 
+                     size={24} 
+                     onClick={handlePrevMonth}
+                     className="cursor-pointer text-gray-500 hover:text-[#FFD700] transition-colors"
+                   />
+                   <span className="text-lg font-black uppercase tracking-widest text-[#FFD700]">
+                     {monthData.monthName} {monthData.year}
+                   </span>
+                   <ChevronRight 
+                     size={24} 
+                     onClick={handleNextMonth}
+                     className="cursor-pointer text-gray-500 hover:text-[#FFD700] transition-colors"
+                   />
                 </div>
                 
-                <div className="grid grid-cols-7 text-center text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">
-                  <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span><span>Do</span>
-                </div>
+                {!monthData.availability && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Calendar className="mx-auto mb-3 opacity-50" size={32} />
+                    <p className="text-sm">No hay disponibilidad para este mes</p>
+                    <p className="text-xs mt-2">Usá las flechas para cambiar de mes</p>
+                  </div>
+                )}
                 
-                <div className="grid grid-cols-7 gap-2">
-                  {[...Array(4)].map((_,i) => <span key={i}></span>)} 
-                  {[...Array(31)].map((_, i) => {
-                    const day = i + 1;
-                    const isSelected = selectedDay === day;
-                    const isAvailable = [1, 5, 8, 12, 15, 19, 22, 26, 29].includes(day);
+                {monthData.availability && (
+                  <>
+                    <div className="mb-4 text-center">
+                      <span className="text-xs text-gray-400">
+                        Cupos disponibles: <span className="text-[#FFD700] font-bold">
+                          {monthData.availability.cupos - monthData.availability.reservas}/{monthData.availability.cupos}
+                        </span>
+                      </span>
+                    </div>
 
-                    return (
-                      <button
-                        key={day}
-                        disabled={!isAvailable}
-                        onClick={() => setSelectedDay(day)}
-                        className={`
-                          h-10 w-10 mx-auto flex items-center justify-center rounded-lg transition-all font-bold text-sm
-                          ${isSelected ? 'bg-[#FFD700] text-black shadow-[0_0_15px_#FFD700] scale-110' : ''}
-                          ${!isSelected && isAvailable ? 'text-white bg-white/5 hover:bg-white/20 hover:text-[#FFD700]' : ''}
-                          ${!isSelected && !isAvailable ? 'text-gray-800 cursor-not-allowed' : ''}
-                        `}
-                      >
-                        {day}
-                      </button>
-                    );
-                  })}
-                </div>
+                    <div className="grid grid-cols-7 text-center text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">
+                      <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span><span>Do</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-7 gap-2">
+                      {[...Array(monthData.firstDay)].map((_, i) => <span key={`empty-${i}`}></span>)}
+                      {[...Array(monthData.daysInMonth)].map((_, i) => {
+                        const day = i + 1;
+                        const isSelected = selectedDay === day;
+                        const isAvailable = monthData.availability.days.includes(day);
+                        const hasCupos = (monthData.availability.cupos - monthData.availability.reservas) > 0;
+                        const canBook = isAvailable && hasCupos;
+
+                        return (
+                          <button
+                            key={day}
+                            disabled={!canBook}
+                            onClick={() => setSelectedDay(day)}
+                            className={`
+                              h-10 w-10 mx-auto flex items-center justify-center rounded-lg transition-all font-bold text-sm relative
+                              ${isSelected ? 'bg-[#FFD700] text-black shadow-[0_0_15px_#FFD700] scale-110' : ''}
+                              ${!isSelected && canBook ? 'text-white bg-white/5 hover:bg-white/20 hover:text-[#FFD700]' : ''}
+                              ${!isSelected && !canBook ? 'text-gray-800 cursor-not-allowed' : ''}
+                            `}
+                          >
+                            {day}
+                            {isAvailable && !hasCupos && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" 
+                                    title="Sin cupos"
+                              />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
 
               <button 

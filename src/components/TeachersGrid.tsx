@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { teachers } from '@/data/teachers';
+import ScrollReveal from './ScrollReveal';
 
 export default function TeachersGrid() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,36 +20,40 @@ export default function TeachersGrid() {
 
       <div className="container mx-auto px-4 relative z-10">
         
-        <div className="mb-16 text-center">
-          <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-2 font-['Oswald']">
-            Nuestro <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] to-[#FFE55C]">Staff</span>
-          </h2>
-          <p className="text-gray-400 text-lg uppercase tracking-widest font-bold">
-            Elegí tu mentor · Reservá tu clase
-          </p>
-        </div>
-
-        <div className="max-w-2xl mx-auto mb-16 relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD700] to-[#00BFFF] rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-          <div className="relative flex items-center bg-[#111] rounded-2xl border border-white/10 p-2">
-            <Search className="ml-4 text-gray-400" size={24} />
-            <input 
-              type="text" 
-              placeholder="Buscar staff o estilo..." 
-              className="w-full bg-transparent border-none py-3 px-4 text-white text-lg focus:outline-none placeholder:text-gray-600 font-['Oswald'] tracking-wide"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        <ScrollReveal>
+          <div className="mb-16 text-center">
+            <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-2 font-['Oswald']">
+              Nuestro <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] to-[#FFE55C]">Staff</span>
+            </h2>
+            <p className="text-gray-400 text-lg uppercase tracking-widest font-bold">
+              Elegí tu mentor · Reservá tu clase
+            </p>
           </div>
-        </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={0.2}>
+          <div className="max-w-2xl mx-auto mb-16 relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD700] to-[#00BFFF] rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative flex items-center bg-[#111] rounded-2xl border border-white/10 p-2">
+              <Search className="ml-4 text-gray-400" size={24} />
+              <input 
+                type="text" 
+                placeholder="Buscar staff o estilo..." 
+                className="w-full bg-transparent border-none py-3 px-4 text-white text-lg focus:outline-none placeholder:text-gray-600 font-['Oswald'] tracking-wide"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filteredTeachers.map((teacher) => (
-            <Link
-              key={teacher.id}
-              href={`/profesores/${teacher.id}`}
-              className="group cursor-pointer relative max-w-[220px] w-full mx-auto"
-            >
+          {filteredTeachers.map((teacher, index) => (
+            <ScrollReveal key={teacher.id} delay={index * 0.05}>
+              <Link
+                href={`/profesores/${teacher.id}`}
+                className="group cursor-pointer relative max-w-[220px] w-full mx-auto"
+              >
               <div className="relative aspect-[4/5] rounded-xl overflow-hidden transition-all duration-500 ease-out border border-white/10 group-hover:border-[#FFD700] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.3)]">
                 <Image
                   src={teacher.image}
@@ -67,7 +72,8 @@ export default function TeachersGrid() {
                   </h3>
                 </div>
               </div>
-            </Link>
+              </Link>
+            </ScrollReveal>
           ))}
         </div>
       </div>

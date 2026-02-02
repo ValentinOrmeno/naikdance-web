@@ -1,9 +1,18 @@
+export type TeacherAvailability = {
+  days: number[];      // Días del mes disponibles [1, 5, 8, 12...]
+  cupos: number;       // Cupos totales por clase
+  reservas: number;    // Cuántos ya reservaron
+};
+
 export type Teacher = {
   id: string;
   name: string;
   style: string;
   image: string;
   classes: string[];
+  availability?: {
+    [monthKey: string]: TeacherAvailability;  // "2026-02", "2026-03", etc.
+  };
 };
 
 export const teachers: Teacher[] = [
@@ -13,6 +22,10 @@ export const teachers: Teacher[] = [
     style: "Urbano / Coreografia",
     image: "/profes/fran-benitez.png",
     classes: ["Martes 19:00 - Urbano Mix", "Jueves 20:00 - Coreo"],
+    availability: {
+      "2026-02": { days: [4, 6, 11, 13, 18, 20, 25, 27], cupos: 15, reservas: 3 },
+      "2026-03": { days: [4, 6, 11, 13, 18, 20, 25, 27], cupos: 15, reservas: 0 },
+    },
   },
   {
     id: "giuli-grimaldi",
@@ -20,6 +33,10 @@ export const teachers: Teacher[] = [
     style: "Reggaeton / Femme",
     image: "/profes/giuli-grimaldi.png",
     classes: ["Lunes 18:00 - Reggaeton Inicial", "Miercoles 19:00 - Femme"],
+    availability: {
+      "2026-02": { days: [3, 5, 10, 12, 17, 19, 24, 26], cupos: 20, reservas: 8 },
+      "2026-03": { days: [3, 5, 10, 12, 17, 19, 24, 26, 31], cupos: 20, reservas: 0 },
+    },
   },
   {
     id: "rodri-chazareta",

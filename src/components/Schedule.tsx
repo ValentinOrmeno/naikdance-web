@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Clock, User, Award } from 'lucide-react';
 import { schedules, getAllDays, getSchedulesByDay } from '@/data/schedules';
+import ScrollReveal from './ScrollReveal';
 
 export default function Schedule() {
   const [selectedDay, setSelectedDay] = useState('Lunes');
@@ -16,33 +17,38 @@ export default function Schedule() {
   return (
     <section id="horarios" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
       <div className="max-w-7xl mx-auto">
-        <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-4 tracking-wide">
-          Horarios de <span className="text-naik-gold">Clases</span>
-        </h2>
-        <p className="text-center text-gray-400 mb-12 text-lg">
-          Elegí tu horario y reservá tu lugar
-        </p>
+        <ScrollReveal>
+          <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-4 tracking-wide">
+            Horarios de <span className="text-naik-gold">Clases</span>
+          </h2>
+          <p className="text-center text-gray-400 mb-12 text-lg">
+            Elegí tu horario y reservá tu lugar
+          </p>
+        </ScrollReveal>
 
         {/* TABS MOBILE */}
-        <div className="lg:hidden mb-8">
-          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-            {days.map((day) => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`px-6 py-3 rounded-lg font-bold uppercase text-sm whitespace-nowrap transition-all duration-300 ${
-                  selectedDay === day
-                    ? 'bg-naik-gold text-black'
-                    : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
-              >
-                {day}
-              </button>
-            ))}
+        <ScrollReveal delay={0.2}>
+          <div className="lg:hidden mb-8">
+            <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+              {days.map((day) => (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDay(day)}
+                  className={`px-6 py-3 rounded-lg font-bold uppercase text-sm whitespace-nowrap transition-all duration-300 ${
+                    selectedDay === day
+                      ? 'bg-naik-gold text-black'
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
-        <div className="lg:hidden space-y-4">
+        <ScrollReveal delay={0.3}>
+          <div className="lg:hidden space-y-4">
           {getSchedulesByDay(selectedDay).map((cls) => (
             <div
               key={cls.id}
@@ -89,9 +95,11 @@ export default function Schedule() {
               No hay clases programadas para este día
             </div>
           )}
-        </div>
+          </div>
+        </ScrollReveal>
 
-        <div className="hidden lg:grid lg:grid-cols-7 gap-4">
+        <ScrollReveal delay={0.3}>
+          <div className="hidden lg:grid lg:grid-cols-7 gap-4">
           {days.map((day) => (
             <div key={day} className="flex flex-col">
               <div className="bg-naik-gold text-black font-black text-center py-3 rounded-t-xl uppercase text-sm mb-2">
@@ -132,13 +140,16 @@ export default function Schedule() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </ScrollReveal>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-400 text-sm">
-            💡 Tocá cualquier clase para reservar tu lugar por WhatsApp
-          </p>
-        </div>
+        <ScrollReveal delay={0.4}>
+          <div className="mt-12 text-center">
+            <p className="text-gray-400 text-sm">
+              💡 Tocá cualquier clase para reservar tu lugar por WhatsApp
+            </p>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

@@ -109,10 +109,12 @@
 ### 5️⃣ **Backlinks y Redes Sociales**
 
 #### Redes sociales (Google las toma en cuenta):
-1. **Instagram**: Enlace en bio → `https://naikdance-web.vercel.app`
-2. **Facebook**: Página con link al sitio
-3. **TikTok**: Bio con link
-4. **YouTube**: (si tienen videos) Link en descripción
+1. **Instagram** (https://www.instagram.com/naikdance/): 
+   - Agregar enlace en bio → `https://naikdance-web.vercel.app`
+   - Publicar contenido regularmente con link al sitio
+2. **Facebook** (opcional): Crear página con link al sitio
+3. **TikTok** (opcional): Crear cuenta y agregar link en bio
+4. **YouTube** (opcional): Si tienen videos, link en descripción
 
 #### Directorios locales:
 - Registrarse en: **PaginasAmarillas.com.ar**

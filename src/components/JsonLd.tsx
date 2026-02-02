@@ -7,7 +7,6 @@ export default function JsonLd() {
     image: 'https://naikdance-web.vercel.app/logo.png',
     '@id': 'https://naikdance-web.vercel.app',
     url: 'https://naikdance-web.vercel.app',
-    telephone: '+54-9-11-6858-2586',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Moreno',
@@ -21,9 +20,7 @@ export default function JsonLd() {
       longitude: -58.7895,
     },
     sameAs: [
-      'https://www.instagram.com/naikdance',
-      'https://www.facebook.com/naikdance',
-      'https://wa.me/5491168582586',
+      'https://www.instagram.com/naikdance/',
     ],
     openingHoursSpecification: [
       {

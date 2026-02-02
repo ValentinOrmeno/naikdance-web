@@ -1,7 +1,6 @@
 "use client";
 
 import { SiMercadopago } from "react-icons/si";
-import { useState } from "react";
 import ScrollReveal from "./ScrollReveal";
 
 const priceCards = [
@@ -43,7 +42,7 @@ const priceCards = [
   },
 ];
 
-export default function Pricing() {
+export default function PricingCompact() {
   const handleEfectivoClick = (packName: string) => {
     const whatsappMessage = `Hola! Vengo de la web. Quiero el ${packName} en EFECTIVO`;
     const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
@@ -107,25 +106,23 @@ export default function Pricing() {
                     </div>
                   </div>
 
-                  {/* Botones de pago estilo vertical */}
-                  <div className="space-y-2 mt-3">
+                  {/* Botones compactos horizontales */}
+                  <div className="flex gap-2 mt-3">
                     <button
                       onClick={() => handleEfectivoClick(`${card.title} - ${row.name}`)}
-                      className="w-full flex items-center justify-center gap-2 bg-transparent hover:bg-white/10 text-white font-bold uppercase py-3 px-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 text-sm border-2 border-white/30 hover:border-white/50"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold uppercase py-2.5 px-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 text-xs border border-white/20 hover:border-white/40"
+                      title="Pagar en Efectivo"
                     >
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-black font-black text-sm">
-                        $
-                      </span>
-                      <span>Efectivo</span>
+                      <span className="text-base">💵</span>
+                      <span className="hidden sm:inline">Efectivo</span>
                     </button>
                     <button
                       onClick={() => handleMercadoPagoClick(`${card.title} - ${row.name}`, row.mpLink)}
-                      className="w-full flex items-center justify-center gap-2 bg-[#00A8E8] hover:bg-[#0095d1] text-white font-bold uppercase py-3 px-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,168,232,0.5)] text-sm"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-naik-blue hover:bg-blue-600 text-white font-bold uppercase py-2.5 px-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,191,255,0.4)] text-xs"
+                      title="Pagar con Mercado Pago"
                     >
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white">
-                        <SiMercadopago className="w-3.5 h-3.5 text-[#00A8E8]" />
-                      </span>
-                      <span>mercado pago</span>
+                      <SiMercadopago className="w-4 h-4" />
+                      <span className="hidden sm:inline">M.Pago</span>
                     </button>
                   </div>
                 </div>
