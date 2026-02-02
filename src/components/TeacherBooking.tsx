@@ -95,7 +95,12 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
             <div className="mb-6">
               <div className="w-20 h-1 bg-[#FFD700] mb-4" />
               <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase tracking-widest">
-                <Home size={14} /> <span>Inicio</span> / <span>Staff</span>
+                <a href="/" className="flex items-center gap-2 hover:text-[#FFD700] transition-colors cursor-pointer">
+                  <Home size={14} /> 
+                  <span>Inicio</span>
+                </a> 
+                <span>/</span> 
+                <span>Staff</span>
               </div>
             </div>
 
