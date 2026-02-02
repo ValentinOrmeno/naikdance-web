@@ -2,15 +2,42 @@
 
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 
 export default function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const playVideo = async () => {
+      try {
+        await video.play();
+      } catch (error) {
+        console.log('Autoplay bloqueado, esperando interacción del usuario');
+      }
+    };
+
+    if (video.paused) {
+      playVideo();
+    }
+
+    video.addEventListener('loadeddata', playVideo);
+    return () => {
+      video.removeEventListener('loadeddata', playVideo);
+    };
+  }, []);
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
+        disablePictureInPicture
         className="absolute inset-0 w-full h-full object-cover opacity-40"
       >
         <source src="/intro2.mp4" type="video/mp4" />

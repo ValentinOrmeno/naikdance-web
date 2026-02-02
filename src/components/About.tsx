@@ -9,7 +9,14 @@ export default function About() {
     const video = videoRef.current;
     if (!video) return;
 
-    video.playbackRate = 0.8;
+    const playVideo = async () => {
+      try {
+        video.playbackRate = 0.8;
+        await video.play();
+      } catch (error) {
+        console.log('Autoplay bloqueado, esperando interacción del usuario');
+      }
+    };
 
     const clipEnd = 6;
     const handleTimeUpdate = () => {
@@ -19,8 +26,15 @@ export default function About() {
       }
     };
 
+    if (video.paused) {
+      playVideo();
+    }
+
+    video.addEventListener("loadeddata", playVideo);
     video.addEventListener("timeupdate", handleTimeUpdate);
+    
     return () => {
+      video.removeEventListener("loadeddata", playVideo);
       video.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, []);
@@ -45,6 +59,7 @@ export default function About() {
             autoPlay
             muted
             playsInline
+            disablePictureInPicture
             preload="metadata"
             poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='100%25' height='100%25' fill='%23080808'/%3E%3C/svg%3E"
           >
