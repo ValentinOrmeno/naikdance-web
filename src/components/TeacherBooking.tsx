@@ -10,6 +10,15 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   // Inicializar con valor estático para evitar hydration mismatch
   const [currentMonth, setCurrentMonth] = useState('2026-02');
 
+  // Validación de email
+  const isValidEmail = (email: string) => {
+    if (!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const emailValid = isValidEmail(email);
+
   // Actualizar al mes actual en el cliente
   useEffect(() => {
     const now = new Date();
@@ -51,6 +60,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   };
 
   const handleReserve = () => {
+    if (!emailValid) return alert('Por favor ingresá un email válido');
     if (!selectedClass) return alert('Por favor seleccioná una clase');
     const [year, month] = currentMonth.split('-');
     const fecha = selectedDay ? `${selectedDay}/${month}/${year}` : 'A coordinar';
@@ -121,9 +131,21 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white text-black border-none rounded-lg py-4 px-5 font-bold focus:ring-4 focus:ring-[#FFD700]/50 outline-none text-lg"
+                  className={`w-full bg-white text-black rounded-lg py-4 px-5 font-bold outline-none text-lg transition-all ${
+                    email && emailValid 
+                      ? 'border-2 border-green-500 focus:ring-4 focus:ring-green-500/30' 
+                      : email && !emailValid 
+                      ? 'border-2 border-red-500 focus:ring-4 focus:ring-red-500/30'
+                      : 'border-none focus:ring-4 focus:ring-[#FFD700]/50'
+                  }`}
                   placeholder="tu@email.com"
                 />
+                {email && !emailValid && (
+                  <p className="text-red-500 text-xs mt-2 font-bold">⚠️ Email inválido</p>
+                )}
+                {email && emailValid && (
+                  <p className="text-green-500 text-xs mt-2 font-bold">✅ Email válido</p>
+                )}
               </div>
 
               <div>
@@ -219,9 +241,14 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
               <button 
                 onClick={handleReserve}
-                className="w-full bg-[#FFD700] hover:bg-[#ffe033] text-black font-black uppercase py-5 rounded-xl mt-4 text-xl tracking-wide transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(255,215,0,0.2)]"
+                disabled={!emailValid}
+                className={`w-full font-black uppercase py-5 rounded-xl mt-4 text-xl tracking-wide transition-all ${
+                  emailValid
+                    ? 'bg-[#FFD700] hover:bg-[#ffe033] text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,215,0,0.2)] cursor-pointer'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
+                }`}
               >
-                Confirmar Reserva
+                {emailValid ? 'Confirmar Reserva' : '⚠️ Email requerido'}
               </button>
 
             </div>
