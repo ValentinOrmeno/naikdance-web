@@ -34,7 +34,7 @@ export default function TeachersGrid() {
             <Search className="ml-4 text-gray-400" size={24} />
             <input 
               type="text" 
-              placeholder="Buscar profe o estilo..." 
+              placeholder="Buscar staff o estilo..." 
               className="w-full bg-transparent border-none py-3 px-4 text-white text-lg focus:outline-none placeholder:text-gray-600 font-['Oswald'] tracking-wide"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

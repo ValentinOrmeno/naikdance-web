@@ -11,7 +11,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const handleReserve = () => {
     if (!selectedClass) return alert('Por favor seleccioná una clase');
     const fecha = selectedDay ? `${selectedDay}/02/2026` : 'A coordinar';
-    const message = `Hola NAIK! Quiero reservar clase.%0A%0A👤 *Profe:* ${teacher.name}%0A📅 *Fecha:* ${fecha}%0A🕒 *Clase:* ${selectedClass}%0A📧 *Email:* ${email}%0A%0APago con Mercado Pago.`;
+    const message = `Hola NAIK! Quiero reservar clase.%0A%0A👤 *Staff:* ${teacher.name}%0A📅 *Fecha:* ${fecha}%0A🕒 *Clase:* ${selectedClass}%0A📧 *Email:* ${email}%0A%0APago con Mercado Pago.`;
     window.open(`https://wa.me/5491100000000?text=${message}`, '_blank');
   };
 
@@ -33,7 +33,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
             <div className="mb-6">
               <div className="w-20 h-1 bg-[#FFD700] mb-4" />
               <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase tracking-widest">
-                <Home size={14} /> <span>Inicio</span> / <span>Profesores</span>
+                <Home size={14} /> <span>Inicio</span> / <span>Staff</span>
               </div>
             </div>
 

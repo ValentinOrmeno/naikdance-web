@@ -35,7 +35,7 @@ export default function About() {
           <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto font-montserrat">
             Somos un estudio de danza urbana en Moreno donde la técnica, la
             energía y la comunidad van juntas. Entrenás, crecés y te subís al
-            escenario con profes que te acompañan en cada paso.
+            escenario con staff que te acompaña en cada paso.
           </p>
         </div>
         <div className="relative min-h-[280px] rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md">
