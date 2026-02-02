@@ -44,17 +44,36 @@ const priceCards = [
 ];
 
 export default function Pricing() {
-  const handleEfectivoClick = (packName: string) => {
-    const whatsappMessage = `Hola! Vengo de la web. Quiero el ${packName} en EFECTIVO`;
+  const formatPackName = (title: string, name: string) => {
+    // Formatear mensajes más naturales
+    if (title === "Cuponeras") {
+      return `la cuponera de ${name.toLowerCase()}`;
+    }
+    if (title === "Pack Mensual") {
+      return `el ${name}`;
+    }
+    if (title === "Clase Suelta") {
+      return `clase suelta de ${name}`;
+    }
+    if (title === "Pase Libre / Full") {
+      return `el ${name}`;
+    }
+    return `${title} - ${name}`;
+  };
+
+  const handleEfectivoClick = (title: string, name: string) => {
+    const packFormatted = formatPackName(title, name);
+    const whatsappMessage = `Hola! Vengo de la web. Quiero ${packFormatted} en EFECTIVO`;
     const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, "_blank");
   };
 
-  const handleMercadoPagoClick = (packName: string, mpLink: string) => {
+  const handleMercadoPagoClick = (title: string, name: string, mpLink: string) => {
     if (mpLink && mpLink.startsWith("http")) {
       window.open(mpLink, "_blank");
     } else {
-      const whatsappMessage = `Hola! Vengo de la web. Quiero pagar el ${packName} con Mercado Pago`;
+      const packFormatted = formatPackName(title, name);
+      const whatsappMessage = `Hola! Vengo de la web. Quiero pagar ${packFormatted} con Mercado Pago`;
       const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
       window.open(whatsappUrl, "_blank");
     }
@@ -110,7 +129,7 @@ export default function Pricing() {
                   {/* Botones de pago estilo vertical */}
                   <div className="space-y-2 mt-3">
                     <button
-                      onClick={() => handleEfectivoClick(`${card.title} - ${row.name}`)}
+                      onClick={() => handleEfectivoClick(card.title, row.name)}
                       className="w-full flex items-center justify-center gap-2 bg-transparent hover:bg-white/10 text-white font-bold uppercase py-3 px-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 text-sm border-2 border-white/30 hover:border-white/50"
                     >
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-black font-black text-sm">
@@ -119,7 +138,7 @@ export default function Pricing() {
                       <span>Efectivo</span>
                     </button>
                     <button
-                      onClick={() => handleMercadoPagoClick(`${card.title} - ${row.name}`, row.mpLink)}
+                      onClick={() => handleMercadoPagoClick(card.title, row.name, row.mpLink)}
                       className="w-full flex items-center justify-center gap-2 bg-[#00A8E8] hover:bg-[#0095d1] text-white font-bold uppercase py-3 px-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,168,232,0.5)] text-sm"
                     >
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white">

@@ -43,17 +43,36 @@ const priceCards = [
 ];
 
 export default function PricingCompact() {
-  const handleEfectivoClick = (packName: string) => {
-    const whatsappMessage = `Hola! Vengo de la web. Quiero el ${packName} en EFECTIVO`;
+  const formatPackName = (title: string, name: string) => {
+    // Formatear mensajes más naturales
+    if (title === "Cuponeras") {
+      return `la cuponera de ${name.toLowerCase()}`;
+    }
+    if (title === "Pack Mensual") {
+      return `el ${name}`;
+    }
+    if (title === "Clase Suelta") {
+      return `clase suelta de ${name}`;
+    }
+    if (title === "Pase Libre / Full") {
+      return `el ${name}`;
+    }
+    return `${title} - ${name}`;
+  };
+
+  const handleEfectivoClick = (title: string, name: string) => {
+    const packFormatted = formatPackName(title, name);
+    const whatsappMessage = `Hola! Vengo de la web. Quiero ${packFormatted} en EFECTIVO`;
     const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, "_blank");
   };
 
-  const handleMercadoPagoClick = (packName: string, mpLink: string) => {
+  const handleMercadoPagoClick = (title: string, name: string, mpLink: string) => {
     if (mpLink && mpLink.startsWith("http")) {
       window.open(mpLink, "_blank");
     } else {
-      const whatsappMessage = `Hola! Vengo de la web. Quiero pagar el ${packName} con Mercado Pago`;
+      const packFormatted = formatPackName(title, name);
+      const whatsappMessage = `Hola! Vengo de la web. Quiero pagar ${packFormatted} con Mercado Pago`;
       const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
       window.open(whatsappUrl, "_blank");
     }
@@ -109,7 +128,7 @@ export default function PricingCompact() {
                   {/* Botones compactos horizontales */}
                   <div className="flex gap-2 mt-3">
                     <button
-                      onClick={() => handleEfectivoClick(`${card.title} - ${row.name}`)}
+                      onClick={() => handleEfectivoClick(card.title, row.name)}
                       className="flex-1 flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold uppercase py-2.5 px-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 text-xs border border-white/20 hover:border-white/40"
                       title="Pagar en Efectivo"
                     >
@@ -117,7 +136,7 @@ export default function PricingCompact() {
                       <span className="hidden sm:inline">Efectivo</span>
                     </button>
                     <button
-                      onClick={() => handleMercadoPagoClick(`${card.title} - ${row.name}`, row.mpLink)}
+                      onClick={() => handleMercadoPagoClick(card.title, row.name, row.mpLink)}
                       className="flex-1 flex items-center justify-center gap-1.5 bg-naik-blue hover:bg-blue-600 text-white font-bold uppercase py-2.5 px-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,191,255,0.4)] text-xs"
                       title="Pagar con Mercado Pago"
                     >
