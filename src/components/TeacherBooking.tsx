@@ -55,10 +55,16 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
     const [year, month] = currentMonth.split('-');
     const fecha = selectedDay ? `${selectedDay}/${month}/${year}` : 'A coordinar';
     const cuposInfo = monthData.availability 
-      ? `\n📊 Cupos: ${monthData.availability.cupos - monthData.availability.reservas}/${monthData.availability.cupos} disponibles`
+      ? `
+📊 Cupos: ${monthData.availability.cupos - monthData.availability.reservas}/${monthData.availability.cupos} disponibles`
       : '';
-    const message = `Hola NAIK! Quiero reservar clase.%0A%0A👤 *Staff:* ${teacher.name}%0A📅 *Fecha:* ${fecha}%0A🕒 *Clase:* ${selectedClass}%0A📧 *Email:* ${email}${cuposInfo}`;
-    window.open(`https://wa.me/5491168582586?text=${message}`, '_blank');
+    const message = `Hola NAIK! Quiero reservar clase.
+
+👤 *Staff:* ${teacher.name}
+📅 *Fecha:* ${fecha}
+🕒 *Clase:* ${selectedClass}
+📧 *Email:* ${email}${cuposInfo}`;
+    window.open(`https://wa.me/5491168582586?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
