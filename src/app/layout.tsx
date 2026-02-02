@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
+import JsonLd from "@/components/JsonLd";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,7 +18,66 @@ const oswald = Oswald({
 
 export const metadata: Metadata = {
   title: "Naik Dance Studio | Academia de Danza Urbana en Moreno",
-  description: "Estudio de danza urbana en Moreno. Clases de Urbano, K-Pop, Reggaeton, Hip Hop y más. Donde la técnica, la energía y la comunidad van juntas.",
+  description: "🔥 Estudio de danza urbana en Moreno, Buenos Aires. Clases de Reggaeton, Urbano, K-Pop, Hip Hop, Femme y más. Staff profesional. ¡Reservá tu clase!",
+  keywords: [
+    "danza urbana moreno",
+    "clases de baile moreno",
+    "reggaeton moreno",
+    "hip hop moreno",
+    "k-pop moreno",
+    "academia de baile moreno",
+    "naik dance",
+    "urbano moreno",
+    "clases de danza buenos aires",
+    "estudio de danza moreno",
+    "femme dance moreno",
+    "lyrical jazz moreno",
+  ],
+  authors: [{ name: "Naik Dance Studio" }],
+  creator: "Naik Dance Studio",
+  publisher: "Naik Dance Studio",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://naikdance-web.vercel.app'),
+  openGraph: {
+    title: "Naik Dance Studio | Academia de Danza Urbana en Moreno",
+    description: "🔥 Clases de Reggaeton, Urbano, K-Pop, Hip Hop, Femme y más. Staff profesional. ¡Reservá tu clase!",
+    url: 'https://naikdance-web.vercel.app',
+    siteName: 'Naik Dance Studio',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Naik Dance Studio - Academia de Danza Urbana',
+      },
+    ],
+    locale: 'es_AR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Naik Dance Studio | Danza Urbana en Moreno",
+    description: "🔥 Clases de Reggaeton, Urbano, K-Pop, Hip Hop y más. ¡Reservá tu clase!",
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'UtC6iu3rLuGqVv7bKvu_Dt2uzHzd6w0at01CNJFtRbc',
+  },
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -34,7 +95,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${inter.variable} ${oswald.variable}`}>
+      <head>
+        <JsonLd />
+      </head>
       <body className="font-inter bg-naik-black text-white antialiased">
+        <GoogleAnalytics />
         {children}
       </body>
     </html>
