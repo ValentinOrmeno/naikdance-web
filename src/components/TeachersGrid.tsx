@@ -81,6 +81,7 @@ export default function TeachersGrid() {
             {categories.map((category) => (
               <button
                 key={category.id}
+                data-filter={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-5 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
                   selectedCategory === category.id

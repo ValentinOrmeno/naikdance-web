@@ -6,9 +6,25 @@ import { ChevronLeft, ChevronRight, Calendar, ChevronDown, Home } from 'lucide-r
 export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [selectedClass, setSelectedClass] = useState('');
   const [email, setEmail] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   // Inicializar con valor estático para evitar hydration mismatch
   const [currentMonth, setCurrentMonth] = useState('2026-02');
+
+  // Bloquear scroll cuando el modal esta abierto
+  useEffect(() => {
+    if (showConfirmModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showConfirmModal]);
 
   // Validación de email
   const isValidEmail = (email: string) => {
@@ -18,6 +34,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   };
 
   const emailValid = isValidEmail(email);
+  const formValid = emailValid && nombre.trim().length >= 2;
 
   // Actualizar al mes actual en el cliente
   useEffect(() => {
@@ -60,21 +77,37 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   };
 
   const handleReserve = () => {
-    if (!emailValid) return alert('Por favor ingresá un email válido');
-    if (!selectedClass) return alert('Por favor seleccioná una clase');
+    if (!formValid) return alert('Por favor completa todos los campos requeridos');
+    if (!selectedClass) return alert('Por favor selecciona una clase');
+    setShowConfirmModal(true);
+  };
+
+  const confirmReservation = () => {
     const [year, month] = currentMonth.split('-');
     const fecha = selectedDay ? `${selectedDay}/${month}/${year}` : 'A coordinar';
     const cuposInfo = monthData.availability 
       ? `
-📊 Cupos: ${monthData.availability.cupos - monthData.availability.reservas}/${monthData.availability.cupos} disponibles`
+- Cupos: ${monthData.availability.cupos - monthData.availability.reservas}/${monthData.availability.cupos} disponibles`
       : '';
+    const telefonoInfo = telefono ? `
+- Telefono: ${telefono}` : '';
     const message = `Hola NAIK! Quiero reservar clase.
 
-👤 *Staff:* ${teacher.name}
-📅 *Fecha:* ${fecha}
-🕒 *Clase:* ${selectedClass}
-📧 *Email:* ${email}${cuposInfo}`;
+- Nombre: ${nombre}
+- Email: ${email}${telefonoInfo}
+- Staff: ${teacher.name}
+- Fecha: ${fecha}
+- Clase: ${selectedClass}${cuposInfo}`;
     window.open(`https://wa.me/5491168582586?text=${encodeURIComponent(message)}`, '_blank');
+    setShowConfirmModal(false);
+  };
+
+  const getCuposColor = (available: number, total: number) => {
+    const percentage = (available / total) * 100;
+    if (percentage > 50) return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/50' };
+    if (percentage > 20) return { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/50' };
+    if (percentage > 0) return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/50' };
+    return { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/50' };
   };
 
   return (
@@ -131,6 +164,26 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
             <div className="space-y-6">
               <div>
+                <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Nombre Completo*</label>
+                <input 
+                  type="text" 
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className={`w-full bg-white text-black rounded-lg py-4 px-5 font-bold outline-none text-lg transition-all ${
+                    nombre.trim().length >= 2
+                      ? 'border-2 border-green-500 focus:ring-4 focus:ring-green-500/30' 
+                      : nombre.length > 0
+                      ? 'border-2 border-red-500 focus:ring-4 focus:ring-red-500/30'
+                      : 'border-none focus:ring-4 focus:ring-[#FFD700]/50'
+                  }`}
+                  placeholder="Juan Perez"
+                />
+                {nombre.length > 0 && nombre.trim().length < 2 && (
+                  <p className="text-red-500 text-xs mt-2 font-bold">⚠️ Minimo 2 caracteres</p>
+                )}
+              </div>
+
+              <div>
                 <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Email*</label>
                 <input 
                   type="email" 
@@ -146,11 +199,19 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                   placeholder="tu@email.com"
                 />
                 {email && !emailValid && (
-                  <p className="text-red-500 text-xs mt-2 font-bold">⚠️ Email inválido</p>
+                  <p className="text-red-500 text-xs mt-2 font-bold">⚠️ Email invalido</p>
                 )}
-                {email && emailValid && (
-                  <p className="text-green-500 text-xs mt-2 font-bold">✅ Email válido</p>
-                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telefono (opcional)</label>
+                <input 
+                  type="tel" 
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  className="w-full bg-white text-black rounded-lg py-4 px-5 font-bold outline-none text-lg transition-all border-none focus:ring-4 focus:ring-[#FFD700]/50"
+                  placeholder="11 1234-5678"
+                />
               </div>
 
               <div>
@@ -197,12 +258,19 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                 
                 {monthData.availability && (
                   <>
-                    <div className="mb-4 text-center">
-                      <span className="text-xs text-gray-400">
-                        Cupos disponibles: <span className="text-[#FFD700] font-bold">
-                          {monthData.availability.cupos - monthData.availability.reservas}/{monthData.availability.cupos}
-                        </span>
-                      </span>
+                    <div className="mb-4 flex justify-center">
+                      {(() => {
+                        const available = monthData.availability.cupos - monthData.availability.reservas;
+                        const total = monthData.availability.cupos;
+                        const colors = getCuposColor(available, total);
+                        return (
+                          <div className={`px-4 py-2 rounded-full ${colors.bg} ${colors.text} border ${colors.border} backdrop-blur-sm`}>
+                            <span className="text-xs font-bold uppercase">
+                              Cupos: {available}/{total} disponibles
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <div className="grid grid-cols-7 text-center text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">
@@ -246,14 +314,14 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
               <button 
                 onClick={handleReserve}
-                disabled={!emailValid}
+                disabled={!formValid}
                 className={`w-full font-black uppercase py-5 rounded-xl mt-4 text-xl tracking-wide transition-all ${
-                  emailValid
+                  formValid
                     ? 'bg-[#FFD700] hover:bg-[#ffe033] text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(255,215,0,0.2)] cursor-pointer'
                     : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
                 }`}
               >
-                {emailValid ? 'Confirmar Reserva' : '⚠️ Email requerido'}
+                {formValid ? 'Confirmar Reserva' : '⚠️ Completa los campos requeridos'}
               </button>
 
             </div>
@@ -261,6 +329,70 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
           
         </div>
       </div>
+
+      {/* MODAL DE CONFIRMACION */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#111] border border-white/20 rounded-xl md:rounded-2xl max-w-md w-full p-5 md:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h3 className="text-xl md:text-2xl font-black text-white mb-5 md:mb-6 text-center uppercase">
+              Confirmar Reserva
+            </h3>
+            
+            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+              <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Nombre</p>
+                <p className="text-white font-bold text-sm md:text-base">{nombre}</p>
+              </div>
+              
+              <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Email</p>
+                <p className="text-white font-bold break-all text-sm md:text-base">{email}</p>
+              </div>
+
+              {telefono && (
+                <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Telefono</p>
+                  <p className="text-white font-bold text-sm md:text-base">{telefono}</p>
+                </div>
+              )}
+              
+              <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Profesor</p>
+                <p className="text-white font-bold text-sm md:text-base">{teacher.name}</p>
+              </div>
+              
+              <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Clase</p>
+                <p className="text-white font-bold text-sm md:text-base">{selectedClass || 'No seleccionada'}</p>
+              </div>
+              
+              {selectedDay && (
+                <div className="bg-white/5 p-3 md:p-4 rounded-lg">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Fecha</p>
+                  <p className="text-white font-bold text-sm md:text-base">
+                    {selectedDay}/{currentMonth.split('-')[1]}/{currentMonth.split('-')[0]}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-3">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3.5 md:py-4 rounded-xl uppercase transition-all text-sm md:text-base"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmReservation}
+                className="flex-1 bg-[#FFD700] hover:bg-[#ffe033] text-black font-bold py-3.5 md:py-4 rounded-xl uppercase transition-all shadow-glow-gold-sm hover:shadow-glow-gold text-sm md:text-base"
+              >
+                Enviar por WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
