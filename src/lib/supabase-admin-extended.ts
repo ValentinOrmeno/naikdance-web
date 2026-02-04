@@ -239,10 +239,10 @@ export async function getStats() {
     const canceladas = allReservations?.filter(r => r.status === 'cancelada').length || 0;
     const total = allReservations?.length || 0;
 
-    // Total de cupos disponibles vs reservados
-    const { data: availability, error: availabilityError } = await supabase
-      .from('availability')
-      .select('cupos_total, cupos_reservados');
+   // Total de cupos disponibles vs reservados
+   const { data: availability, error: availabilityError } = await supabase
+     .from('availability')
+     .select('teacher_id, cupos_total, cupos_reservados');
 
     if (availabilityError) {
       throw new Error(availabilityError.message);

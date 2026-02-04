@@ -386,7 +386,9 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                         const hasSchedules = schedules.some(s => s.day === day);
                         
                         // Verificar cupos disponibles
-                        const hasCupos = (monthData.availability.cupos - monthData.availability.reservas) > 0;
+                        const hasCupos = monthData.availability 
+                          ? (monthData.availability.cupos - monthData.availability.reservas) > 0 
+                          : false;
                         
                         // Solo puede reservar si tiene horarios configurados Y hay cupos
                         const canBook = hasSchedules && hasCupos;

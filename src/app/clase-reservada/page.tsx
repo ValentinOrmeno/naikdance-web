@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ClaseReservadaPage() {
+function ClaseReservadaContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('loading');
   const [countdown, setCountdown] = useState(5);
@@ -159,4 +159,16 @@ Confirmo mi reserva. Gracias!`;
   }
 
   return null;
+}
+
+export default function ClaseReservadaPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-naik-gold animate-spin" />
+      </div>
+    }>
+      <ClaseReservadaContent />
+    </Suspense>
+  );
 }
