@@ -1,141 +1,25 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
-function PagoExitosoContent() {
-  const searchParams = useSearchParams();
-  const [code, setCode] = useState("");
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState("");
-
-  useEffect(() => {
-    const codeParam = searchParams.get("code") || "";
-    const titleParam = searchParams.get("title") || "pack";
-    const statusParam = searchParams.get("status") || "approved";
-    
-    setCode(codeParam);
-    setTitle(titleParam);
-    setStatus(statusParam);
-
-    const whatsappMessage = `Hola! Ya pague por Mercado Pago.
-
-${titleParam}
-Codigo: ${codeParam}
-
-Gracias!`;
-    const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
-
-    const timer = setTimeout(() => {
-      window.location.href = whatsappUrl;
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [searchParams]);
-
-  return (
-    <div className="min-h-screen bg-naik-black flex items-center justify-center px-4">
-      <div className="text-center max-w-lg">
-        <div className="mb-8 relative w-40 h-40 mx-auto">
-          <Image
-            src="/logo.png"
-            alt="Naik Dance Studio"
-            fill
-            className="object-contain opacity-90"
-          />
-        </div>
-
-        <div className="mb-8">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-            <svg
-              className="w-10 h-10 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={3}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-
-          <h1 className="font-bebas text-white text-5xl md:text-6xl mb-2 tracking-wide">
-            ¡Pago {status === "pending" ? "Pendiente" : "Exitoso"}!
-          </h1>
-
-          <p className="text-gray-300 text-lg mb-6">
-            {status === "pending" 
-              ? "Tu pago está siendo procesado" 
-              : "Gracias por tu compra"}
-          </p>
-
-          {/* Card con el código */}
-          <div className="bg-naik-dark/90 border-2 border-naik-gold/30 rounded-2xl p-6 mb-6 backdrop-blur-md">
-            <p className="text-gray-400 text-sm uppercase tracking-wider mb-2">
-              Tu código de cuponera
-            </p>
-            <div className="bg-naik-black/50 rounded-xl py-4 px-6 mb-4 border border-naik-gold/20">
-              <p className="text-naik-gold text-3xl font-black tracking-wider font-mono">
-                {code || "GENERANDO..."}
-              </p>
-            </div>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              📦 {title}
-            </p>
-            <p className="text-gray-500 text-xs mt-3 italic">
-              Guarda este código para usar tus clases
-            </p>
-          </div>
-
-          <p className="text-naik-gold text-sm font-bold mb-4 flex items-center justify-center gap-2">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            Redirigiendo a WhatsApp...
-          </p>
-
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-2 h-2 bg-naik-gold rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
-            <div className="w-2 h-2 bg-naik-gold rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-            <div className="w-2 h-2 bg-naik-gold rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
-          </div>
-        </div>
-
-        <p className="text-gray-500 text-xs">
-          Si no te redirige automáticamente,{" "}
-          <button
-            onClick={() => {
-              const whatsappMessage = `Hola! Ya pague por Mercado Pago.
-
-${title}
-Codigo: ${code}
-
-Gracias!`;
-              const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
-              window.location.href = whatsappUrl;
-            }}
-            className="text-naik-gold underline hover:text-yellow-500 transition-colors"
-          >
-            hacé click acá
-          </button>
-        </p>
-      </div>
-    </div>
-  );
-}
+export const dynamic = 'force-dynamic';
 
 export default function PagoExitoso() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirigir inmediatamente a la nueva página de confirmación
+    router.replace('/clase-reservada?status=approved');
+  }, [router]);
+
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-naik-black flex items-center justify-center">
-        <div className="text-white">Cargando...</div>
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-12 h-12 text-naik-gold animate-spin mx-auto mb-4" />
+        <p className="text-gray-400">Redirigiendo...</p>
       </div>
-    }>
-      <PagoExitosoContent />
-    </Suspense>
+    </div>
   );
 }
