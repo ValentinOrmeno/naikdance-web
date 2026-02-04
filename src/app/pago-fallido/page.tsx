@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export default function PagoFallido() {
   return (
     <div className="min-h-screen bg-naik-black flex items-center justify-center px-4">

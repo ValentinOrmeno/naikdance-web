@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
+export const dynamic = 'force-dynamic';
+
 export default function PagoExitoso() {
   const searchParams = useSearchParams();
   const [code, setCode] = useState("");
