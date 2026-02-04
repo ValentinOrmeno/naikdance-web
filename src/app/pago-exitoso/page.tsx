@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-export const dynamic = 'force-dynamic';
-
-export default function PagoExitoso() {
+function PagoExitosoContent() {
   const searchParams = useSearchParams();
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
@@ -127,5 +125,17 @@ Gracias!`;
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PagoExitoso() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-naik-black flex items-center justify-center">
+        <div className="text-white">Cargando...</div>
+      </div>
+    }>
+      <PagoExitosoContent />
+    </Suspense>
   );
 }
