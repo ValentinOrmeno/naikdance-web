@@ -13,6 +13,7 @@ export default function Navbar() {
     { href: '#horarios', label: 'Horarios' },
     { href: '#aranceles', label: 'Aranceles' },
     { href: '#nosotros', label: 'Nosotros' },
+    { href: '#faq', label: 'FAQ' },
     { href: '#contacto', label: 'Contacto' },
   ];
 

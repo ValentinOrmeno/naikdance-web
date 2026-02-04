@@ -5,6 +5,7 @@ import Classes from '@/components/Classes';
 import Schedule from '@/components/Schedule';
 import Pricing from '@/components/Pricing';
 import TeachersGrid from '@/components/TeachersGrid';
+import FAQ from '@/components/FAQ';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 
@@ -20,6 +21,7 @@ export default function Home() {
       <Schedule />
       <Pricing />
       <TeachersGrid />
+      <FAQ />
       <Contact />
       <Footer />
     </main>
