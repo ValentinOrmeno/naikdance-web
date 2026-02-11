@@ -190,7 +190,7 @@ export async function getAllAvailability(month?: string) {
 }
 
 /**
- * Actualiza la disponibilidad de un profesor
+ * Actualiza o crea la disponibilidad de un profesor (UPSERT)
  */
 export async function updateAvailability(
   teacherId: string,
@@ -202,11 +202,16 @@ export async function updateAvailability(
   }
 ) {
   try {
+    // Usar upsert para crear o actualizar
     const { data, error } = await supabase
       .from('availability')
-      .update(updates)
-      .eq('teacher_id', teacherId)
-      .eq('month', month);
+      .upsert({
+        teacher_id: teacherId,
+        month: month,
+        ...updates
+      }, {
+        onConflict: 'teacher_id,month'
+      });
 
     if (error) {
       console.error('Error al actualizar disponibilidad:', error);
