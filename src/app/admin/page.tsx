@@ -68,6 +68,14 @@ export default function AdminPage() {
     days: [] as number[]
   });
 
+  // Helper: verificar si un día ya pasó
+  const isDayPast = (day: number, month: string) => {
+    const [year, monthNum] = month.split('-').map(Number);
+    const dayDate = new Date(year, monthNum - 1, day, 23, 59, 59); // Final del día
+    const today = new Date();
+    return dayDate < today;
+  };
+
   // Acciones rápidas
   const handleConfirmAllPending = async () => {
     const pendingReservations = reservations.filter(r => r.status === 'pendiente');
@@ -817,18 +825,29 @@ export default function AdminPage() {
                               <div className="grid grid-cols-7 gap-1">
                                 {Array.from({length: 31}, (_, i) => i + 1).map(day => {
                                   const isSelected = editForm.days.includes(day);
+                                  const isPast = editingCupo && isDayPast(day, editingCupo.month);
                                   return (
                                     <button
                                       key={day}
-                                      onClick={() => isSelected ? handleRemoveDay(day) : setEditForm({...editForm, days: [...editForm.days, day].sort((a,b) => a-b)})}
+                                      disabled={isPast}
+                                      onClick={() => {
+                                        if (isPast) return;
+                                        if (isSelected) {
+                                          handleRemoveDay(day);
+                                        } else {
+                                          setEditForm({...editForm, days: [...editForm.days, day].sort((a,b) => a-b)});
+                                        }
+                                      }}
                                       className={`
                                         aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                                        ${isSelected 
-                                          ? 'bg-naik-gold text-black hover:bg-yellow-400' 
-                                          : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                                        ${isPast
+                                          ? 'bg-white/5 text-gray-600 cursor-not-allowed line-through'
+                                          : isSelected 
+                                            ? 'bg-naik-gold text-black hover:bg-yellow-400' 
+                                            : 'bg-white/10 text-gray-400 hover:bg-white/20'
                                         }
                                       `}
-                                      title={isSelected ? 'Click para quitar' : 'Click para agregar'}
+                                      title={isPast ? 'Día ya pasado' : isSelected ? 'Click para quitar' : 'Click para agregar'}
                                     >
                                       {day}
                                     </button>
@@ -1086,16 +1105,20 @@ export default function AdminPage() {
                   <div className="grid grid-cols-7 gap-1">
                     {Array.from({length: 31}, (_, i) => i + 1).map(day => {
                       const isSelected = newSchedule.day === String(day);
+                      const isPast = isDayPast(day, scheduleModal.month);
                       return (
                         <button
                           key={day}
                           type="button"
-                          onClick={() => setNewSchedule({...newSchedule, day: String(day)})}
+                          disabled={isPast}
+                          onClick={() => !isPast && setNewSchedule({...newSchedule, day: String(day)})}
                           className={`
                             aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${isSelected 
-                              ? 'bg-naik-gold text-black' 
-                              : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                            ${isPast
+                              ? 'bg-white/5 text-gray-600 cursor-not-allowed line-through'
+                              : isSelected 
+                                ? 'bg-naik-gold text-black' 
+                                : 'bg-white/10 text-gray-400 hover:bg-white/20'
                             }
                           `}
                         >
@@ -1337,10 +1360,13 @@ export default function AdminPage() {
                   <div className="grid grid-cols-7 gap-1">
                     {Array.from({length: 31}, (_, i) => i + 1).map(day => {
                       const isSelected = addAvailabilityModal.days.includes(day);
+                      const isPast = isDayPast(day, selectedMonth);
                       return (
                         <button
                           key={day}
+                          disabled={isPast}
                           onClick={() => {
+                            if (isPast) return;
                             if (isSelected) {
                               setAddAvailabilityModal({
                                 ...addAvailabilityModal,
@@ -1355,9 +1381,11 @@ export default function AdminPage() {
                           }}
                           className={`
                             aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${isSelected 
-                              ? 'bg-naik-gold text-black hover:bg-yellow-400' 
-                              : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                            ${isPast 
+                              ? 'bg-white/5 text-gray-600 cursor-not-allowed line-through' 
+                              : isSelected 
+                                ? 'bg-naik-gold text-black hover:bg-yellow-400' 
+                                : 'bg-white/10 text-gray-400 hover:bg-white/20'
                             }
                           `}
                         >
