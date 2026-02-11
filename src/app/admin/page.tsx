@@ -696,7 +696,7 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2 mt-2 flex-wrap">
                             <span className="text-xs text-gray-500 font-bold uppercase">Días:</span>
                             {item.days && item.days.length > 0 ? (
-                              item.days.slice(0, 6).map(day => (
+                              item.days.slice(0, 6).map((day: number) => (
                                 <span 
                                   key={day}
                                   className="inline-flex items-center justify-center w-7 h-7 bg-naik-gold/20 text-naik-gold border border-naik-gold/30 rounded text-xs font-bold"
