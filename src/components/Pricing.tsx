@@ -1,7 +1,7 @@
 "use client";
 
 import { SiMercadopago } from "react-icons/si";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 
@@ -74,6 +74,17 @@ export default function Pricing() {
     window.open(whatsappUrl, "_blank");
   };
 
+  // Pre-rellenar datos del usuario si los tiene guardados
+  useEffect(() => {
+    if (showModal) {
+      const localName = localStorage.getItem('bookingUserName');
+      const localEmail = localStorage.getItem('bookingUserEmail');
+      
+      if (localName) setUserName(localName);
+      if (localEmail) setUserEmail(localEmail);
+    }
+  }, [showModal]);
+
   const handleMercadoPagoClick = async (title: string, name: string, price: number) => {
     // Abrir modal para capturar datos
     setPendingPayment({ title, name, price });
@@ -93,9 +104,13 @@ export default function Pricing() {
     setShowModal(false);
 
     try {
-      // Guardar datos en sessionStorage
+      // Guardar datos en sessionStorage (para el flujo de pago actual)
       sessionStorage.setItem('paymentUserName', userName);
       sessionStorage.setItem('paymentUserEmail', userEmail);
+      
+      // Guardar también en localStorage (para futuros usos)
+      localStorage.setItem('bookingUserName', userName);
+      localStorage.setItem('bookingUserEmail', userEmail);
 
       const fullTitle = `${pendingPayment.title} - ${pendingPayment.name}`;
       const category = pendingPayment.title;

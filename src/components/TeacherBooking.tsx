@@ -48,6 +48,26 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
     setCurrentMonth(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
   }, []);
 
+  // Pre-rellenar datos del usuario si los tiene guardados
+  useEffect(() => {
+    // Intentar desde sessionStorage (pago reciente)
+    const sessionName = sessionStorage.getItem('paymentUserName');
+    const sessionEmail = sessionStorage.getItem('paymentUserEmail');
+    
+    // Intentar desde localStorage (reservas anteriores)
+    const localName = localStorage.getItem('bookingUserName');
+    const localEmail = localStorage.getItem('bookingUserEmail');
+    const localPhone = localStorage.getItem('bookingUserPhone');
+    
+    if (sessionName) setNombre(sessionName);
+    else if (localName) setNombre(localName);
+    
+    if (sessionEmail) setEmail(sessionEmail);
+    else if (localEmail) setEmail(localEmail);
+    
+    if (localPhone) setTelefono(localPhone);
+  }, []);
+
   // Cargar disponibilidad y horarios desde Supabase
   useEffect(() => {
     const loadData = async () => {
@@ -181,6 +201,11 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
       }
 
       const { init_point } = await response.json();
+      
+      // Guardar datos del usuario para futuros usos
+      localStorage.setItem('bookingUserName', nombre);
+      localStorage.setItem('bookingUserEmail', email);
+      if (telefono) localStorage.setItem('bookingUserPhone', telefono);
       
       // Redirigir a Mercado Pago
       console.log('Redirigiendo a Mercado Pago...');
@@ -388,8 +413,11 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                   <>
                     <div className="mb-4 flex justify-center">
                       {(() => {
-                        const available = monthData.availability.cupos - monthData.availability.reservas;
+                        // Asegurar que cupos_reservados nunca sea negativo
+                        const reservados = Math.max(0, monthData.availability.reservas);
                         const total = monthData.availability.cupos;
+                        // Calcular disponibles y asegurar que no exceda el total
+                        const available = Math.min(total, Math.max(0, total - reservados));
                         const colors = getCuposColor(available, total);
                         return (
                           <div className={`px-4 py-2 rounded-full ${colors.bg} ${colors.text} border ${colors.border} backdrop-blur-sm`}>
@@ -414,9 +442,9 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                         // Verificar si hay horarios configurados para este día
                         const hasSchedules = schedules.some(s => s.day === day);
                         
-                        // Verificar cupos disponibles
+                        // Verificar cupos disponibles (asegurar que reservados nunca sea negativo)
                         const hasCupos = monthData.availability 
-                          ? (monthData.availability.cupos - monthData.availability.reservas) > 0 
+                          ? (monthData.availability.cupos - Math.max(0, monthData.availability.reservas)) > 0 
                           : false;
                         
                         // Solo puede reservar si tiene horarios configurados Y hay cupos
