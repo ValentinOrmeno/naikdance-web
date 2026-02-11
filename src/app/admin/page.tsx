@@ -830,7 +830,7 @@ export default function AdminPage() {
                               <div className="grid grid-cols-7 gap-1">
                                 {Array.from({length: 31}, (_, i) => i + 1).map(day => {
                                   const isSelected = editForm.days.includes(day);
-                                  const isPast = editingCupo && isDayPast(day, editingCupo.month);
+                                  const isPast = editingCupo ? isDayPast(day, editingCupo.month) : false;
                                   return (
                                     <button
                                       key={day}
