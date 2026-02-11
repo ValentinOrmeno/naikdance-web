@@ -70,7 +70,7 @@ export default function AdminPage() {
     days: [] as number[]
   });
 
-  // Helper: verificar si un día ya pasó
+  // Helper: verificar si un dia ya paso
   const isDayPast = (day: number, month: string) => {
     const [year, monthNum] = month.split('-').map(Number);
     const dayDate = new Date(year, monthNum - 1, day);
@@ -79,7 +79,7 @@ export default function AdminPage() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // El día es "pasado" si es anterior al día actual (no incluye el día actual)
+    // El dia es "pasado" si es anterior al dia actual (no incluye el dia actual)
     return dayDate < today;
   };
 
@@ -91,7 +91,7 @@ export default function AdminPage() {
       return;
     }
     
-    if (!confirm(`¿Confirmar ${pendingReservations.length} reservas pendientes?`)) return;
+    if (!confirm(`Confirmar ${pendingReservations.length} reservas pendientes?`)) return;
     
     try {
       setLoading(true);
@@ -123,7 +123,7 @@ export default function AdminPage() {
       return;
     }
     if (addAvailabilityModal.days.length === 0) {
-      alert('Selecciona al menos un día');
+      alert('Selecciona al menos un dia');
       return;
     }
 
@@ -143,11 +143,11 @@ export default function AdminPage() {
   };
 
   const handleResetAllCupos = async () => {
-    if (!confirm('⚠️ ATENCIÓN: Esto eliminará TODA la disponibilidad (días y cupos) de todos los profesores. ¿Estás seguro?')) {
+    if (!confirm('ATENCION: Esto eliminara TODA la disponibilidad (dias y cupos) de todos los profesores. Estas seguro?')) {
       return;
     }
     
-    if (!confirm('¿Realmente querés borrar todo y empezar de cero?')) {
+    if (!confirm('Realmente queres borrar todo y empezar de cero?')) {
       return;
     }
 
@@ -370,7 +370,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteSchedule = async (id: string) => {
-    if (!confirm('¿Estas seguro de eliminar este horario?')) return;
+    if (!confirm('Estas seguro de eliminar este horario?')) return;
 
     try {
       await deleteClassSchedule(id);
@@ -813,7 +813,7 @@ export default function AdminPage() {
 
                           {/* Edición de Días */}
                           <div>
-                            <h4 className="text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles del Mes</h4>
+                            <h4 className="text-sm font-bold uppercase mb-3 text-naik-gold">Dias Disponibles del Mes</h4>
                             <div className="flex gap-2 mb-4">
                               <input
                                 type="number"
@@ -861,7 +861,7 @@ export default function AdminPage() {
                                             : 'bg-white/10 text-gray-400 hover:bg-white/20'
                                         }
                                       `}
-                                      title={isPast ? 'Día ya pasado' : isSelected ? 'Click para quitar' : 'Click para agregar'}
+                                      title={isPast ? 'Dia ya pasado' : isSelected ? 'Click para quitar' : 'Click para agregar'}
                                     >
                                       {day}
                                     </button>
@@ -869,7 +869,7 @@ export default function AdminPage() {
                                 })}
                               </div>
                               <p className="text-xs text-gray-400 mt-3 text-center">
-                                Click en un día para agregar/quitar • {editForm.days.length} días seleccionados
+                                Click en un dia para agregar/quitar - {editForm.days.length} dias seleccionados
                               </p>
                             </div>
                           </div>
@@ -1114,14 +1114,14 @@ export default function AdminPage() {
               
               {/* Calendario para seleccionar día */}
               <div className="mb-6">
-                <label className="block text-sm font-bold uppercase mb-3 text-white">Seleccionar Día *</label>
+                <label className="block text-sm font-bold uppercase mb-3 text-white">Seleccionar Dia *</label>
                 {scheduleModal.availableDays.length === 0 ? (
                   <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
                     <p className="text-yellow-500 font-bold text-sm">
-                      ⚠️ No hay disponibilidad (cupos) para este profesor en este mes
+                      No hay disponibilidad (cupos) para este profesor en este mes
                     </p>
                     <p className="text-gray-400 text-xs mt-2">
-                      Primero creá disponibilidad desde "Dashboard → Agregar Disponibilidad"
+                      Primero crea disponibilidad desde Dashboard - Agregar Disponibilidad
                     </p>
                   </div>
                 ) : (
@@ -1150,11 +1150,11 @@ export default function AdminPage() {
                             `}
                             title={
                               isPast 
-                                ? 'Día ya pasado' 
+                                ? 'Dia ya pasado' 
                                 : !hasAvailability 
                                   ? 'Sin cupos disponibles' 
                                   : isSelected 
-                                    ? 'Día seleccionado' 
+                                    ? 'Dia seleccionado' 
                                     : 'Click para seleccionar'
                             }
                           >
@@ -1393,7 +1393,7 @@ export default function AdminPage() {
 
               {/* Calendario para días */}
               <div>
-                <label className="block text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles</label>
+                <label className="block text-sm font-bold uppercase mb-3 text-naik-gold">Dias Disponibles</label>
                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                   <div className="grid grid-cols-7 gap-1">
                     {Array.from({length: 31}, (_, i) => i + 1).map(day => {
@@ -1433,7 +1433,7 @@ export default function AdminPage() {
                     })}
                   </div>
                   <p className="text-xs text-gray-400 mt-3 text-center">
-                    {addAvailabilityModal.days.length} días seleccionados
+                                    {addAvailabilityModal.days.length} dias seleccionados
                   </p>
                 </div>
               </div>
