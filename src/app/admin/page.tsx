@@ -18,7 +18,14 @@ export default function AdminPage() {
   const [availability, setAvailability] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('2026-02');
+  
+  // Generar mes actual por defecto
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
+  
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [editingCupo, setEditingCupo] = useState<{teacherId: string; month: string} | null>(null);
   const [editForm, setEditForm] = useState({cupos_total: 0, cupos_reservados: 0, days: [] as number[]});
   const [newDay, setNewDay] = useState('');
@@ -69,6 +76,27 @@ export default function AdminPage() {
     cupos: 15,
     days: [] as number[]
   });
+
+  // Helper: generar proximos 6 meses desde hoy
+  const getNextMonths = () => {
+    const months = [];
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    
+    const now = new Date();
+    
+    for (let i = 0; i < 6; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const value = `${year}-${String(month).padStart(2, '0')}`;
+      const label = `${monthNames[month - 1]} ${year}`;
+      
+      months.push({ value, label });
+    }
+    
+    return months;
+  };
 
   // Helper: verificar si un día ya pasó
   const isDayPast = (day: number, month: string) => {
@@ -650,12 +678,7 @@ export default function AdminPage() {
             <div className="mb-6">
               <label className="block text-sm font-bold uppercase mb-3">Mes</label>
               <div className="flex flex-wrap gap-2">
-                {[
-                  { value: '2026-02', label: 'Febrero 2026' },
-                  { value: '2026-03', label: 'Marzo 2026' },
-                  { value: '2026-04', label: 'Abril 2026' },
-                  { value: '2026-05', label: 'Mayo 2026' },
-                ].map(month => (
+                {getNextMonths().map(month => (
                   <button
                     key={month.value}
                     onClick={() => setSelectedMonth(month.value)}
