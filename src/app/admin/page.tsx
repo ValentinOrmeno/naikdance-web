@@ -1004,6 +1004,18 @@ export default function AdminPage() {
                     </button>
                   </div>
                 )}
+
+                {activeTab === 'confirmadas' && reservation.status === 'confirmada' && (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleCancel(reservation.id)}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl uppercase transition-all flex items-center justify-center gap-2"
+                    >
+                      <XCircle size={20} />
+                      Cancelar Reserva
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
