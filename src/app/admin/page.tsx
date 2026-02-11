@@ -126,8 +126,11 @@ export default function AdminPage() {
       for (const reservation of pendingReservations) {
         await confirmReservation(reservation.id);
       }
+      // Corregir cupos negativos después de operaciones masivas
+      await fixNegativeCupos();
       alert(`${pendingReservations.length} reservas confirmadas correctamente`);
       await loadData();
+      await loadStats(); // Actualizar estadísticas
     } catch (error: any) {
       console.error('Error al confirmar reservas:', error);
       alert('Error al confirmar algunas reservas');
@@ -187,24 +190,6 @@ export default function AdminPage() {
     } catch (error: any) {
       console.error('Error al resetear cupos:', error);
       alert('Error al resetear cupos');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFixNegativeCupos = async () => {
-    if (!confirm('Esto corregira todos los cupos reservados negativos poniendolos en 0. Continuar?')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const result = await fixNegativeCupos();
-      alert(`Correccion completada. ${result.fixed} registros corregidos.`);
-      await loadData();
-    } catch (error: any) {
-      console.error('Error al corregir cupos:', error);
-      alert('Error al corregir cupos negativos');
     } finally {
       setLoading(false);
     }
@@ -300,10 +285,18 @@ export default function AdminPage() {
         alert('Reserva confirmada! Cupos actualizados.');
       } else {
         await cancelReservation(confirmModal.id);
+        // Después de cancelar, corregir automáticamente cupos negativos si los hay
+        await fixNegativeCupos();
         alert('Reserva cancelada.');
       }
       setConfirmModal({ show: false, id: '', action: 'confirm' });
+      
+      // Recargar datos del tab actual
       await loadData();
+      
+      // IMPORTANTE: Siempre recargar estadísticas después de confirmar/cancelar
+      // para mantener el dashboard actualizado
+      await loadStats();
     } catch (error: any) {
       console.error('Error en executeAction:', error);
       alert(error.message || 'Error al procesar la accion');
@@ -608,34 +601,18 @@ export default function AdminPage() {
                     <span>Zona de Admin Avanzado</span>
                     <span className="group-open:rotate-180 transition-transform">▼</span>
                   </summary>
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <button
-                        onClick={handleFixNegativeCupos}
-                        disabled={loading}
-                        className="w-full bg-yellow-600/20 border-2 border-yellow-500 hover:bg-yellow-600 text-yellow-400 hover:text-white font-bold py-3 px-6 rounded-xl uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle size={20} />
-                        <span>Corregir Cupos Negativos</span>
-                      </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        Corrige errores de cupos negativos poniendolos en 0.
-                      </p>
-                    </div>
-
-                    <div>
-                      <button
-                        onClick={handleResetAllCupos}
-                        disabled={loading}
-                        className="w-full bg-red-600/20 border-2 border-red-500 hover:bg-red-600 text-red-400 hover:text-white font-bold py-3 px-6 rounded-xl uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        <Trash2 size={20} />
-                        <span>Resetear Todos los Cupos</span>
-                      </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        Elimina TODA la disponibilidad. Usalo solo para empezar de cero.
-                      </p>
-                    </div>
+                  <div className="mt-4">
+                    <button
+                      onClick={handleResetAllCupos}
+                      disabled={loading}
+                      className="w-full bg-red-600/20 border-2 border-red-500 hover:bg-red-600 text-red-400 hover:text-white font-bold py-3 px-6 rounded-xl uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      <Trash2 size={20} />
+                      <span>Resetear Todos los Cupos</span>
+                    </button>
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Elimina TODA la disponibilidad. Usalo solo para empezar de cero.
+                    </p>
                   </div>
                 </details>
               </div>
