@@ -46,12 +46,14 @@ export default function AdminPage() {
     teacherName: string;
     month: string;
     schedules: any[];
+    availableDays: number[];
   }>({
     show: false,
     teacherId: '',
     teacherName: '',
     month: '',
-    schedules: []
+    schedules: [],
+    availableDays: []
   });
   const [newSchedule, setNewSchedule] = useState({
     day: '',
@@ -321,12 +323,19 @@ export default function AdminPage() {
   const handleViewSchedules = async (teacherId: string, teacherName: string, month: string) => {
     try {
       const schedules = await getClassSchedules(teacherId, month);
+      // Cargar disponibilidad del profesor para saber qué días tienen cupos
+      const allAvailability = await getAllAvailability(month);
+      const teacherAvailability = allAvailability?.find(
+        (a: any) => a.teacher_id === teacherId && a.month === month
+      );
+      
       setScheduleModal({
         show: true,
         teacherId,
         teacherName,
         month,
-        schedules: schedules || []
+        schedules: schedules || [],
+        availableDays: teacherAvailability?.days || []
       });
       setNewSchedule({ day: '', time: '', class_name: '', max_students: '15', duration: '60' });
     } catch (error) {
@@ -1089,7 +1098,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <button
-                onClick={() => setScheduleModal({show: false, teacherId: '', teacherName: '', month: '', schedules: []})}
+                onClick={() => setScheduleModal({show: false, teacherId: '', teacherName: '', month: '', schedules: [], availableDays: []})}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <X size={24} />
@@ -1106,32 +1115,56 @@ export default function AdminPage() {
               {/* Calendario para seleccionar día */}
               <div className="mb-6">
                 <label className="block text-sm font-bold uppercase mb-3 text-white">Seleccionar Día *</label>
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <div className="grid grid-cols-7 gap-1">
-                    {Array.from({length: 31}, (_, i) => i + 1).map(day => {
-                      const isSelected = newSchedule.day === String(day);
-                      const isPast = isDayPast(day, scheduleModal.month);
-                      return (
-                        <button
-                          key={day}
-                          type="button"
-                          disabled={isPast}
-                          onClick={() => !isPast && setNewSchedule({...newSchedule, day: String(day)})}
-                          className={`
-                            aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${isPast
-                              ? 'bg-white/5 text-gray-600 cursor-not-allowed line-through'
-                              : isSelected 
-                                ? 'bg-naik-gold text-black' 
-                                : 'bg-white/10 text-gray-400 hover:bg-white/20'
-                            }
-                          `}
-                        >
-                          {day}
-                        </button>
-                      );
-                    })}
+                {scheduleModal.availableDays.length === 0 ? (
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
+                    <p className="text-yellow-500 font-bold text-sm">
+                      ⚠️ No hay disponibilidad (cupos) para este profesor en este mes
+                    </p>
+                    <p className="text-gray-400 text-xs mt-2">
+                      Primero creá disponibilidad desde "Dashboard → Agregar Disponibilidad"
+                    </p>
                   </div>
+                ) : (
+                  <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div className="grid grid-cols-7 gap-1">
+                      {Array.from({length: 31}, (_, i) => i + 1).map(day => {
+                        const isSelected = newSchedule.day === String(day);
+                        const isPast = isDayPast(day, scheduleModal.month);
+                        const hasAvailability = scheduleModal.availableDays.includes(day);
+                        const isDisabled = isPast || !hasAvailability;
+                        
+                        return (
+                          <button
+                            key={day}
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() => !isDisabled && setNewSchedule({...newSchedule, day: String(day)})}
+                            className={`
+                              aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                              ${isDisabled
+                                ? 'bg-white/5 text-gray-600 cursor-not-allowed opacity-40' + (isPast ? ' line-through' : '')
+                                : isSelected 
+                                  ? 'bg-naik-gold text-black' 
+                                  : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                              }
+                            `}
+                            title={
+                              isPast 
+                                ? 'Día ya pasado' 
+                                : !hasAvailability 
+                                  ? 'Sin cupos disponibles' 
+                                  : isSelected 
+                                    ? 'Día seleccionado' 
+                                    : 'Click para seleccionar'
+                            }
+                          >
+                            {day}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                   {newSchedule.day && (
                     <p className="text-xs text-naik-gold mt-3 text-center font-bold">
                       Día {newSchedule.day} seleccionado
