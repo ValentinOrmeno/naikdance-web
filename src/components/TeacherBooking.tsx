@@ -229,11 +229,34 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
               </div>
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-8 font-['Oswald']">
+            <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4 font-['Oswald']">
               {teacher.name.split(' ').map((word: string, i: number) => (
                 <span key={i} className="block">{word}</span>
               ))}
             </h1>
+
+            {/* Información del profesor */}
+            <div className="mb-8 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="inline-block px-4 py-2 bg-gradient-to-r from-[#FFD700] to-yellow-500 text-black font-bold text-sm uppercase tracking-wide rounded-full">
+                  {teacher.style}
+                </span>
+              </div>
+              
+              {teacher.classes && teacher.classes.length > 0 && (
+                <div className="space-y-2">
+                  <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wide">Clases</h2>
+                  <ul className="space-y-1">
+                    {teacher.classes.map((clase: string, idx: number) => (
+                      <li key={idx} className="text-white flex items-center gap-2">
+                        <Clock size={16} className="text-[#FFD700]" />
+                        <span>{clase}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
 
             <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 border border-white/10 shadow-2xl">
               <Image 
@@ -249,9 +272,15 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
           <div className="flex flex-col justify-center lg:pt-20">
             
-            <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/10">
-              <Calendar className="text-[#FFD700]" size={28} />
-              <h3 className="font-bold text-2xl text-white font-['Oswald'] uppercase">Reservá tu clase</h3>
+            <div className="mb-8 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <Calendar className="text-[#FFD700]" size={28} />
+                <h2 className="font-bold text-3xl text-white font-['Oswald'] uppercase">Reservá tu clase</h2>
+              </div>
+              <p className="text-gray-400 leading-relaxed">
+                Elegí el día y horario que más te convenga y reservá tu clase con {teacher.name} en NAIK Dance Studio. 
+                Clases de {teacher.style.toLowerCase()} en Moreno, Buenos Aires.
+              </p>
             </div>
 
             <div className="space-y-6">

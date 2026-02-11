@@ -165,20 +165,6 @@ export const teachers: Teacher[] = [
     classes: ["Miercoles 18:00 - Reggaeton", "Viernes 19:00 - Fusion"],
   },
   {
-    id: "lyrical-jazz",
-    name: "Staff Lyrical",
-    style: "Lyrical / Contemporaneo",
-    image: "/profes/lyricall-jazz.jpg",
-    classes: ["Lunes 19:00 - Lyrical", "Miercoles 20:00 - Contempo"],
-  },
-  {
-    id: "acro-kids",
-    name: "Staff Acro",
-    style: "Acrobacia Infantil",
-    image: "/profes/acro-kids.jpg",
-    classes: ["Sabados 10:00 - Acro Kids", "Sabados 11:30 - Acro Teens"],
-  },
-  {
     id: "seba-gardel",
     name: "Seba Gardel",
     style: "Reggaeton",

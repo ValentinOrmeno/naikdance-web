@@ -279,3 +279,25 @@ export async function getStats() {
     throw error;
   }
 }
+
+/**
+ * Resetea toda la disponibilidad (elimina todos los cupos)
+ */
+export async function resetAllAvailability() {
+  try {
+    const { error } = await supabase
+      .from('availability')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Borrar todos los registros
+
+    if (error) {
+      console.error('Error al resetear availability:', error);
+      throw new Error(error.message);
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error en resetAllAvailability:', error);
+    throw error;
+  }
+}

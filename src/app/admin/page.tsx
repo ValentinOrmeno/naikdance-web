@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { confirmReservation, cancelReservation } from '@/lib/supabase-admin';
-import { getAllReservations, getAllAvailability, getStats, updateAvailability, getReservationsByTeacher, getClassSchedules, createClassSchedule, updateClassSchedule, deleteClassSchedule } from '@/lib/supabase-admin-extended';
+import { getAllReservations, getAllAvailability, getStats, updateAvailability, getReservationsByTeacher, getClassSchedules, createClassSchedule, updateClassSchedule, deleteClassSchedule, resetAllAvailability } from '@/lib/supabase-admin-extended';
 import type { Reservation } from '@/lib/supabase';
 import { X, Calendar, Users, TrendingUp, CheckCircle, Clock, XCircle, Edit2, Save, Eye, Plus, Trash2, CalendarClock } from 'lucide-react';
 import { teachers } from '@/data/teachers';
 
-type Tab = 'pendientes' | 'confirmadas' | 'cupos' | 'estadisticas';
+type Tab = 'dashboard' | 'pendientes' | 'confirmadas' | 'cupos';
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>('pendientes');
+  const [loginError, setLoginError] = useState('');
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [availability, setAvailability] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -60,13 +61,112 @@ export default function AdminPage() {
     duration: '60'
   });
   const [editingSchedule, setEditingSchedule] = useState<string | null>(null);
+  const [addAvailabilityModal, setAddAvailabilityModal] = useState({
+    show: false,
+    teacherId: '',
+    cupos: 15,
+    days: [] as number[]
+  });
+
+  // Acciones rápidas
+  const handleConfirmAllPending = async () => {
+    const pendingReservations = reservations.filter(r => r.status === 'pendiente');
+    if (pendingReservations.length === 0) {
+      alert('No hay reservas pendientes para confirmar');
+      return;
+    }
+    
+    if (!confirm(`¿Confirmar ${pendingReservations.length} reservas pendientes?`)) return;
+    
+    try {
+      setLoading(true);
+      for (const reservation of pendingReservations) {
+        await confirmReservation(reservation.id);
+      }
+      alert(`${pendingReservations.length} reservas confirmadas correctamente`);
+      await loadData();
+    } catch (error: any) {
+      console.error('Error al confirmar reservas:', error);
+      alert('Error al confirmar algunas reservas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickAvailability = () => {
+    setAddAvailabilityModal({
+      show: true,
+      teacherId: '',
+      cupos: 15,
+      days: []
+    });
+  };
+
+  const handleSaveAvailability = async () => {
+    if (!addAvailabilityModal.teacherId) {
+      alert('Selecciona un profesor');
+      return;
+    }
+    if (addAvailabilityModal.days.length === 0) {
+      alert('Selecciona al menos un día');
+      return;
+    }
+
+    try {
+      await updateAvailability(addAvailabilityModal.teacherId, selectedMonth, {
+        cupos_total: addAvailabilityModal.cupos,
+        cupos_reservados: 0,
+        days: addAvailabilityModal.days
+      });
+      alert('Disponibilidad agregada correctamente');
+      setAddAvailabilityModal({ show: false, teacherId: '', cupos: 15, days: [] });
+      if (activeTab === 'cupos') await loadAvailability();
+    } catch (error: any) {
+      console.error('Error al agregar disponibilidad:', error);
+      alert('Error al agregar disponibilidad');
+    }
+  };
+
+  const handleResetAllCupos = async () => {
+    if (!confirm('⚠️ ATENCIÓN: Esto eliminará TODA la disponibilidad (días y cupos) de todos los profesores. ¿Estás seguro?')) {
+      return;
+    }
+    
+    if (!confirm('¿Realmente querés borrar todo y empezar de cero?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await resetAllAvailability();
+      alert('✓ Todos los cupos fueron eliminados correctamente');
+      await loadData();
+    } catch (error: any) {
+      console.error('Error al resetear cupos:', error);
+      alert('Error al resetear cupos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = () => {
-    if (password === 'naik2026') {
+    setLoginError('');
+    
+    const pwd = password.trim();
+    
+    if (!pwd) {
+      setLoginError('Por favor ingresa la contraseña');
+      return;
+    }
+    
+    if (pwd === 'naik2026') {
       setIsAuthenticated(true);
+      setPassword('');
       loadData();
     } else {
-      alert('Contraseña incorrecta');
+      setLoginError('Contraseña incorrecta');
+      setPassword('');
+      setTimeout(() => setLoginError(''), 3000);
     }
   };
 
@@ -106,14 +206,15 @@ export default function AdminPage() {
   };
 
   const loadData = () => {
-    if (activeTab === 'pendientes') {
+    if (activeTab === 'dashboard') {
+      loadStats();
+      loadReservations('pendiente');
+    } else if (activeTab === 'pendientes') {
       loadReservations('pendiente');
     } else if (activeTab === 'confirmadas') {
       loadReservations('confirmada');
     } else if (activeTab === 'cupos') {
       loadAvailability();
-    } else if (activeTab === 'estadisticas') {
-      loadStats();
     }
   };
 
@@ -267,17 +368,32 @@ export default function AdminPage() {
           <h1 className="text-3xl font-black text-white mb-6 text-center uppercase">
             Panel Admin
           </h1>
+          
+          {loginError && (
+            <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-lg p-3 animate-fade-in">
+              <p className="text-red-400 text-sm font-bold text-center">
+                ⚠️ {loginError}
+              </p>
+            </div>
+          )}
+          
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setLoginError(''); // Limpiar error al escribir
+            }}
             onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
             placeholder="Contraseña"
-            className="w-full bg-white text-black rounded-lg py-3 px-4 mb-4 outline-none"
+            className={`w-full bg-white text-black rounded-lg py-3 px-4 mb-4 outline-none transition-all ${
+              loginError ? 'ring-2 ring-red-500' : ''
+            }`}
+            autoFocus
           />
           <button
             onClick={handleLogin}
-            className="w-full bg-naik-gold hover:bg-yellow-400 text-black font-bold py-3 rounded-xl uppercase transition-all"
+            className="w-full bg-naik-gold hover:bg-yellow-400 text-black font-bold py-3 rounded-xl uppercase transition-all hover:scale-105"
           >
             Entrar
           </button>
@@ -287,10 +403,10 @@ export default function AdminPage() {
   }
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
     { id: 'pendientes', label: 'Pendientes', icon: Clock },
     { id: 'confirmadas', label: 'Confirmadas', icon: CheckCircle },
     { id: 'cupos', label: 'Gestion Cupos', icon: Calendar },
-    { id: 'estadisticas', label: 'Estadisticas', icon: TrendingUp },
   ] as const;
 
   return (
@@ -331,88 +447,177 @@ export default function AdminPage() {
           })}
         </div>
 
-        {/* TAB: ESTADISTICAS */}
-        {activeTab === 'estadisticas' && stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Reservas */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-blue-500/20 p-3 rounded-lg">
-                  <Users size={24} className="text-blue-400" />
-                </div>
-                <h3 className="text-lg font-black uppercase">Reservas</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Total</span>
-                  <span className="text-2xl font-bold">{stats.reservas.total}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-yellow-400">Pendientes</span>
-                  <span className="text-xl font-bold text-yellow-400">{stats.reservas.pendientes}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-green-400">Confirmadas</span>
-                  <span className="text-xl font-bold text-green-400">{stats.reservas.confirmadas}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-red-400">Canceladas</span>
-                  <span className="text-xl font-bold text-red-400">{stats.reservas.canceladas}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Cupos */}
-            <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-purple-500/20 p-3 rounded-lg">
-                  <Calendar size={24} className="text-purple-400" />
-                </div>
-                <h3 className="text-lg font-black uppercase">Cupos</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Totales</span>
-                  <span className="text-2xl font-bold">{stats.cupos.totales}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-400">Reservados</span>
-                  <span className="text-xl font-bold text-orange-400">{stats.cupos.reservados}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-green-400">Disponibles</span>
-                  <span className="text-xl font-bold text-green-400">{stats.cupos.disponibles}</span>
-                </div>
-                <div className="mt-4 pt-4 border-t border-purple-500/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Ocupacion</span>
-                    <span className="text-3xl font-black text-naik-gold">{stats.cupos.ocupacion}%</span>
+        {/* TAB: DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-8">
+            {/* Stats Cards - Grandes y Visuales */}
+            {stats && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {/* Reservas Pendientes */}
+                <div className="bg-gradient-to-br from-yellow-600/30 to-yellow-800/30 border-2 border-yellow-500/50 rounded-2xl p-6 md:p-8 hover:scale-105 transition-transform">
+                  <div className="flex items-center justify-between mb-4">
+                    <Clock size={32} className="text-yellow-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-yellow-400">Pendientes</span>
                   </div>
-                  <div className="w-full bg-white/10 rounded-full h-2 mt-2">
+                  <div className="text-5xl md:text-6xl font-black text-white mb-2">{stats.reservas.pendientes}</div>
+                  <div className="text-sm text-gray-400">Reservas por confirmar</div>
+                </div>
+
+                {/* Confirmadas Hoy */}
+                <div className="bg-gradient-to-br from-green-600/30 to-green-800/30 border-2 border-green-500/50 rounded-2xl p-6 md:p-8 hover:scale-105 transition-transform">
+                  <div className="flex items-center justify-between mb-4">
+                    <CheckCircle size={32} className="text-green-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-green-400">Confirmadas</span>
+                  </div>
+                  <div className="text-5xl md:text-6xl font-black text-white mb-2">{stats.reservas.confirmadas}</div>
+                  <div className="text-sm text-gray-400">Total confirmadas</div>
+                </div>
+
+                {/* Ocupación */}
+                <div className="bg-gradient-to-br from-naik-gold/30 to-yellow-600/30 border-2 border-naik-gold/50 rounded-2xl p-6 md:p-8 hover:scale-105 transition-transform">
+                  <div className="flex items-center justify-between mb-4">
+                    <TrendingUp size={32} className="text-naik-gold" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-naik-gold">Ocupación</span>
+                  </div>
+                  <div className="text-5xl md:text-6xl font-black text-white mb-2">{stats.cupos.ocupacion}%</div>
+                  <div className="w-full bg-white/10 rounded-full h-3 mt-3">
                     <div 
-                      className="bg-naik-gold rounded-full h-2 transition-all"
+                      className="bg-naik-gold rounded-full h-3 transition-all duration-500"
                       style={{width: `${stats.cupos.ocupacion}%`}}
                     />
                   </div>
                 </div>
+
+                {/* Total Reservas */}
+                <div className="bg-gradient-to-br from-blue-600/30 to-blue-800/30 border-2 border-blue-500/50 rounded-2xl p-6 md:p-8 hover:scale-105 transition-transform">
+                  <div className="flex items-center justify-between mb-4">
+                    <Users size={32} className="text-blue-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-400">Total</span>
+                  </div>
+                  <div className="text-5xl md:text-6xl font-black text-white mb-2">{stats.reservas.total}</div>
+                  <div className="text-sm text-gray-400">Reservas registradas</div>
+                </div>
+              </div>
+            )}
+
+            {/* Acciones Rápidas */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8">
+              <h3 className="text-2xl md:text-3xl font-black uppercase mb-6 flex items-center gap-3">
+                <span className="text-naik-gold">⚡</span> Acciones Rápidas
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button
+                  onClick={handleConfirmAllPending}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-xl uppercase transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                >
+                  <CheckCircle size={24} />
+                  <span>Confirmar Pendientes</span>
+                </button>
+
+                <button
+                  onClick={handleQuickAvailability}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-xl uppercase transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                >
+                  <Calendar size={24} />
+                  <span>Agregar Disponibilidad</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('cupos')}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-4 px-6 rounded-xl uppercase transition-all hover:scale-105 flex items-center justify-center gap-3"
+                >
+                  <Edit2 size={24} />
+                  <span>Gestionar Cupos</span>
+                </button>
+              </div>
+              
+              {/* Zona de Admin Avanzado */}
+              <div className="mt-6 pt-6 border-t border-red-500/20">
+                <details className="group">
+                  <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-400 uppercase font-bold tracking-wide flex items-center gap-2">
+                    <span>⚠️ Zona de Admin Avanzado</span>
+                    <span className="group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="mt-4">
+                    <button
+                      onClick={handleResetAllCupos}
+                      disabled={loading}
+                      className="w-full bg-red-600/20 border-2 border-red-500 hover:bg-red-600 text-red-400 hover:text-white font-bold py-3 px-6 rounded-xl uppercase transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      <Trash2 size={20} />
+                      <span>Resetear Todos los Cupos</span>
+                    </button>
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Elimina TODA la disponibilidad. Úsalo solo para empezar de cero.
+                    </p>
+                  </div>
+                </details>
               </div>
             </div>
 
-            {/* Profesores */}
-            <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 border border-yellow-500/30 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-yellow-500/20 p-3 rounded-lg">
-                  <Users size={24} className="text-yellow-400" />
+            {/* Últimas Reservas Pendientes */}
+            {reservations.length > 0 && (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl md:text-3xl font-black uppercase flex items-center gap-3">
+                    <Clock className="text-yellow-400" size={28} />
+                    Últimas Pendientes
+                  </h3>
+                  <button
+                    onClick={() => setActiveTab('pendientes')}
+                    className="text-sm text-naik-gold hover:text-yellow-400 font-bold uppercase transition-colors"
+                  >
+                    Ver todas →
+                  </button>
                 </div>
-                <h3 className="text-lg font-black uppercase">Profesores</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Total Activos</span>
-                  <span className="text-4xl font-black text-naik-gold">{stats.profesores.total}</span>
+                
+                <div className="space-y-3">
+                  {reservations.slice(0, 5).map((reservation) => (
+                    <div
+                      key={reservation.id}
+                      className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-naik-gold/50 transition-all"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">Alumno</p>
+                          <p className="font-bold">{reservation.nombre}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">Profesor</p>
+                          <p className="text-sm">{reservation.teacher_id}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">Fecha</p>
+                          <p className="text-sm">{reservation.fecha}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleConfirm(reservation.id)}
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-sm uppercase transition-all"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => handleCancel(reservation.id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg text-sm uppercase transition-all"
+                          >
+                            ✗
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
+                {reservations.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    🎉 No hay reservas pendientes
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -421,16 +626,27 @@ export default function AdminPage() {
           <div>
             {/* Selector de mes */}
             <div className="mb-6">
-              <label className="block text-sm font-bold uppercase mb-2">Mes</label>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white outline-none"
-              >
-                <option value="2026-02">Febrero 2026</option>
-                <option value="2026-03">Marzo 2026</option>
-                <option value="2026-04">Abril 2026</option>
-              </select>
+              <label className="block text-sm font-bold uppercase mb-3">Mes</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: '2026-02', label: 'Febrero 2026' },
+                  { value: '2026-03', label: 'Marzo 2026' },
+                  { value: '2026-04', label: 'Abril 2026' },
+                  { value: '2026-05', label: 'Mayo 2026' },
+                ].map(month => (
+                  <button
+                    key={month.value}
+                    onClick={() => setSelectedMonth(month.value)}
+                    className={`px-5 py-2 rounded-lg font-bold uppercase transition-all ${
+                      selectedMonth === month.value
+                        ? 'bg-naik-gold text-black'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    {month.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Lista de disponibilidad */}
@@ -472,14 +688,29 @@ export default function AdminPage() {
                             className="w-16 h-16 rounded-full object-cover"
                           />
                         )}
-                        <div>
+                        <div className="flex-1">
                           <h3 className="text-xl font-black">{teacherInfo?.name || item.teacher_id}</h3>
                           <p className="text-sm text-gray-400">
                             {teacherInfo?.classes?.join(', ') || 'N/A'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Dias: {item.days?.join(', ') || 'No especificado'}
-                          </p>
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <span className="text-xs text-gray-500 font-bold uppercase">Días:</span>
+                            {item.days && item.days.length > 0 ? (
+                              item.days.slice(0, 6).map(day => (
+                                <span 
+                                  key={day}
+                                  className="inline-flex items-center justify-center w-7 h-7 bg-naik-gold/20 text-naik-gold border border-naik-gold/30 rounded text-xs font-bold"
+                                >
+                                  {day}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-gray-500">No especificado</span>
+                            )}
+                            {item.days && item.days.length > 6 && (
+                              <span className="text-xs text-gray-500">+{item.days.length - 6} más</span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -560,8 +791,8 @@ export default function AdminPage() {
 
                           {/* Edición de Días */}
                           <div>
-                            <h4 className="text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles</h4>
-                            <div className="flex gap-2 mb-3">
+                            <h4 className="text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles del Mes</h4>
+                            <div className="flex gap-2 mb-4">
                               <input
                                 type="number"
                                 min="1"
@@ -580,21 +811,33 @@ export default function AdminPage() {
                                 Agregar
                               </button>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {editForm.days.map(day => (
-                                <div
-                                  key={day}
-                                  className="bg-white/10 px-3 py-1 rounded-lg flex items-center gap-2"
-                                >
-                                  <span>{day}</span>
-                                  <button
-                                    onClick={() => handleRemoveDay(day)}
-                                    className="text-red-400 hover:text-red-300"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                </div>
-                              ))}
+                            
+                            {/* Mini Calendario Visual */}
+                            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                              <div className="grid grid-cols-7 gap-1">
+                                {Array.from({length: 31}, (_, i) => i + 1).map(day => {
+                                  const isSelected = editForm.days.includes(day);
+                                  return (
+                                    <button
+                                      key={day}
+                                      onClick={() => isSelected ? handleRemoveDay(day) : setEditForm({...editForm, days: [...editForm.days, day].sort((a,b) => a-b)})}
+                                      className={`
+                                        aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                                        ${isSelected 
+                                          ? 'bg-naik-gold text-black hover:bg-yellow-400' 
+                                          : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                                        }
+                                      `}
+                                      title={isSelected ? 'Click para quitar' : 'Click para agregar'}
+                                    >
+                                      {day}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-xs text-gray-400 mt-3 text-center">
+                                Click en un día para agregar/quitar • {editForm.days.length} días seleccionados
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -835,19 +1078,42 @@ export default function AdminPage() {
                 <Plus size={20} />
                 Agregar Nuevo Horario
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-400 uppercase mb-2">Día *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="31"
-                    value={newSchedule.day}
-                    onChange={(e) => setNewSchedule({...newSchedule, day: e.target.value})}
-                    placeholder="1-31"
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white outline-none"
-                  />
+              
+              {/* Calendario para seleccionar día */}
+              <div className="mb-6">
+                <label className="block text-sm font-bold uppercase mb-3 text-white">Seleccionar Día *</label>
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({length: 31}, (_, i) => i + 1).map(day => {
+                      const isSelected = newSchedule.day === String(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => setNewSchedule({...newSchedule, day: String(day)})}
+                          className={`
+                            aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                            ${isSelected 
+                              ? 'bg-naik-gold text-black' 
+                              : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                            }
+                          `}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {newSchedule.day && (
+                    <p className="text-xs text-naik-gold mt-3 text-center font-bold">
+                      Día {newSchedule.day} seleccionado
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              {/* Otros campos */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div>
                   <label className="block text-xs text-gray-400 uppercase mb-2">Hora *</label>
                   <input
@@ -888,9 +1154,10 @@ export default function AdminPage() {
                   />
                 </div>
               </div>
+              
               <button
                 onClick={handleAddSchedule}
-                className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl uppercase transition-all flex items-center justify-center gap-2"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl uppercase transition-all flex items-center justify-center gap-2"
               >
                 <Plus size={20} />
                 Agregar Horario
@@ -911,38 +1178,54 @@ export default function AdminPage() {
                       if (a.day !== b.day) return a.day - b.day;
                       return a.time.localeCompare(b.time);
                     })
-                    .map((schedule) => (
-                      <div
-                        key={schedule.id}
-                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-naik-gold/50 transition-all"
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="bg-naik-gold text-black font-black rounded-lg w-16 h-16 flex items-center justify-center text-2xl">
-                              {schedule.day}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <span className="text-lg font-bold text-white">{schedule.time}</span>
-                                <span className="text-gray-400">-</span>
-                                <span className="text-sm text-gray-400">{schedule.duration} min</span>
+                    .map((schedule) => {
+                      // Convertir mes "2026-02" a nombre
+                      const [year, month] = scheduleModal.month.split('-');
+                      const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                      const monthName = monthNames[parseInt(month) - 1];
+                      
+                      return (
+                        <div
+                          key={schedule.id}
+                          className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-naik-gold/50 transition-all"
+                        >
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 flex-1">
+                              {/* Badge del día con contexto */}
+                              <div className="text-center">
+                                <div className="bg-naik-gold text-black font-black rounded-xl px-4 py-3 mb-1">
+                                  <div className="text-3xl leading-none">{schedule.day}</div>
+                                </div>
+                                <div className="text-xs text-gray-400 font-bold uppercase">{monthName}</div>
                               </div>
-                              <p className="text-lg font-black text-naik-gold">{schedule.class_name}</p>
-                              <p className="text-sm text-gray-400 mt-1">
-                                Max: {schedule.max_students} alumnos
-                              </p>
+                              
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <span className="text-xl font-bold text-white">{schedule.time}</span>
+                                  <span className="text-gray-500">•</span>
+                                  <span className="text-sm text-gray-400">{schedule.duration} min</span>
+                                </div>
+                                <p className="text-lg font-black text-naik-gold mb-1">{schedule.class_name}</p>
+                                <div className="flex items-center gap-2">
+                                  <Users size={14} className="text-gray-500" />
+                                  <p className="text-sm text-gray-400">
+                                    Máximo: <span className="text-white font-bold">{schedule.max_students}</span> alumnos
+                                  </p>
+                                </div>
+                              </div>
                             </div>
+                            <button
+                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              className="bg-red-600 hover:bg-red-700 p-3 rounded-lg transition-all"
+                              title="Eliminar horario"
+                            >
+                              <Trash2 size={20} />
+                            </button>
                           </div>
-                          <button
-                            onClick={() => handleDeleteSchedule(schedule.id)}
-                            className="bg-red-600 hover:bg-red-700 p-3 rounded-lg transition-all"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={20} />
-                          </button>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               )}
             </div>
@@ -988,6 +1271,121 @@ export default function AdminPage() {
                 }`}
               >
                 Si, {confirmModal.action === 'confirm' ? 'confirmar' : 'cancelar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Agregar Disponibilidad */}
+      {addAvailabilityModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-2xl w-full p-6 my-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-black text-white uppercase">
+                Agregar Disponibilidad
+              </h3>
+              <button
+                onClick={() => setAddAvailabilityModal({ show: false, teacherId: '', cupos: 15, days: [] })}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Selección de profesor */}
+              <div>
+                <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">Profesor</label>
+                <select
+                  value={addAvailabilityModal.teacherId}
+                  onChange={(e) => setAddAvailabilityModal({...addAvailabilityModal, teacherId: e.target.value})}
+                  className="w-full bg-[#1a1a1a] border border-white/20 rounded-lg px-4 py-3 text-white outline-none"
+                  style={{
+                    colorScheme: 'dark'
+                  }}
+                >
+                  <option value="" style={{backgroundColor: '#1a1a1a', color: '#999'}}>Seleccionar profesor...</option>
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id} style={{backgroundColor: '#1a1a1a', color: 'white'}}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Mes */}
+              <div>
+                <label className="block text-sm font-bold uppercase mb-2 text-gray-400">Mes</label>
+                <p className="text-white font-bold text-lg">{selectedMonth}</p>
+              </div>
+
+              {/* Cupos por día */}
+              <div>
+                <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">Cupos por día</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={addAvailabilityModal.cupos}
+                  onChange={(e) => setAddAvailabilityModal({...addAvailabilityModal, cupos: parseInt(e.target.value) || 1})}
+                  className="w-32 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white outline-none"
+                />
+              </div>
+
+              {/* Calendario para días */}
+              <div>
+                <label className="block text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles</label>
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({length: 31}, (_, i) => i + 1).map(day => {
+                      const isSelected = addAvailabilityModal.days.includes(day);
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => {
+                            if (isSelected) {
+                              setAddAvailabilityModal({
+                                ...addAvailabilityModal,
+                                days: addAvailabilityModal.days.filter(d => d !== day)
+                              });
+                            } else {
+                              setAddAvailabilityModal({
+                                ...addAvailabilityModal,
+                                days: [...addAvailabilityModal.days, day].sort((a,b) => a-b)
+                              });
+                            }
+                          }}
+                          className={`
+                            aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                            ${isSelected 
+                              ? 'bg-naik-gold text-black hover:bg-yellow-400' 
+                              : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                            }
+                          `}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3 text-center">
+                    {addAvailabilityModal.days.length} días seleccionados
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botones */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setAddAvailabilityModal({ show: false, teacherId: '', cupos: 15, days: [] })}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl uppercase transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveAvailability}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl uppercase transition-all"
+              >
+                Guardar
               </button>
             </div>
           </div>
