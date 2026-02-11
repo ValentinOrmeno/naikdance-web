@@ -306,3 +306,42 @@ export async function resetAllAvailability() {
     throw error;
   }
 }
+
+/**
+ * Corrige cupos_reservados negativos poniendolos en 0
+ */
+export async function fixNegativeCupos() {
+  try {
+    // Obtener todos los registros con cupos negativos
+    const { data: negative, error: fetchError } = await supabase
+      .from('availability')
+      .select('*')
+      .lt('cupos_reservados', 0);
+
+    if (fetchError) {
+      console.error('Error al buscar cupos negativos:', fetchError);
+      throw new Error(fetchError.message);
+    }
+
+    if (!negative || negative.length === 0) {
+      return { success: true, fixed: 0 };
+    }
+
+    // Corregir cada uno a 0
+    for (const item of negative) {
+      const { error } = await supabase
+        .from('availability')
+        .update({ cupos_reservados: 0 })
+        .eq('id', item.id);
+
+      if (error) {
+        console.error('Error al corregir cupo:', error);
+      }
+    }
+
+    return { success: true, fixed: negative.length };
+  } catch (error: any) {
+    console.error('Error en fixNegativeCupos:', error);
+    throw error;
+  }
+}

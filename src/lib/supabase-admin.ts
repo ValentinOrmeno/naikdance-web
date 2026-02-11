@@ -39,8 +39,23 @@ export async function updateCuposReservados(teacherId: string, month: string, in
 
   const newReservas = availability.cupos_reservados + increment;
   
+  // Validar que no exceda el total
   if (newReservas > availability.cupos_total) {
     throw new Error('No hay cupos disponibles');
+  }
+  
+  // Validar que no sea negativo
+  if (newReservas < 0) {
+    console.warn('Intentando establecer cupos_reservados negativo, ajustando a 0');
+    const { data, error } = await supabase
+      .from('availability')
+      .update({ cupos_reservados: 0 })
+      .eq('teacher_id', teacherId)
+      .eq('month', month)
+      .select();
+    
+    if (error) throw error;
+    return data && data.length > 0 ? data[0] : null;
   }
 
   const { data, error } = await supabase
