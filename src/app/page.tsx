@@ -2,7 +2,8 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
 import Classes from '@/components/Classes';
-import Schedule from '@/components/Schedule';
+// import Schedule from '@/components/Schedule'; // Comentado - datos hardcodeados, reemplazado por Instagram
+// import InstagramFeed from '@/components/InstagramFeed'; // Comentado - sección de Instagram removida
 import Pricing from '@/components/Pricing';
 import TeachersGrid from '@/components/TeachersGrid';
 import FAQ from '@/components/FAQ';
@@ -18,7 +19,8 @@ export default function Home() {
       <Hero />
       <About />
       <Classes />
-      <Schedule />
+      {/* <Schedule /> */} {/* Comentado - datos hardcodeados */}
+      {/* <InstagramFeed /> */} {/* Comentado - sección de Instagram removida */}
       <Pricing />
       <TeachersGrid />
       <FAQ />
