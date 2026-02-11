@@ -143,7 +143,7 @@ export default function AdminPage() {
   };
 
   const handleResetAllCupos = async () => {
-    if (!confirm('⚠️ ATENCIÓN: Esto eliminará TODA la disponibilidad (días y cupos) de todos los profesores. ¿Estás seguro?')) {
+    if (!confirm('ATENCION: Esto eliminara TODA la disponibilidad (dias y cupos) de todos los profesores. Estas seguro?')) {
       return;
     }
     
@@ -154,7 +154,7 @@ export default function AdminPage() {
     try {
       setLoading(true);
       await resetAllAvailability();
-      alert('✓ Todos los cupos fueron eliminados correctamente');
+      alert('Todos los cupos fueron eliminados correctamente');
       await loadData();
     } catch (error: any) {
       console.error('Error al resetear cupos:', error);
@@ -394,7 +394,7 @@ export default function AdminPage() {
           {loginError && (
             <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-lg p-3 animate-fade-in">
               <p className="text-red-400 text-sm font-bold text-center">
-                ⚠️ {loginError}
+                {loginError}
               </p>
             </div>
           )}
@@ -559,7 +559,7 @@ export default function AdminPage() {
               <div className="mt-6 pt-6 border-t border-red-500/20">
                 <details className="group">
                   <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-400 uppercase font-bold tracking-wide flex items-center gap-2">
-                    <span>⚠️ Zona de Admin Avanzado</span>
+                    <span>Zona de Admin Avanzado</span>
                     <span className="group-open:rotate-180 transition-transform">▼</span>
                   </summary>
                   <div className="mt-4">
@@ -591,7 +591,7 @@ export default function AdminPage() {
                     onClick={() => setActiveTab('pendientes')}
                     className="text-sm text-naik-gold hover:text-yellow-400 font-bold uppercase transition-colors"
                   >
-                    Ver todas →
+                    Ver todas
                   </button>
                 </div>
                 
@@ -619,13 +619,13 @@ export default function AdminPage() {
                             onClick={() => handleConfirm(reservation.id)}
                             className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg text-sm uppercase transition-all"
                           >
-                            ✓
+                            OK
                           </button>
                           <button
                             onClick={() => handleCancel(reservation.id)}
                             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg text-sm uppercase transition-all"
                           >
-                            ✗
+                            X
                           </button>
                         </div>
                       </div>
@@ -869,7 +869,7 @@ export default function AdminPage() {
                                 })}
                               </div>
                               <p className="text-xs text-gray-400 mt-3 text-center">
-                                Click en un día para agregar/quitar • {editForm.days.length} días seleccionados
+                                Click en un dia para agregar/quitar - {editForm.days.length} dias seleccionados
                               </p>
                             </div>
                           </div>
@@ -971,7 +971,7 @@ export default function AdminPage() {
                       onClick={() => handleConfirm(reservation.id)}
                       className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl uppercase transition-all"
                     >
-                      ✓ Confirmar
+                      Confirmar
                     </button>
                     <button
                       onClick={() => handleCancel(reservation.id)}
@@ -1118,10 +1118,10 @@ export default function AdminPage() {
                 {scheduleModal.availableDays.length === 0 ? (
                   <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
                     <p className="text-yellow-500 font-bold text-sm">
-                      ⚠️ No hay disponibilidad (cupos) para este profesor en este mes
+                      No hay disponibilidad (cupos) para este profesor en este mes
                     </p>
                     <p className="text-gray-400 text-xs mt-2">
-                      Primero creá disponibilidad desde "Dashboard → Agregar Disponibilidad"
+                      Primero crea disponibilidad desde Dashboard - Agregar Disponibilidad
                     </p>
                   </div>
                 ) : (
@@ -1264,7 +1264,7 @@ export default function AdminPage() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                   <span className="text-xl font-bold text-white">{schedule.time}</span>
-                                  <span className="text-gray-500">•</span>
+                                  <span className="text-gray-500">-</span>
                                   <span className="text-sm text-gray-400">{schedule.duration} min</span>
                                 </div>
                                 <p className="text-lg font-black text-naik-gold mb-1">{schedule.class_name}</p>
