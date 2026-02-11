@@ -2,6 +2,7 @@
 
 import { SiMercadopago } from "react-icons/si";
 import { useState } from "react";
+import { X } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 
 const priceCards = [
@@ -45,6 +46,10 @@ const priceCards = [
 
 export default function Pricing() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [pendingPayment, setPendingPayment] = useState<{title: string, name: string, price: number} | null>(null);
 
   const formatPackName = (title: string, name: string) => {
     if (title === "Cuponeras") {
@@ -70,12 +75,30 @@ export default function Pricing() {
   };
 
   const handleMercadoPagoClick = async (title: string, name: string, price: number) => {
-    const loadingKey = `${title}-${name}`;
+    // Abrir modal para capturar datos
+    setPendingPayment({ title, name, price });
+    setShowModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!userName.trim() || !userEmail.trim()) {
+      alert('Por favor completa tu nombre y email');
+      return;
+    }
+
+    if (!pendingPayment) return;
+
+    const loadingKey = `${pendingPayment.title}-${pendingPayment.name}`;
     setLoadingId(loadingKey);
+    setShowModal(false);
 
     try {
-      const fullTitle = `${title} - ${name}`;
-      const category = title;
+      // Guardar datos en sessionStorage
+      sessionStorage.setItem('paymentUserName', userName);
+      sessionStorage.setItem('paymentUserEmail', userEmail);
+
+      const fullTitle = `${pendingPayment.title} - ${pendingPayment.name}`;
+      const category = pendingPayment.title;
 
       const response = await fetch('/api/create-preference', {
         method: 'POST',
@@ -84,7 +107,7 @@ export default function Pricing() {
         },
         body: JSON.stringify({
           title: fullTitle,
-          price: price,
+          price: pendingPayment.price,
           category: category,
         }),
       });
@@ -202,6 +225,64 @@ export default function Pricing() {
           ))}
         </div>
       </section>
+
+      {/* Modal para capturar datos del usuario */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-black text-white uppercase">
+                Completa tus datos
+              </h3>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setLoadingId(null);
+                }}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">
+                  Nombre Completo *
+                </label>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Ej: Juan Perez"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white outline-none focus:border-naik-gold transition-colors"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white outline-none focus:border-naik-gold transition-colors"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleConfirmPayment}
+              className="w-full bg-[#00A8E8] hover:bg-[#0095d1] text-white font-bold uppercase py-4 rounded-xl transition-all hover:shadow-[0_8px_25px_rgba(0,168,232,0.5)]"
+            >
+              Continuar al Pago
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

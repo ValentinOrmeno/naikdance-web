@@ -9,10 +9,18 @@ function ClaseReservadaContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('loading');
   const [countdown, setCountdown] = useState(5);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     const paymentStatus = searchParams.get('status');
     setStatus(paymentStatus || 'approved');
+
+    // Recuperar datos del usuario desde sessionStorage
+    const storedName = sessionStorage.getItem('paymentUserName') || '';
+    const storedEmail = sessionStorage.getItem('paymentUserEmail') || '';
+    setUserName(storedName);
+    setUserEmail(storedEmail);
 
     // Countdown para redirección
     if (paymentStatus === 'approved') {
@@ -20,11 +28,18 @@ function ClaseReservadaContent() {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            // Redirigir a WhatsApp
-            const message = `Hola NAIK! Ya complete el pago de mi clase. 
-            
+            // Redirigir a WhatsApp con los datos del usuario
+            const message = `Hola NAIK! Ya complete el pago con Mercado Pago.
+
+Nombre: ${storedName}
+Email: ${storedEmail}
+
 Confirmo mi reserva. Gracias!`;
             window.location.href = `https://wa.me/5491168582586?text=${encodeURIComponent(message)}`;
+            
+            // Limpiar sessionStorage después de usar
+            sessionStorage.removeItem('paymentUserName');
+            sessionStorage.removeItem('paymentUserEmail');
           }
           return prev - 1;
         });
@@ -132,7 +147,12 @@ Confirmo mi reserva. Gracias!`;
             {/* Botones */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://wa.me/5491168582586?text=Hola! Ya complete el pago de mi clase. Confirmo mi reserva. Gracias!"
+                href={`https://wa.me/5491168582586?text=${encodeURIComponent(`Hola NAIK! Ya complete el pago con Mercado Pago.
+
+Nombre: ${userName}
+Email: ${userEmail}
+
+Confirmo mi reserva. Gracias!`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl uppercase transition-all shadow-[0_0_30px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2"
