@@ -5,6 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageLoader from "@/components/PageLoader";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -103,6 +104,7 @@ export default function RootLayout({
       <body className="font-inter bg-naik-black text-white antialiased">
         <GoogleAnalytics />
         <SpeedInsights />
+        <Analytics />
         <PageLoader />
         {children}
       </body>
