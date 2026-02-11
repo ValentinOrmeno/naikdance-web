@@ -71,8 +71,13 @@ export default function AdminPage() {
   // Helper: verificar si un día ya pasó
   const isDayPast = (day: number, month: string) => {
     const [year, monthNum] = month.split('-').map(Number);
-    const dayDate = new Date(year, monthNum - 1, day, 23, 59, 59); // Final del día
+    const dayDate = new Date(year, monthNum - 1, day);
+    
+    // Obtener solo la fecha de hoy sin hora (inicio del día)
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // El día es "pasado" si es anterior al día actual (no incluye el día actual)
     return dayDate < today;
   };
 

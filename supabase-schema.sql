@@ -63,15 +63,28 @@ INSERT INTO availability (teacher_id, month, days, cupos_total, cupos_reservados
 ALTER TABLE availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
 
--- 8. Políticas de seguridad (permitir lectura pública, escritura solo autenticados)
-CREATE POLICY "Availability es pública para lectura" ON availability
+-- 8. Políticas de seguridad para availability (lectura y escritura pública)
+CREATE POLICY "Availability lectura pública" ON availability
   FOR SELECT USING (true);
 
+CREATE POLICY "Availability escritura pública" ON availability
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Availability actualización pública" ON availability
+  FOR UPDATE USING (true);
+
+CREATE POLICY "Availability eliminación pública" ON availability
+  FOR DELETE USING (true);
+
+-- 9. Políticas de seguridad para reservations (lectura y escritura pública)
 CREATE POLICY "Reservations lectura pública" ON reservations
   FOR SELECT USING (true);
 
 CREATE POLICY "Reservations escritura pública" ON reservations
   FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Reservations actualización pública" ON reservations
+  FOR UPDATE USING (true);
 
 -- Nota: En producción, deberías restringir más las políticas
 -- Por ahora, para simplificar, permitimos lectura/escritura pública
