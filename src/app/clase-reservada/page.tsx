@@ -123,10 +123,6 @@ Confirmo mi reserva. Gracias!`;
                   Tu reserva ha sido confirmada automáticamente
                 </p>
                 <p className="flex items-center gap-2">
-                  <Mail size={16} className="text-blue-400" />
-                  Recibirás un email de confirmación
-                </p>
-                <p className="flex items-center gap-2">
                   <Phone size={16} className="text-green-400" />
                   Te contactaremos por WhatsApp con los detalles finales
                 </p>
