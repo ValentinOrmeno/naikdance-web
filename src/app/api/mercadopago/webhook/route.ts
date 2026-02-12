@@ -114,9 +114,10 @@ export async function POST(request: NextRequest) {
       // Solo procesar pagos aprobados
       if (paymentData.status === 'approved') {
         const metadata = paymentData.metadata || {};
+        const metaType = (metadata.type || '').toString();
         
         // Verificar que sea una clase suelta
-        if (metadata.type === 'clase_suelta') {
+        if (metaType === 'clase_suelta') {
           console.log('=== PAGO APROBADO - CREANDO RESERVA ===');
           
           // Crear reserva en Supabase
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
               { status: 500 }
             );
           }
-        } else if (metadata.type === 'pack') {
+        } else if (metaType === 'pack' || (metadata.category && !metaType)) {
           console.log('=== PAGO APROBADO - REGISTRANDO PACK/CUPONERA ===');
 
           try {
