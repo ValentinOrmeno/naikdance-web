@@ -225,7 +225,7 @@ export default function AdminPage() {
       });
       alert('Disponibilidad agregada correctamente');
       setAddAvailabilityModal({ show: false, teacherId: '', cupos: 15, days: [] });
-      if (activeTab === 'cupos') await loadAvailability();
+      if (activeTab === "clases") await loadAvailability();
     } catch (error: any) {
       console.error('Error al agregar disponibilidad:', error);
       alert('Error al agregar disponibilidad');
