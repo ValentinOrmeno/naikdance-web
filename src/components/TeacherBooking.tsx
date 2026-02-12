@@ -284,11 +284,27 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
       }
 
       const { init_point } = await response.json();
-      
+
+      // Guardar datos del pago en sessionStorage para la pantalla de confirmacion
+      try {
+        sessionStorage.setItem('paymentContext', 'clase');
+        sessionStorage.setItem('paymentUserName', nombre);
+        sessionStorage.setItem('paymentUserEmail', email);
+        sessionStorage.setItem('paymentTeacherName', teacher.name || '');
+        sessionStorage.setItem('paymentClassInfo', claseInfo);
+        sessionStorage.setItem('paymentDate', fecha);
+      } catch (e) {
+        console.error('No se pudieron guardar datos de pago en sessionStorage:', e);
+      }
+
       // Guardar datos del usuario para futuros usos
-      localStorage.setItem('bookingUserName', nombre);
-      localStorage.setItem('bookingUserEmail', email);
-      if (telefono) localStorage.setItem('bookingUserPhone', telefono);
+      try {
+        localStorage.setItem('bookingUserName', nombre);
+        localStorage.setItem('bookingUserEmail', email);
+        if (telefono) localStorage.setItem('bookingUserPhone', telefono);
+      } catch (e) {
+        console.error('No se pudieron guardar datos de booking en localStorage:', e);
+      }
       
       // Redirigir a Mercado Pago
       console.log('Redirigiendo a Mercado Pago...');

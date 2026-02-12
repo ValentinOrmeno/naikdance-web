@@ -105,10 +105,39 @@ export async function createPackPurchase(input: {
 }
 
 /**
- * Obtiene todas las compras de packs/cuponeras (más recientes primero)
+ * Marca como "vencidos" los packs/cuponeras que tengan más de 30 días
+ * desde su creación y que aún estén en estado "activo".
+ */
+async function expireOldPacksIfNeeded() {
+  try {
+    const now = Date.now();
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const cutoffIso = new Date(now - THIRTY_DAYS_MS).toISOString();
+
+    const { error } = await supabase
+      .from('pack_purchases')
+      .update({ status: 'vencido' })
+      .lt('created_at', cutoffIso)
+      .eq('status', 'activo');
+
+    if (error) {
+      console.error('Error al marcar packs vencidos:', error);
+      // No lanzamos error para no romper el flujo principal; solo logueamos
+    }
+  } catch (error: any) {
+    console.error('Error en expireOldPacksIfNeeded:', error);
+  }
+}
+
+/**
+ * Obtiene todas las compras de packs/cuponeras (más recientes primero).
+ * Antes de devolver datos, marca como "vencidos" los packs con más de 30 días.
  */
 export async function getAllPackPurchases(): Promise<PackPurchase[]> {
   try {
+    // Asegurar expiración por fecha antes de leer
+    await expireOldPacksIfNeeded();
+
     const { data, error } = await supabase
       .from('pack_purchases')
       .select('*')

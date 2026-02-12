@@ -133,14 +133,32 @@ export default function Pricing() {
       // Guardar datos en sessionStorage (para el flujo de pago actual)
       sessionStorage.setItem('paymentUserName', userName);
       sessionStorage.setItem('paymentUserEmail', userEmail);
-      
-      // Guardar también en localStorage (para futuros usos)
-      localStorage.setItem('bookingUserName', userName);
-      localStorage.setItem('bookingUserEmail', userEmail);
 
       const fullTitle = `${pendingPayment.title} - ${pendingPayment.name}`;
       const category = pendingPayment.title;
       const classesCount = getClassesCountForPack(pendingPayment.title, pendingPayment.name);
+
+      // Guardar contexto del pago (pack/cuponera/pase/etc) para la pantalla de confirmacion
+      try {
+        sessionStorage.setItem('paymentContext', 'pack');
+        sessionStorage.setItem('paymentPackTitle', pendingPayment.title);
+        sessionStorage.setItem('paymentPackName', pendingPayment.name);
+        if (classesCount !== null) {
+          sessionStorage.setItem('paymentClassesCount', String(classesCount));
+        } else {
+          sessionStorage.removeItem('paymentClassesCount');
+        }
+      } catch (e) {
+        console.error('No se pudieron guardar datos de pack en sessionStorage:', e);
+      }
+
+      // Guardar también en localStorage (para futuros usos en formularios)
+      try {
+        localStorage.setItem('bookingUserName', userName);
+        localStorage.setItem('bookingUserEmail', userEmail);
+      } catch (e) {
+        console.error('No se pudieron guardar datos de booking en localStorage:', e);
+      }
 
       const response = await fetch('/api/create-preference', {
         method: 'POST',

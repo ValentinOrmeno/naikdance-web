@@ -505,8 +505,6 @@ export default function AdminPage() {
     try {
       if (confirmModal.action === 'confirm') {
         await confirmReservation(confirmModal.id);
-        alert('Reserva confirmada! Cupos actualizados.');
-
         // Luego de confirmar, buscar si hay un pack activo para este alumno
         const confirmedReservation = reservations.find((r) => r.id === confirmModal.id);
         if (confirmedReservation && confirmedReservation.email) {
@@ -593,7 +591,6 @@ export default function AdminPage() {
         await cancelReservation(confirmModal.id);
         // Después de cancelar, corregir automáticamente cupos negativos si los hay
         await fixNegativeCupos();
-        alert('Reserva cancelada.');
       }
       setConfirmModal({ show: false, id: '', action: 'confirm' });
       
@@ -1837,16 +1834,8 @@ export default function AdminPage() {
                       prev.map((p) => (p.id === updated.id ? updated : p))
                     );
 
-                    const total = updated.clases_incluidas;
-                    const usadas = updated.clases_usadas;
-                    const restantes =
-                      total === null ? "∞" : Math.max(total - usadas, 0).toString();
-
-                    alert(
-                      total === null
-                        ? `Se descontó 1 clase del pack. Lleva ${usadas} clases usadas.`
-                        : `Se descontó 1 clase del pack. Lleva ${usadas}/${total} clases (restan ${restantes}).`
-                    );
+                    // Ya se ve el nuevo uso reflejado en el tab de créditos,
+                    // no hace falta mostrar un alert extra del navegador.
                   } catch (error) {
                     console.error("Error al usar crédito del pack desde modal:", error);
                     alert("Error al usar un crédito del pack");
