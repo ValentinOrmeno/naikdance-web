@@ -14,8 +14,9 @@ import {
   deleteClassSchedule,
   resetAllAvailability,
   fixNegativeCupos,
+  getAllPackPurchases,
 } from "@/lib/supabase-admin-extended";
-import type { Reservation, Availability, ClassSchedule } from "@/lib/supabase";
+import type { Reservation, Availability, ClassSchedule, PackPurchase } from "@/lib/supabase";
 import type { AdminStats } from "@/lib/supabase-admin-extended";
 import {
   X,
@@ -34,7 +35,7 @@ import {
 } from "lucide-react";
 import { teachers } from "@/data/teachers";
 
-type Tab = "dashboard" | "reservas" | "clases";
+type Tab = "dashboard" | "reservas" | "clases" | "creditos";
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
@@ -48,6 +49,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [reservasFilter, setReservasFilter] = useState<"todas" | "pendiente" | "confirmada">("pendiente");
+  const [packPurchases, setPackPurchases] = useState<PackPurchase[]>([]);
   
   // Generar mes actual por defecto
   const getCurrentMonth = () => {
@@ -434,6 +436,18 @@ export default function AdminPage() {
     setLoading(false);
   };
 
+  const loadPackPurchases = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllPackPurchases();
+      setPackPurchases(data || []);
+    } catch (error) {
+      console.error("Error al cargar packs:", error);
+      alert("Error al cargar packs y cuponeras");
+    }
+    setLoading(false);
+  };
+
   const loadStats = async () => {
     setLoading(true);
     try {
@@ -454,6 +468,8 @@ export default function AdminPage() {
       loadReservations(status);
     } else if (activeTab === 'clases') {
       loadAvailability();
+    } else if (activeTab === "creditos") {
+      loadPackPurchases();
     }
   };
 
@@ -755,6 +771,7 @@ export default function AdminPage() {
     { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
     { id: 'reservas', label: 'Reservas', icon: Clock },
     { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
+    { id: 'creditos', label: 'Alumnos y Créditos', icon: Users },
   ] as const;
 
   return (
@@ -1055,6 +1072,110 @@ export default function AdminPage() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* TAB: ALUMNOS Y CRÉDITOS (packs/cuponeras) */}
+        {activeTab === "creditos" && (
+          <div className="space-y-4">
+            {loading && (
+              <div className="text-center py-12 text-gray-400">
+                Cargando packs y cuponeras...
+              </div>
+            )}
+
+            {!loading && packPurchases.length === 0 && (
+              <div className="text-center py-12 text-gray-400">
+                Todavía no hay compras de packs o cuponeras registradas
+              </div>
+            )}
+
+            {!loading &&
+              packPurchases.map((pack) => {
+                const usadas = pack.clases_usadas;
+                const total = pack.clases_incluidas;
+                const restantes =
+                  total === null ? "∞" : Math.max(total - usadas, 0).toString();
+
+                return (
+                  <div
+                    key={pack.id}
+                    className="bg-[#111] border border-white/20 rounded-xl p-6 hover:border-naik-gold/50 transition-all"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs text-gray-400 uppercase mb-1">
+                          Alumno
+                        </p>
+                        <p className="font-bold text-lg">
+                          {pack.alumno_nombre}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {pack.alumno_email}
+                        </p>
+                        {pack.alumno_telefono && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Tel: {pack.alumno_telefono}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">
+                            Tipo de pack
+                          </p>
+                          <p className="text-sm font-bold">
+                            {pack.pack_type} -{" "}
+                            <span className="text-naik-gold">
+                              {pack.pack_name}
+                            </span>
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">
+                            Clases
+                          </p>
+                          <p className="text-sm font-bold">
+                            {total === null
+                              ? "Ilimitadas"
+                              : `${usadas}/${total}`}{" "}
+                            {total !== null && (
+                              <span className="text-xs text-gray-400 ml-1">
+                                (restan {restantes})
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">
+                            Estado
+                          </p>
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                              pack.status === "activo"
+                                ? "bg-green-500/20 text-green-400"
+                                : pack.status === "completo"
+                                ? "bg-blue-500/20 text-blue-400"
+                                : "bg-red-500/20 text-red-400"
+                            }`}
+                          >
+                            {pack.status.toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {/* Placeholder para acciones futuras: usar crédito, enviar WhatsApp, etc. */}
+                      <p className="text-xs text-gray-500">
+                        Próximamente: usar créditos y enviar mensaje de saldo por
+                        WhatsApp desde acá.
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         )}
       </div>

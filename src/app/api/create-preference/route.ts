@@ -4,7 +4,7 @@ import { preference } from '@/lib/mercadopago';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, price, category } = body;
+    const { title, price, category, userName, userEmail, classesCount } = body;
 
     if (!title || price == null || price === '') {
       return NextResponse.json(
@@ -25,12 +25,22 @@ export async function POST(request: NextRequest) {
           currency_id: 'ARS',
         },
       ],
+      metadata: {
+        type: 'pack',
+        category: category,
+        title: String(title).substring(0, 255),
+        alumno_nombre: userName || '',
+        alumno_email: userEmail || '',
+        clases_incluidas: typeof classesCount === 'number' ? classesCount : null,
+      },
       back_urls: {
         success: `${siteUrl}/pago-exitoso`,
         failure: `${siteUrl}/pago-fallido`,
         pending: `${siteUrl}/pago-exitoso?status=pending`,
       },
-      auto_return: 'approved',
+      // Para packs/cuponeras no necesitamos auto_return; lo quitamos para evitar
+      // el error "auto_return invalid. back_url.success must be defined" de Mercado Pago
+      notification_url: `${siteUrl}/api/mercadopago/webhook`,
       statement_descriptor: 'NAIK DANCE',
     };
 

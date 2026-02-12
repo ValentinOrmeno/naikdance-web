@@ -18,6 +18,21 @@ export type AdminStats = {
   };
 };
 
+export type PackPurchase = {
+  id: string;
+  alumno_email: string;
+  alumno_nombre: string;
+  alumno_telefono?: string;
+  pack_type: string;
+  pack_name: string;
+  clases_incluidas: number | null;
+  clases_usadas: number;
+  status: 'activo' | 'completo' | 'vencido';
+  origin: 'mercado_pago' | 'efectivo' | 'manual';
+  payment_id?: string;
+  created_at: string;
+};
+
 /**
  * Obtiene TODAS las reservas, opcionalmente filtradas por estado
  */
@@ -42,6 +57,121 @@ export async function getAllReservations(status?: 'pendiente' | 'confirmada' | '
     return data;
   } catch (error: any) {
     console.error('Error en getAllReservations:', error);
+    throw error;
+  }
+}
+
+/**
+ * Crea un registro de compra de pack/cuponera
+ */
+export async function createPackPurchase(input: {
+  alumno_email: string;
+  alumno_nombre: string;
+  alumno_telefono?: string;
+  pack_type: string;
+  pack_name: string;
+  clases_incluidas: number | null;
+  origin: 'mercado_pago' | 'efectivo' | 'manual';
+  payment_id?: string;
+}): Promise<PackPurchase> {
+  try {
+    const payload = {
+      alumno_email: input.alumno_email,
+      alumno_nombre: input.alumno_nombre,
+      alumno_telefono: input.alumno_telefono ?? null,
+      pack_type: input.pack_type,
+      pack_name: input.pack_name,
+      clases_incluidas: input.clases_incluidas,
+      origin: input.origin,
+      payment_id: input.payment_id ?? null,
+    };
+
+    const { data, error } = await supabase
+      .from('pack_purchases')
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error al crear pack_purchase:', error);
+      throw new Error(error.message);
+    }
+
+    return data as PackPurchase;
+  } catch (error: any) {
+    console.error('Error en createPackPurchase:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene todas las compras de packs/cuponeras (más recientes primero)
+ */
+export async function getAllPackPurchases(): Promise<PackPurchase[]> {
+  try {
+    const { data, error } = await supabase
+      .from('pack_purchases')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error al obtener pack_purchases:', error);
+      throw new Error(error.message);
+    }
+
+    return (data || []) as PackPurchase[];
+  } catch (error: any) {
+    console.error('Error en getAllPackPurchases:', error);
+    throw error;
+  }
+}
+
+/**
+ * Incrementa el uso de clases de un pack
+ */
+export async function incrementPackUsage(
+  id: string,
+  amount: number = 1
+): Promise<PackPurchase | null> {
+  try {
+    const { data, error } = await supabase
+      .from('pack_purchases')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error al obtener pack_purchase:', error);
+      throw new Error(error.message);
+    }
+
+    const current = (data || {}) as PackPurchase;
+    const total = current.clases_incluidas ?? null;
+    const newUsadas = current.clases_usadas + amount;
+
+    let newStatus: PackPurchase['status'] = current.status;
+    if (total !== null && newUsadas >= total) {
+      newStatus = 'completo';
+    }
+
+    const { data: updated, error: updateError } = await supabase
+      .from('pack_purchases')
+      .update({
+        clases_usadas: newUsadas,
+        status: newStatus,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error al actualizar pack_purchase:', updateError);
+      throw new Error(updateError.message);
+    }
+
+    return updated as PackPurchase;
+  } catch (error: any) {
+    console.error('Error en incrementPackUsage:', error);
     throw error;
   }
 }

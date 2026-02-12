@@ -44,6 +44,32 @@ const priceCards = [
   },
 ];
 
+const getClassesCountForPack = (title: string, name: string): number | null => {
+  // Pack Mensual: PACK X2, PACK X3, PACK X4 -> 2,3,4 clases
+  if (title === "Pack Mensual") {
+    const match = name.match(/X(\d+)/i);
+    if (match) return parseInt(match[1], 10) || null;
+  }
+
+  // Cuponeras: "4 Clases", "8 Clases", etc.
+  if (title === "Cuponeras") {
+    const num = parseInt(name, 10);
+    return isNaN(num) ? null : num;
+  }
+
+  // Pase Libre / Full: ilimitado (null)
+  if (title === "Pase Libre / Full") {
+    return null;
+  }
+
+  // Clase suelta u otros: 1
+  if (title === "Clase Suelta") {
+    return 1;
+  }
+
+  return null;
+};
+
 export default function Pricing() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -114,6 +140,7 @@ export default function Pricing() {
 
       const fullTitle = `${pendingPayment.title} - ${pendingPayment.name}`;
       const category = pendingPayment.title;
+      const classesCount = getClassesCountForPack(pendingPayment.title, pendingPayment.name);
 
       const response = await fetch('/api/create-preference', {
         method: 'POST',
@@ -124,6 +151,9 @@ export default function Pricing() {
           title: fullTitle,
           price: pendingPayment.price,
           category: category,
+          userName,
+          userEmail,
+          classesCount,
         }),
       });
 

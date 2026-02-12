@@ -88,3 +88,40 @@ CREATE POLICY "Reservations actualización pública" ON reservations
 
 -- Nota: En producción, deberías restringir más las políticas
 -- Por ahora, para simplificar, permitimos lectura/escritura pública
+
+-- 10. Tabla de compras de packs y cuponeras
+CREATE TABLE pack_purchases (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  alumno_email TEXT NOT NULL,
+  alumno_nombre TEXT NOT NULL,
+  alumno_telefono TEXT,
+  pack_type TEXT NOT NULL, -- Ej: "Pack Mensual", "Cuponeras", "Pase Libre / Full"
+  pack_name TEXT NOT NULL, -- Ej: "PACK X4", "8 Clases"
+  clases_incluidas INTEGER, -- Cantidad de clases incluidas (NULL = ilimitado)
+  clases_usadas INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'activo' CHECK (status IN ('activo', 'completo', 'vencido')),
+  origin TEXT NOT NULL CHECK (origin IN ('mercado_pago', 'efectivo', 'manual')),
+  payment_id TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Índices para búsquedas rápidas
+CREATE INDEX idx_pack_purchases_email ON pack_purchases(alumno_email);
+CREATE INDEX idx_pack_purchases_status ON pack_purchases(status);
+
+-- Trigger para updated_at en pack_purchases
+CREATE TRIGGER update_pack_purchases_updated_at BEFORE UPDATE ON pack_purchases
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- RLS para pack_purchases (lectura/escritura pública por ahora)
+ALTER TABLE pack_purchases ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Pack purchases lectura pública" ON pack_purchases
+  FOR SELECT USING (true);
+
+CREATE POLICY "Pack purchases escritura pública" ON pack_purchases
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Pack purchases actualización pública" ON pack_purchases
+  FOR UPDATE USING (true);

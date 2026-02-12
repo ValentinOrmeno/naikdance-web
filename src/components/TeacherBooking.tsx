@@ -135,7 +135,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
     setSelectedSchedule(null);
   };
 
-  const handleWhatsAppConsulta = () => {
+  const handleWhatsAppConsulta = async () => {
     if (!formValid) return alert('Por favor completa todos los campos requeridos');
     if (!selectedSchedule) return alert('Por favor selecciona un horario');
     
@@ -144,6 +144,22 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
     const claseInfo = selectedSchedule 
       ? `${selectedSchedule.class_name} - ${selectedSchedule.time}hs`
       : 'A coordinar';
+
+    // Crear una reserva pendiente en Supabase para que aparezca en el panel
+    try {
+      await createReservation({
+        teacher_id: teacher.id,
+        nombre,
+        email,
+        telefono: telefono || undefined,
+        clase: claseInfo,
+        fecha,
+        month: currentMonth,
+      });
+    } catch (error) {
+      console.error('Error al crear reserva pendiente para consulta:', error);
+      // No bloqueamos el flujo de WhatsApp si falla el registro
+    }
     
     const telefonoInfo = telefono ? `
 - Telefono: ${telefono}` : '';
@@ -156,7 +172,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 - Clase: ${claseInfo}
 - Duracion: ${selectedSchedule.duration} minutos`;
 
-    const whatsappUrl = `https://wa.me/5491133445566?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

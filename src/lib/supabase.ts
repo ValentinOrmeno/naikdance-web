@@ -49,3 +49,18 @@ export type ClassSchedule = {
   price: number; // precio en pesos
   created_at: string;
 };
+
+export type PackPurchase = {
+  id: string;
+  alumno_email: string;
+  alumno_nombre: string;
+  alumno_telefono?: string;
+  pack_type: string;
+  pack_name: string;
+  clases_incluidas: number | null;
+  clases_usadas: number;
+  status: 'activo' | 'completo' | 'vencido';
+  origin: 'mercado_pago' | 'efectivo' | 'manual';
+  payment_id?: string;
+  created_at: string;
+};

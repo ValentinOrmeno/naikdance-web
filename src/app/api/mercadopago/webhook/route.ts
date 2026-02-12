@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createReservation } from '@/lib/supabase-admin';
+import { createPackPurchase } from '@/lib/supabase-admin-extended';
 
 // Valida la firma de Mercado Pago usando x-signature y x-request-id
 // Doc oficial: https://www.mercadopago.com.ar/developers/en/docs/your-integrations/notifications/webhooks
@@ -149,8 +150,34 @@ export async function POST(request: NextRequest) {
               { status: 500 }
             );
           }
+        } else if (metadata.type === 'pack') {
+          console.log('=== PAGO APROBADO - REGISTRANDO PACK/CUPONERA ===');
+
+          try {
+            await createPackPurchase({
+              alumno_email: metadata.alumno_email,
+              alumno_nombre: metadata.alumno_nombre,
+              alumno_telefono: metadata.alumno_telefono || undefined,
+              pack_type: metadata.category || 'Pack',
+              pack_name: metadata.title || '',
+              clases_incluidas:
+                typeof metadata.clases_incluidas === 'number'
+                  ? metadata.clases_incluidas
+                  : null,
+              origin: 'mercado_pago',
+              payment_id: paymentId.toString(),
+            });
+
+            console.log('Pack/cuponera registrado correctamente');
+          } catch (error) {
+            console.error('Error al registrar pack/cuponera:', error);
+            return NextResponse.json(
+              { error: 'Error creating pack purchase' },
+              { status: 500 }
+            );
+          }
         } else {
-          console.log('Not a clase_suelta payment, ignoring');
+          console.log('Pago recibido sin metadata conocida, ignorando');
         }
       } else {
         console.log(`Payment status: ${paymentData.status}, skipping reservation`);
