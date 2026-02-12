@@ -510,6 +510,14 @@ export default function AdminPage() {
         // Luego de confirmar, buscar si hay un pack activo para este alumno
         const confirmedReservation = reservations.find((r) => r.id === confirmModal.id);
         if (confirmedReservation && confirmedReservation.email) {
+          // Asegurarnos de tener packs cargados aunque el usuario no haya entrado a la pestaña "Alumnos y Créditos"
+          let packsParaBuscar = packPurchases;
+          if (!packsParaBuscar || packsParaBuscar.length === 0) {
+            const data = await getAllPackPurchases();
+            packsParaBuscar = data || [];
+            setPackPurchases(packsParaBuscar);
+          }
+
           const email = confirmedReservation.email.toLowerCase().trim();
           const telefonoReserva = (confirmedReservation.telefono || '').replace(/\D/g, '');
           const nombreReserva = (confirmedReservation.nombre || '').toLowerCase().trim();
@@ -518,7 +526,7 @@ export default function AdminPage() {
 
           // 1) Intentar por email (principal)
           if (email) {
-            matchingPacks = packPurchases.filter((p) => {
+            matchingPacks = packsParaBuscar.filter((p) => {
               const packEmail = (p.alumno_email || '').toLowerCase().trim();
               const total = p.clases_incluidas;
               const usadas = p.clases_usadas;
@@ -537,7 +545,7 @@ export default function AdminPage() {
 
           // 2) Si no encontramos por email, intentar por teléfono + nombre
           if (matchingPacks.length === 0 && telefonoReserva) {
-            const candidatosTelefono = packPurchases.filter((p) => {
+            const candidatosTelefono = packsParaBuscar.filter((p) => {
               const packTel = (p.alumno_telefono || '').replace(/\D/g, '');
               const total = p.clases_incluidas;
               const usadas = p.clases_usadas;

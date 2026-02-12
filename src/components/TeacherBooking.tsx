@@ -19,6 +19,15 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'mp' | 'pack' | 'cash'>('mp');
+  const [feedbackModal, setFeedbackModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    title: '',
+    message: '',
+  });
 
   // Bloquear scroll cuando el modal esta abierto
   useEffect(() => {
@@ -220,13 +229,19 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
       });
 
       if (paymentMethod === 'pack') {
-        alert(
-          'Tu reserva quedó registrada usando tu pack/cuponera. El estudio la confirmará y descontará el crédito correspondiente.'
-        );
+        setFeedbackModal({
+          show: true,
+          title: 'Reserva registrada con tu pack/cuponera',
+          message:
+            'Tu reserva quedó registrada usando tu pack/cuponera. El estudio la confirmará y descontará el crédito correspondiente.',
+        });
       } else {
-        alert(
-          'Tu reserva quedó registrada para pagar en efectivo en el estudio. Recordá llegar unos minutos antes.'
-        );
+        setFeedbackModal({
+          show: true,
+          title: 'Reserva registrada para pagar en efectivo',
+          message:
+            'Tu reserva quedó registrada para pagar en efectivo en el estudio. Recordá llegar unos minutos antes.',
+        });
       }
     } catch (error) {
       console.error('Error al crear reserva sin pago MP:', error);
@@ -818,6 +833,50 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                 className="flex-1 bg-[#009EE3] hover:bg-[#0083C0] text-white font-bold py-3.5 md:py-4 rounded-xl uppercase transition-all shadow-[0_0_20px_rgba(0,158,227,0.4)] text-sm md:text-base"
               >
                 💳 Confirmar Pago
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE FEEDBACK DE RESERVA (PACK / EFECTIVO) */}
+      {feedbackModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#111] border border-naik-gold/40 rounded-2xl max-w-md w-full p-6 md:p-7 shadow-2xl">
+            <div className="flex justify-between items-start gap-4 mb-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-naik-gold mb-1">
+                  Reserva creada
+                </p>
+                <h3 className="text-xl md:text-2xl font-black text-white leading-snug">
+                  {feedbackModal.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setFeedbackModal({ show: false, title: '', message: '' })}
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Cerrar mensaje"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm md:text-base text-gray-300 mb-6 whitespace-pre-line">
+              {feedbackModal.message}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setFeedbackModal({ show: false, title: '', message: '' })}
+                className="flex-1 bg-naik-gold hover:bg-yellow-400 text-black font-black py-3 rounded-xl uppercase tracking-wide text-sm md:text-base transition-all hover:scale-[1.02]"
+              >
+                Entendido
+              </button>
+              <button
+                onClick={handleWhatsAppConsulta}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-3 rounded-xl uppercase tracking-wide text-xs md:text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <span>Consultar por WhatsApp</span>
               </button>
             </div>
           </div>
