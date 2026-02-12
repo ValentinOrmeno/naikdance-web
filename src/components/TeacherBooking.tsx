@@ -18,6 +18,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [availability, setAvailability] = useState<any>(null);
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<'mp' | 'pack' | 'cash'>('mp');
 
   // Bloquear scroll cuando el modal esta abierto
   useEffect(() => {
@@ -155,6 +156,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
         clase: claseInfo,
         fecha,
         month: currentMonth,
+        source: 'whatsapp',
       });
     } catch (error) {
       console.error('Error al crear reserva pendiente para consulta:', error);
@@ -180,6 +182,56 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
     if (!formValid) return alert('Por favor completa todos los campos requeridos');
     if (!selectedSchedule) return alert('Por favor selecciona un horario');
     setShowConfirmModal(true);
+  };
+
+  const handleReservaSegunPago = async () => {
+    if (!formValid || !selectedSchedule) {
+      alert('Por favor completa todos los datos y elegí un horario');
+      return;
+    }
+
+    if (paymentMethod === 'mp') {
+      // Flujo actual de Mercado Pago
+      setShowConfirmModal(true);
+      return;
+    }
+
+    // Flujo sin Mercado Pago: pack/cuponera o efectivo
+    const [year, month] = currentMonth.split('-');
+    const fecha = selectedDay ? `${selectedDay}/${month}/${year}` : 'A coordinar';
+    const claseBase = selectedSchedule
+      ? `${selectedSchedule.class_name} - ${selectedSchedule.time}hs`
+      : 'A coordinar';
+
+    const pagoLabel = paymentMethod === 'pack' ? 'PACK/CUPONERA' : 'EFECTIVO';
+    const claseConPago = `${claseBase} [${pagoLabel}]`;
+
+    try {
+      await createReservation({
+        teacher_id: teacher.id,
+        nombre,
+        email,
+        telefono: telefono || undefined,
+        clase: claseConPago,
+        fecha,
+        month: currentMonth,
+        // Reserva pendiente creada desde la web (no WhatsApp, no MP)
+        source: 'web',
+      });
+
+      if (paymentMethod === 'pack') {
+        alert(
+          'Tu reserva quedó registrada usando tu pack/cuponera. El estudio la confirmará y descontará el crédito correspondiente.'
+        );
+      } else {
+        alert(
+          'Tu reserva quedó registrada para pagar en efectivo en el estudio. Recordá llegar unos minutos antes.'
+        );
+      }
+    } catch (error) {
+      console.error('Error al crear reserva sin pago MP:', error);
+      alert('Error al registrar la reserva. Por favor intenta nuevamente o consultá por WhatsApp.');
+    }
   };
 
   const procesarPago = async () => {
@@ -565,41 +617,101 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
               {/* Botones de acción - Solo aparecen cuando todo está completo */}
               {formValid && selectedSchedule && (
                 <div className="mt-6 space-y-3 animate-fade-in">
-                {/* Botón WhatsApp - Consulta */}
-                <button 
-                  onClick={handleWhatsAppConsulta}
-                  disabled={!formValid || loadingData}
-                  className={`w-full font-black uppercase py-5 rounded-xl text-lg tracking-wide transition-all flex items-center justify-center gap-3 ${
-                    formValid && !loadingData
-                      ? 'bg-green-600 hover:bg-green-700 text-white hover:scale-[1.02] shadow-[0_0_30px_rgba(34,197,94,0.3)] cursor-pointer'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
-                  }`}
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                  </svg>
-                  💬 Consultar por WhatsApp
-                </button>
+                  {/* Selector de método de pago */}
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+                    <p className="text-xs text-gray-300 uppercase font-bold tracking-wide">
+                      ¿Cómo vas a pagar esta clase?
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('pack')}
+                        className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${
+                          paymentMethod === 'pack'
+                            ? 'bg-naik-gold text-black border-naik-gold'
+                            : 'bg-transparent text-gray-300 border-white/20 hover:border-naik-gold/60'
+                        }`}
+                      >
+                        Tengo pack/cuponera
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('mp')}
+                        className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${
+                          paymentMethod === 'mp'
+                            ? 'bg-[#009EE3] text-white border-[#009EE3]'
+                            : 'bg-transparent text-gray-300 border-white/20 hover:border-[#009EE3]/60'
+                        }`}
+                      >
+                        Mercado Pago
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cash')}
+                        className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${
+                          paymentMethod === 'cash'
+                            ? 'bg-white text-black border-white'
+                            : 'bg-transparent text-gray-300 border-white/20 hover:border-white/60'
+                        }`}
+                      >
+                        Efectivo
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-gray-400">
+                      - Si elegís <span className="font-bold text-naik-gold">pack/cuponera</span>, la reserva
+                      se descuenta de tu pack cuando el estudio la confirma.{' '}
+                      <br />
+                      - Con <span className="font-bold text-[#009EE3]">Mercado Pago</span> pagás ahora la clase
+                      suelta. <br />- Con <span className="font-bold">efectivo</span>, pagás en el estudio.
+                    </p>
+                  </div>
 
-                {/* Botón Mercado Pago - Comprar */}
-                <button 
-                  onClick={handleComprarClase}
-                  disabled={!formValid || loadingData}
-                  className={`w-full font-black uppercase py-5 rounded-xl text-lg tracking-wide transition-all flex items-center justify-center gap-3 ${
-                    formValid && !loadingData
-                      ? 'bg-[#009EE3] hover:bg-[#0083C0] text-white hover:scale-[1.02] shadow-[0_0_30px_rgba(0,158,227,0.3)] cursor-pointer'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
-                  }`}
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M21.5 7.5h-8.5c-.8 0-1.5.7-1.5 1.5v12c0 .8.7 1.5 1.5 1.5h8.5c.8 0 1.5-.7 1.5-1.5V9c0-.8-.7-1.5-1.5-1.5zm-4.2 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM12 4.5H3.5C2.7 4.5 2 5.2 2 6v12c0 .8.7 1.5 1.5 1.5H12V4.5z"/>
-                  </svg>
-                  💳 Comprar Clase - ${selectedSchedule?.price?.toLocaleString('es-AR') || '7.500'}
-                </button>
+                  {/* Botón principal según método de pago */}
+                  <button
+                    onClick={handleReservaSegunPago}
+                    disabled={!formValid || loadingData}
+                    className={`w-full font-black uppercase py-5 rounded-xl text-lg tracking-wide transition-all flex items-center justify-center gap-3 ${
+                      formValid && !loadingData
+                        ? paymentMethod === 'mp'
+                          ? 'bg-[#009EE3] hover:bg-[#0083C0] text-white hover:scale-[1.02] shadow-[0_0_30px_rgba(0,158,227,0.3)] cursor-pointer'
+                          : 'bg-naik-gold hover:bg-yellow-400 text-black hover:scale-[1.02] shadow-[0_0_30px_rgba(250,204,21,0.3)] cursor-pointer'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    {paymentMethod === 'mp' ? (
+                      <>
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21.5 7.5h-8.5c-.8 0-1.5.7-1.5 1.5v12c0 .8.7 1.5 1.5 1.5h8.5c.8 0 1.5-.7 1.5-1.5V9c0-.8-.7-1.5-1.5-1.5zm-4.2 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM12 4.5H3.5C2.7 4.5 2 5.2 2 6v12c0 .8.7 1.5 1.5 1.5H12V4.5z" />
+                        </svg>
+                        💳 Pagar ahora - $
+                        {selectedSchedule?.price?.toLocaleString('es-AR') || '7.500'}
+                      </>
+                    ) : paymentMethod === 'pack' ? (
+                      <>
+                        <span>✅ Reservar usando mi pack/cuponera</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>💵 Reservar y pagar en efectivo</span>
+                      </>
+                    )}
+                  </button>
 
-                <p className="text-xs text-gray-400 text-center mt-2">
-                  💬 Consultá si tenés cuponera o pack | 💳 Pagá para reservar tu clase
-                </p>
+                  {/* Botón WhatsApp - Consulta adicional */}
+                  <button
+                    onClick={handleWhatsAppConsulta}
+                    disabled={!formValid || loadingData}
+                    className={`w-full font-black uppercase py-4 rounded-xl text-sm tracking-wide transition-all flex items-center justify-center gap-3 ${
+                      formValid && !loadingData
+                        ? 'bg-green-600 hover:bg-green-700 text-white hover:scale-[1.02] shadow-[0_0_30px_rgba(34,197,94,0.3)] cursor-pointer'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                    💬 Consultar por WhatsApp
+                  </button>
                 </div>
               )}
 

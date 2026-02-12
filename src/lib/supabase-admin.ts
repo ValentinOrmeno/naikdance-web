@@ -1,6 +1,8 @@
 import { supabase } from './supabase';
 
 // Funciones para manejar reservas
+type ReservationSource = 'web' | 'whatsapp' | 'mercado_pago';
+
 export async function createReservation(data: {
   teacher_id: string;
   nombre: string;
@@ -9,10 +11,32 @@ export async function createReservation(data: {
   clase: string;
   fecha: string;
   month: string;
+  source?: ReservationSource;
 }) {
+  const source: ReservationSource = data.source ?? 'web';
+
+  // Calcular expires_at solo para reservas creadas por WhatsApp
+  const expires_at =
+    source === 'whatsapp'
+      ? new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
+      : null;
+
+  const payload = {
+    teacher_id: data.teacher_id,
+    nombre: data.nombre,
+    email: data.email,
+    telefono: data.telefono ?? null,
+    clase: data.clase,
+    fecha: data.fecha,
+    month: data.month,
+    status: 'pendiente' as const,
+    source,
+    expires_at,
+  };
+
   const { data: reservation, error } = await supabase
     .from('reservations')
-    .insert([{ ...data, status: 'pendiente' }])
+    .insert([payload])
     .select();
 
   if (error) throw error;

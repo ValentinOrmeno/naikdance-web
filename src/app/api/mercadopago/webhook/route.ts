@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
               month: metadata.month,
               payment_id: paymentId.toString(),
               payment_status: 'approved',
+              source: 'mercado_pago' as const,
             };
 
             console.log('Creando reserva:', reservaData);

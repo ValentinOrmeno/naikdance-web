@@ -26,6 +26,8 @@ CREATE TABLE reservations (
   fecha TEXT NOT NULL, -- Formato: "15/02/2026"
   month TEXT NOT NULL, -- Formato: "2026-02"
   status TEXT NOT NULL CHECK (status IN ('pendiente', 'confirmada', 'cancelada')),
+  source TEXT NOT NULL DEFAULT 'web' CHECK (source IN ('web', 'whatsapp', 'mercado_pago')),
+  expires_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

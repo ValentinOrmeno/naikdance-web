@@ -32,6 +32,8 @@ export type Reservation = {
   fecha: string;
   month: string;
   status: 'pendiente' | 'confirmada' | 'cancelada';
+   source: 'web' | 'whatsapp' | 'mercado_pago';
+   expires_at?: string | null;
   payment_id?: string;
   payment_status?: string;
   created_at: string;

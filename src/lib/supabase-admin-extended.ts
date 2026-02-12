@@ -509,3 +509,28 @@ export async function fixNegativeCupos() {
     throw error;
   }
 }
+
+/**
+ * Elimina reservas pendientes creadas por WhatsApp que ya vencieron
+ * (expires_at < ahora y status = 'pendiente')
+ */
+export async function deleteExpiredWhatsappReservations() {
+  try {
+    const nowIso = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('reservations')
+      .delete()
+      .lt('expires_at', nowIso)
+      .eq('status', 'pendiente')
+      .eq('source', 'whatsapp');
+
+    if (error) {
+      console.error('Error al eliminar reservas vencidas de WhatsApp:', error);
+      throw new Error(error.message);
+    }
+  } catch (error: any) {
+    console.error('Error en deleteExpiredWhatsappReservations:', error);
+    throw error;
+  }
+}

@@ -15,6 +15,8 @@ import {
   resetAllAvailability,
   fixNegativeCupos,
   getAllPackPurchases,
+  incrementPackUsage,
+  deleteExpiredWhatsappReservations,
 } from "@/lib/supabase-admin-extended";
 import type { Reservation, Availability, ClassSchedule, PackPurchase } from "@/lib/supabase";
 import type { AdminStats } from "@/lib/supabase-admin-extended";
@@ -50,6 +52,15 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [reservasFilter, setReservasFilter] = useState<"todas" | "pendiente" | "confirmada">("pendiente");
   const [packPurchases, setPackPurchases] = useState<PackPurchase[]>([]);
+  const [packConfirmModal, setPackConfirmModal] = useState<{
+    show: boolean;
+    reservationId: string | null;
+    pack: PackPurchase | null;
+  }>({
+    show: false,
+    reservationId: null,
+    pack: null,
+  });
   
   // Generar mes actual por defecto
   const getCurrentMonth = () => {
@@ -387,6 +398,9 @@ export default function AdminPage() {
   const loadReservations = async (status?: 'pendiente' | 'confirmada' | 'cancelada') => {
     setLoading(true);
     try {
+      // Limpiar reservas vencidas de WhatsApp antes de cargar
+      await deleteExpiredWhatsappReservations();
+
       const data = await getAllReservations(status);
       setReservations(data || []);
     } catch (error) {
@@ -492,6 +506,81 @@ export default function AdminPage() {
       if (confirmModal.action === 'confirm') {
         await confirmReservation(confirmModal.id);
         alert('Reserva confirmada! Cupos actualizados.');
+
+        // Luego de confirmar, buscar si hay un pack activo para este alumno
+        const confirmedReservation = reservations.find((r) => r.id === confirmModal.id);
+        if (confirmedReservation && confirmedReservation.email) {
+          const email = confirmedReservation.email.toLowerCase().trim();
+          const telefonoReserva = (confirmedReservation.telefono || '').replace(/\D/g, '');
+          const nombreReserva = (confirmedReservation.nombre || '').toLowerCase().trim();
+
+          let matchingPacks: PackPurchase[] = [];
+
+          // 1) Intentar por email (principal)
+          if (email) {
+            matchingPacks = packPurchases.filter((p) => {
+              const packEmail = (p.alumno_email || '').toLowerCase().trim();
+              const total = p.clases_incluidas;
+              const usadas = p.clases_usadas;
+              const tieneCupos = total === null ? true : usadas < total;
+
+              const vieneDePack =
+                confirmedReservation.clase?.toUpperCase().includes('PACK/CUPONERA') ?? false;
+
+              if (vieneDePack) {
+                return p.status === 'activo' && packEmail === email && tieneCupos;
+              }
+
+              return p.status === 'activo' && packEmail === email && tieneCupos;
+            });
+          }
+
+          // 2) Si no encontramos por email, intentar por teléfono + nombre
+          if (matchingPacks.length === 0 && telefonoReserva) {
+            const candidatosTelefono = packPurchases.filter((p) => {
+              const packTel = (p.alumno_telefono || '').replace(/\D/g, '');
+              const total = p.clases_incluidas;
+              const usadas = p.clases_usadas;
+              const tieneCupos = total === null ? true : usadas < total;
+              const nombrePack = (p.alumno_nombre || '').toLowerCase().trim();
+
+              const nombreCoincide =
+                !!nombreReserva && !!nombrePack && nombreReserva === nombrePack;
+
+              return (
+                p.status === 'activo' &&
+                packTel.length > 0 &&
+                packTel === telefonoReserva &&
+                tieneCupos &&
+                nombreCoincide
+              );
+            });
+
+            // Solo sugerimos si hay un único candidato claro por teléfono+nombre
+            if (candidatosTelefono.length === 1) {
+              matchingPacks = candidatosTelefono;
+            }
+          }
+
+          if (matchingPacks.length > 0) {
+            const packOrdenados =
+              matchingPacks[0].created_at && matchingPacks[0].created_at !== null
+                ? [...matchingPacks].sort((a, b) => {
+                    const da = new Date(a.created_at as any).getTime();
+                    const db = new Date(b.created_at as any).getTime();
+                    return db - da;
+                  })
+                : matchingPacks;
+
+            const packSeleccionado = packOrdenados[0];
+
+            setPackConfirmModal({
+              show: true,
+              reservationId: confirmedReservation.id,
+              pack: packSeleccionado,
+            });
+          }
+        }
       } else {
         await cancelReservation(confirmModal.id);
         // Después de cancelar, corregir automáticamente cupos negativos si los hay
@@ -1167,11 +1256,64 @@ export default function AdminPage() {
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-3">
-                      {/* Placeholder para acciones futuras: usar crédito, enviar WhatsApp, etc. */}
-                      <p className="text-xs text-gray-500">
-                        Próximamente: usar créditos y enviar mensaje de saldo por
-                        WhatsApp desde acá.
-                      </p>
+                      <button
+                        disabled={pack.status !== "activo"}
+                        onClick={async () => {
+                          try {
+                            const updated = await incrementPackUsage(pack.id, 1);
+                            if (!updated) return;
+                            setPackPurchases((prev) =>
+                              prev.map((p) => (p.id === pack.id ? updated : p))
+                            );
+
+                            const total = updated.clases_incluidas;
+                            const usadas = updated.clases_usadas;
+                            const restantes =
+                              total === null ? "∞" : Math.max(total - usadas, 0).toString();
+
+                            alert(
+                              total === null
+                                ? `Se registro 1 uso. Lleva ${usadas} clases tomadas con este pack.`
+                                : `Se registro 1 uso. Lleva ${usadas}/${total} clases (restan ${restantes}).`
+                            );
+                          } catch (error) {
+                            console.error("Error al usar crédito del pack:", error);
+                            alert("Error al usar un crédito del pack");
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all"
+                      >
+                        Usar 1 crédito
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (!pack.alumno_telefono) {
+                            alert(
+                              "Este pack no tiene teléfono guardado. Para packs manuales podés cargar el teléfono desde Supabase."
+                            );
+                            return;
+                          }
+
+                          const cleanPhone = pack.alumno_telefono.replace(/\D/g, "");
+                          const total = pack.clases_incluidas;
+                          const usadas = pack.clases_usadas;
+                          const restantes =
+                            total === null ? "ilimitadas" : Math.max(total - usadas, 0).toString();
+
+                          const mensaje = `Hola! Te escribimos de NAIK Dance.\n\nTe confirmamos que usaste una clase de tu ${pack.pack_type} (${pack.pack_name}).\n\nLlevás usadas ${usadas}${
+                            total === null ? "" : ` de ${total}`
+                          } clases, te quedan ${restantes}.\n\nGracias por entrenar con nosotros!`;
+
+                          const url = `https://wa.me/54${cleanPhone}?text=${encodeURIComponent(
+                            mensaje
+                          )}`;
+                          window.open(url, "_blank");
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-[#25D366] hover:bg-[#1ebe5a] text-black transition-all"
+                      >
+                        WhatsApp saldo
+                      </button>
                     </div>
                   </div>
                 );
@@ -1618,6 +1760,95 @@ export default function AdminPage() {
                 }`}
               >
                 Si, {confirmModal.action === 'confirm' ? 'confirmar' : 'cancelar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: sugerir descuento automático de pack */}
+      {packConfirmModal.show && packConfirmModal.pack && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#111] border border-naik-gold/40 rounded-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-black text-white uppercase">
+                Usar crédito de pack
+              </h3>
+              <button
+                onClick={() =>
+                  setPackConfirmModal({ show: false, reservationId: null, pack: null })
+                }
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <p className="text-gray-300 mb-4 text-sm">
+              Se encontró un pack activo para este alumno:
+            </p>
+
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6 text-sm">
+              <p className="text-naik-gold font-bold mb-1">
+                {packConfirmModal.pack.pack_type} - {packConfirmModal.pack.pack_name}
+              </p>
+              <p className="text-gray-300">
+                Alumno: {packConfirmModal.pack.alumno_nombre} (
+                {packConfirmModal.pack.alumno_email})
+              </p>
+              <p className="text-gray-300 mt-1">
+                Usadas: {packConfirmModal.pack.clases_usadas}
+                {packConfirmModal.pack.clases_incluidas === null
+                  ? " / ilimitadas"
+                  : ` / ${packConfirmModal.pack.clases_incluidas}`}
+              </p>
+            </div>
+
+            <p className="text-gray-300 mb-6 text-sm">
+              ¿Querés descontar <span className="font-bold text-naik-gold">1 crédito</span> de
+              este pack para esta reserva?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() =>
+                  setPackConfirmModal({ show: false, reservationId: null, pack: null })
+                }
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl uppercase transition-all text-sm"
+              >
+                No, dejar así
+              </button>
+              <button
+                onClick={async () => {
+                  if (!packConfirmModal.pack) return;
+                  try {
+                    const updated = await incrementPackUsage(packConfirmModal.pack.id, 1);
+                    if (!updated) return;
+
+                    setPackPurchases((prev) =>
+                      prev.map((p) => (p.id === updated.id ? updated : p))
+                    );
+
+                    const total = updated.clases_incluidas;
+                    const usadas = updated.clases_usadas;
+                    const restantes =
+                      total === null ? "∞" : Math.max(total - usadas, 0).toString();
+
+                    alert(
+                      total === null
+                        ? `Se descontó 1 clase del pack. Lleva ${usadas} clases usadas.`
+                        : `Se descontó 1 clase del pack. Lleva ${usadas}/${total} clases (restan ${restantes}).`
+                    );
+                  } catch (error) {
+                    console.error("Error al usar crédito del pack desde modal:", error);
+                    alert("Error al usar un crédito del pack");
+                  } finally {
+                    setPackConfirmModal({ show: false, reservationId: null, pack: null });
+                  }
+                }}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl uppercase transition-all text-sm"
+              >
+                Sí, usar 1 crédito
               </button>
             </div>
           </div>
