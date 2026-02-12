@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Oswald } from "next/font/google";
+import { Inter, Oswald, Bebas_Neue, Montserrat } from "next/font/google";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
@@ -16,6 +16,20 @@ const inter = Inter({
 const oswald = Oswald({
   subsets: ["latin"],
   variable: "--font-oswald",
+  display: "swap",
+});
+
+const bebas = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-montserrat",
   display: "swap",
 });
 
@@ -97,7 +111,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${oswald.variable}`}>
+    <html lang="es" className={`${inter.variable} ${oswald.variable} ${bebas.variable} ${montserrat.variable}`}>
       <head>
         <JsonLd />
       </head>

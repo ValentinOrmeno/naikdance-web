@@ -254,7 +254,11 @@ export async function getStats() {
     }
 
     const cuposTotales = availability?.reduce((sum, a) => sum + (a.cupos_total || 0), 0) || 0;
-    const cuposReservados = availability?.reduce((sum, a) => sum + (a.cupos_reservados || 0), 0) || 0;
+    // Aseguramos que cupos_reservados nunca reste ocupación por valores negativos
+    const cuposReservados = availability?.reduce(
+      (sum, a) => sum + Math.max(0, a.cupos_reservados || 0),
+      0
+    ) || 0;
     const cuposDisponibles = cuposTotales - cuposReservados;
     const ocupacion = cuposTotales > 0 ? ((cuposReservados / cuposTotales) * 100).toFixed(1) : '0';
 

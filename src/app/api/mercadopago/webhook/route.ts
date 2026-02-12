@@ -1,11 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { createReservation } from '@/lib/supabase-admin';
 
-// Función para validar firma de Mercado Pago (opcional pero recomendado)
+// Valida la firma de Mercado Pago usando x-signature y x-request-id
+// Doc oficial: https://www.mercadopago.com.ar/developers/en/docs/your-integrations/notifications/webhooks
 async function verifyMercadoPagoSignature(req: NextRequest): Promise<boolean> {
-  // Por ahora retornamos true, en producción deberías validar la firma
-  // usando el secret key de MP
-  return true;
+  const secret = process.env.MP_WEBHOOK_SECRET;
+
+  // Si no hay secreto configurado, no bloqueamos pero avisamos en logs
+  if (!secret) {
+    console.warn('[MP Webhook] MP_WEBHOOK_SECRET no configurado. Omitiendo validación de firma.');
+    return true;
+  }
+
+  const xSignature = req.headers.get('x-signature');
+  const xRequestId = req.headers.get('x-request-id');
+
+  if (!xSignature || !xRequestId) {
+    console.error('[MP Webhook] Falta header x-signature o x-request-id');
+    return false;
+  }
+
+  // data.id viene en query params según la doc
+  const url = req.nextUrl;
+  const dataId = url.searchParams.get('data.id') ?? '';
+
+  // x-signature viene en el formato: ts=1704908010,v1=HASH
+  const parts = xSignature.split(',');
+  let ts: string | undefined;
+  let hash: string | undefined;
+
+  for (const part of parts) {
+    const [rawKey, rawValue] = part.split('=', 2);
+    if (!rawKey || !rawValue) continue;
+    const key = rawKey.trim();
+    const value = rawValue.trim();
+
+    if (key === 'ts') {
+      ts = value;
+    } else if (key === 'v1') {
+      hash = value;
+    }
+  }
+
+  if (!ts || !hash) {
+    console.error('[MP Webhook] No se pudo extraer ts/v1 de x-signature');
+    return false;
+  }
+
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  const computed = crypto
+    .createHmac('sha256', secret)
+    .update(manifest)
+    .digest('hex');
+
+  const isValid = computed === hash;
+
+  if (!isValid) {
+    console.error('[MP Webhook] Firma inválida. Esperado vs recibido no coinciden.');
+  }
+
+  return isValid;
 }
 
 export async function POST(request: NextRequest) {

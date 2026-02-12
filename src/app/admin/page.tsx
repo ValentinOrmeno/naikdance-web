@@ -9,6 +9,8 @@ import { teachers } from '@/data/teachers';
 
 type Tab = 'dashboard' | 'pendientes' | 'confirmadas' | 'cupos';
 
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
 export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -204,8 +206,14 @@ export default function AdminPage() {
       setLoginError('Por favor ingresa la contraseña');
       return;
     }
+
+    if (!ADMIN_PASSWORD) {
+      console.error('NEXT_PUBLIC_ADMIN_PASSWORD no está configurada');
+      setLoginError('Error de configuración del panel. Hablá con el desarrollador.');
+      return;
+    }
     
-    if (pwd === 'naik2026') {
+    if (pwd === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       setPassword('');
       loadData();

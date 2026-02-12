@@ -20,9 +20,9 @@ const config: Config = {
       fontFamily: {
         oswald: ['var(--font-oswald)', 'sans-serif'],
         inter: ['var(--font-inter)', 'sans-serif'],
-        bebas: ['Bebas Neue', 'sans-serif'],
+        bebas: ['var(--font-bebas)', 'sans-serif'],
         anton: ['Anton', 'sans-serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
       },
       boxShadow: {
         'glow-gold': '0 0 20px rgba(255, 215, 0, 0.6)',
