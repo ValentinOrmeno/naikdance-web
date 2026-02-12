@@ -1,5 +1,23 @@
 import { supabase } from './supabase';
 
+export type AdminStats = {
+  reservas: {
+    total: number;
+    pendientes: number;
+    confirmadas: number;
+    canceladas: number;
+  };
+  cupos: {
+    totales: number;
+    reservados: number;
+    disponibles: number;
+    ocupacion: number;
+  };
+  profesores: {
+    total: number;
+  };
+};
+
 /**
  * Obtiene TODAS las reservas, opcionalmente filtradas por estado
  */
@@ -228,7 +246,7 @@ export async function updateAvailability(
 /**
  * Obtiene estadísticas generales del sistema
  */
-export async function getStats() {
+export async function getStats(): Promise<AdminStats> {
   try {
     // Total de reservas por estado
     const { data: allReservations, error: reservationsError } = await supabase
@@ -294,6 +312,7 @@ export async function getStats() {
  */
 export async function resetAllAvailability() {
   try {
+    // Eliminar toda la disponibilidad
     const { error } = await supabase
       .from('availability')
       .delete()
@@ -302,6 +321,17 @@ export async function resetAllAvailability() {
     if (error) {
       console.error('Error al resetear availability:', error);
       throw new Error(error.message);
+    }
+
+    // Eliminar también todos los horarios de clases
+    const { error: schedulesError } = await supabase
+      .from('class_schedules')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000');
+
+    if (schedulesError) {
+      console.error('Error al resetear class_schedules:', schedulesError);
+      throw new Error(schedulesError.message);
     }
 
     return { success: true };
