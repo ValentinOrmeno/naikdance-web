@@ -314,6 +314,8 @@ export default function Pricing() {
                   Nombre Completo *
                 </label>
                 <input
+                  id="pricing-nombre"
+                  name="nombre"
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
@@ -328,6 +330,8 @@ export default function Pricing() {
                   Email *
                 </label>
                 <input
+                  id="pricing-email"
+                  name="email"
                   type="email"
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}

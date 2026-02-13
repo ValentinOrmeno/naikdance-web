@@ -837,11 +837,13 @@ export default function AdminPage() {
           )}
           
           <input
+            id="admin-password"
+            name="password"
             type="password"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
-              setLoginError(''); // Limpiar error al escribir
+              setLoginError('');
             }}
             onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
             placeholder="Contraseña"
@@ -1557,6 +1559,8 @@ export default function AdminPage() {
                       Hora *
                     </label>
                     <input
+                      id="schedule-time"
+                      name="time"
                       type="time"
                       value={newSchedule.time}
                       onChange={(e) =>
@@ -1570,6 +1574,8 @@ export default function AdminPage() {
                       Clase *
                     </label>
                     <input
+                      id="schedule-class-name"
+                      name="class_name"
                       type="text"
                       value={newSchedule.class_name}
                       onChange={(e) =>
@@ -1584,6 +1590,8 @@ export default function AdminPage() {
                       Duración (min)
                     </label>
                     <input
+                      id="schedule-duration"
+                      name="duration"
                       type="number"
                       value={newSchedule.duration}
                       onChange={(e) =>
@@ -1598,6 +1606,8 @@ export default function AdminPage() {
                       Max Alumnos
                     </label>
                     <input
+                      id="schedule-max-students"
+                      name="max_students"
                       type="number"
                       value={newSchedule.max_students}
                       onChange={(e) =>
@@ -1873,6 +1883,8 @@ export default function AdminPage() {
               <div>
                 <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">Profesor</label>
                 <select
+                  id="add-availability-teacher"
+                  name="teacherId"
                   value={addAvailabilityModal.teacherId}
                   onChange={(e) => setAddAvailabilityModal({...addAvailabilityModal, teacherId: e.target.value})}
                   className="w-full bg-[#1a1a1a] border border-white/20 rounded-lg px-4 py-3 text-white outline-none"
@@ -1897,6 +1909,8 @@ export default function AdminPage() {
               <div>
                 <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">Cupos por día</label>
                 <input
+                  id="add-availability-cupos"
+                  name="cupos"
                   type="number"
                   min="1"
                   value={addAvailabilityModal.cupos}
@@ -2004,6 +2018,8 @@ export default function AdminPage() {
               <div>
                 <label className="block text-sm font-bold uppercase mb-2 text-naik-gold">Profesor</label>
                 <select
+                  id="quick-class-teacher"
+                  name="teacherId"
                   value={quickClassModal.teacherId}
                   onChange={(e) =>
                     setQuickClassModal({ ...quickClassModal, teacherId: e.target.value })
@@ -2094,6 +2110,8 @@ export default function AdminPage() {
                     Nombre de la clase
                   </label>
                   <input
+                    id="quick-class-name"
+                    name="className"
                     type="text"
                     value={quickClassModal.className}
                     onChange={(e) =>
@@ -2108,6 +2126,8 @@ export default function AdminPage() {
                     Hora
                   </label>
                   <input
+                    id="quick-class-time"
+                    name="time"
                     type="time"
                     value={quickClassModal.time}
                     onChange={(e) =>
@@ -2125,6 +2145,8 @@ export default function AdminPage() {
                     Duración (min)
                   </label>
                   <input
+                    id="quick-class-duration"
+                    name="duration"
                     type="number"
                     value={quickClassModal.duration}
                     onChange={(e) =>
@@ -2138,6 +2160,8 @@ export default function AdminPage() {
                     Cupos
                   </label>
                   <input
+                    id="quick-class-cupos"
+                    name="cupos"
                     type="number"
                     min="1"
                     value={quickClassModal.cupos}

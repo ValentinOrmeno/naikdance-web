@@ -12,10 +12,15 @@ export default function About() {
 
     const playVideo = async () => {
       try {
+        video.muted = true;
         video.playbackRate = 0.8;
         await video.play();
-      } catch (error) {
-        console.log('Autoplay bloqueado, esperando interacción del usuario');
+      } catch {
+        setTimeout(() => {
+          video.muted = true;
+          video.playbackRate = 0.8;
+          video.play().catch(() => {});
+        }, 300);
       }
     };
 
@@ -27,15 +32,21 @@ export default function About() {
       }
     };
 
-    if (video.paused) {
-      playVideo();
-    }
+    const onCanPlay = () => {
+      if (video.paused) playVideo();
+    };
 
+    video.muted = true;
+    if (video.paused) playVideo();
     video.addEventListener("loadeddata", playVideo);
+    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("canplaythrough", onCanPlay);
     video.addEventListener("timeupdate", handleTimeUpdate);
-    
+
     return () => {
       video.removeEventListener("loadeddata", playVideo);
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("canplaythrough", onCanPlay);
       video.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, []);
@@ -64,7 +75,7 @@ export default function About() {
               muted
               playsInline
               disablePictureInPicture
-              preload="metadata"
+              preload="auto"
               poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='100%25' height='100%25' fill='%23080808'/%3E%3C/svg%3E"
             >
               <source src="/about-vertical.mp4" type="video/mp4" />

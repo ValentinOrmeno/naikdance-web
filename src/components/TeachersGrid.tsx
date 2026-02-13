@@ -65,6 +65,8 @@ export default function TeachersGrid() {
             <div className="relative flex items-center bg-[#111] rounded-2xl border border-white/10 p-2">
               <Search className="ml-4 text-gray-400" size={24} />
               <input 
+                id="staff-search"
+                name="staff-search"
                 type="text" 
                 placeholder="Buscar staff o estilo..." 
                 className="w-full bg-transparent border-none py-3 px-4 text-white text-lg focus:outline-none placeholder:text-gray-600 font-['Oswald'] tracking-wide"

@@ -411,6 +411,8 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
               <div>
                 <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Nombre Completo*</label>
                 <input 
+                  id="booking-nombre"
+                  name="nombre"
                   type="text" 
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
@@ -431,6 +433,8 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
               <div>
                 <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Email*</label>
                 <input 
+                  id="booking-email"
+                  name="email"
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -451,6 +455,8 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
               <div>
                 <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telefono (opcional)</label>
                 <input 
+                  id="booking-telefono"
+                  name="telefono"
                   type="tel" 
                   value={telefono}
                   onChange={(e) => setTelefono(e.target.value)}
