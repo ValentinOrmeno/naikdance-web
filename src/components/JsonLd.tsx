@@ -1,15 +1,16 @@
 export default function JsonLd() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'DanceGroup',
+    '@type': 'SportsActivityLocation',
     name: 'Naik Dance Studio',
     description: 'Estudio de danza urbana en Moreno, Buenos Aires. Clases de Reggaeton, Urbano, K-Pop, Hip Hop, Femme y más.',
     image: 'https://naikdance-web.vercel.app/logo.png',
     '@id': 'https://naikdance-web.vercel.app',
     url: 'https://naikdance-web.vercel.app',
+    telephone: '+54 9 11 3863-8020',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Moreno',
+      streetAddress: 'Av. Bartolomé Mitre 3257',
       addressLocality: 'Moreno',
       addressRegion: 'Buenos Aires',
       addressCountry: 'AR',
@@ -37,12 +38,6 @@ export default function JsonLd() {
       },
     ],
     priceRange: '$$',
-    offers: {
-      '@type': 'Offer',
-      category: 'Clases de Danza',
-      priceCurrency: 'ARS',
-      availability: 'https://schema.org/InStock',
-    },
   };
 
   return (

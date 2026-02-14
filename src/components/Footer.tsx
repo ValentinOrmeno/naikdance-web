@@ -6,11 +6,12 @@ export default function Footer() {
     <footer className="text-white py-12 px-4">
       <div className="grid gap-6 grid-cols-1 md:grid-cols-3 items-center justify-items-center max-w-7xl mx-auto">
         <div className="flex items-center justify-center">
-          <Image 
-            src="/logo.png" 
-            alt="Naik Dance Studio" 
-            width={220} 
+          <Image
+            src="/logo.png"
+            alt="Naik Dance Studio"
+            width={220}
             height={80}
+            sizes="(max-width: 768px) 120px, 220px"
             className="h-16 w-auto object-contain opacity-90"
           />
         </div>
@@ -58,7 +59,7 @@ export default function Footer() {
           </a>
         </div>
       </div>
-      <div className="text-center mt-6 text-xs text-gray-500 tracking-widest uppercase">
+      <div className="text-center mt-6 text-xs text-gray-400 tracking-widest uppercase">
         © 2026 Naik Dance Studio · Moreno, Bs As.
       </div>
     </footer>

@@ -1,14 +1,15 @@
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import About from '@/components/About';
-import Classes from '@/components/Classes';
-// import Schedule from '@/components/Schedule'; // Comentado - datos hardcodeados, reemplazado por Instagram
-// import InstagramFeed from '@/components/InstagramFeed'; // Comentado - sección de Instagram removida
-import Pricing from '@/components/Pricing';
-import TeachersGrid from '@/components/TeachersGrid';
-import FAQ from '@/components/FAQ';
-import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+
+// Below-the-fold: lazy load para reducir JS inicial (FCP/LCP) y ahorro ~54 KiB
+const About = dynamic(() => import('@/components/About'), { ssr: true });
+const Classes = dynamic(() => import('@/components/Classes'), { ssr: true });
+const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: true });
+const TeachersGrid = dynamic(() => import('@/components/TeachersGrid'), { ssr: true });
+const FAQ = dynamic(() => import('@/components/FAQ'), { ssr: true });
+const Contact = dynamic(() => import('@/components/Contact'), { ssr: true });
 
 export default function Home() {
   return (
@@ -19,8 +20,6 @@ export default function Home() {
       <Hero />
       <About />
       <Classes />
-      {/* <Schedule /> */} {/* Comentado - datos hardcodeados */}
-      {/* <InstagramFeed /> */} {/* Comentado - sección de Instagram removida */}
       <Pricing />
       <TeachersGrid />
       <FAQ />

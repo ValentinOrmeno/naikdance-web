@@ -27,7 +27,7 @@ export default function Schedule() {
         </ScrollReveal>
 
         {/* TABS MOBILE */}
-        <ScrollReveal delay={0.2}>
+        <ScrollReveal delay={0.08}>
           <div className="lg:hidden mb-8">
             <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
               {days.map((day) => (
@@ -47,7 +47,7 @@ export default function Schedule() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.3}>
+        <ScrollReveal delay={0.1}>
           <div className="lg:hidden space-y-4">
           {getSchedulesByDay(selectedDay).map((cls) => (
             <div
@@ -98,7 +98,7 @@ export default function Schedule() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.3}>
+        <ScrollReveal delay={0.1}>
           <div className="hidden lg:grid lg:grid-cols-7 gap-4">
           {days.map((day) => (
             <div key={day} className="flex flex-col">
@@ -143,7 +143,7 @@ export default function Schedule() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.4}>
+        <ScrollReveal delay={0.15}>
           <div className="mt-12 text-center">
             <p className="text-gray-400 text-sm">
               💡 Tocá cualquier clase para reservar tu lugar por WhatsApp

@@ -1,7 +1,7 @@
 "use client";
 
 import { SiMercadopago } from "react-icons/si";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 
@@ -77,7 +77,7 @@ export default function Pricing() {
   const [userEmail, setUserEmail] = useState('');
   const [pendingPayment, setPendingPayment] = useState<{title: string, name: string, price: number} | null>(null);
 
-  const formatPackName = (title: string, name: string) => {
+  const formatPackName = useCallback((title: string, name: string) => {
     if (title === "Cuponeras") {
       return `la cuponera de ${name.toLowerCase()}`;
     }
@@ -91,14 +91,14 @@ export default function Pricing() {
       return `el ${name}`;
     }
     return `${title} - ${name}`;
-  };
+  }, []);
 
-  const handleEfectivoClick = (title: string, name: string) => {
+  const handleEfectivoClick = useCallback((title: string, name: string) => {
     const packFormatted = formatPackName(title, name);
     const whatsappMessage = `Hola! Vengo de la web. Quiero ${packFormatted} en EFECTIVO`;
     const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, "_blank");
-  };
+  }, [formatPackName]);
 
   // Pre-rellenar datos del usuario si los tiene guardados
   useEffect(() => {
@@ -111,11 +111,10 @@ export default function Pricing() {
     }
   }, [showModal]);
 
-  const handleMercadoPagoClick = async (title: string, name: string, price: number) => {
-    // Abrir modal para capturar datos
+  const handleMercadoPagoClick = useCallback((title: string, name: string, price: number) => {
     setPendingPayment({ title, name, price });
     setShowModal(true);
-  };
+  }, []);
 
   const handleConfirmPayment = async () => {
     if (!userName.trim() || !userEmail.trim()) {
@@ -200,7 +199,7 @@ export default function Pricing() {
         </ScrollReveal>
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[1400px] mx-auto">
           {priceCards.map((card, index) => (
-            <ScrollReveal key={card.title} delay={index * 0.1}>
+            <ScrollReveal key={card.title} delay={index * 0.04}>
               <div
                 className={`bg-naik-dark/70 border rounded-2xl p-6 flex flex-col gap-3 backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)] min-h-[480px] ${
                   card.featured

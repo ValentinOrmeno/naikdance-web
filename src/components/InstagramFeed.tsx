@@ -67,7 +67,7 @@ export default function InstagramFeed() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {instagramPosts.map((post, index) => (
-              <ScrollReveal key={post.id} delay={index * 0.1}>
+              <ScrollReveal key={post.id} delay={index * 0.04}>
                 <a
                   href={post.url}
                   target="_blank"
@@ -80,7 +80,7 @@ export default function InstagramFeed() {
                     alt={post.caption}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
                   />
 
                   {/* Overlay on hover */}
@@ -115,7 +115,7 @@ export default function InstagramFeed() {
         )}
 
         {/* Info del Estudio */}
-        <ScrollReveal delay={0.3}>
+        <ScrollReveal delay={0.1}>
           <div className="mt-16 bg-gradient-to-br from-naik-dark/80 to-black/80 border border-naik-gold/20 rounded-2xl p-8 md:p-12 backdrop-blur-md">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
@@ -168,7 +168,7 @@ export default function InstagramFeed() {
         </ScrollReveal>
 
         {/* CTA Final */}
-        <ScrollReveal delay={0.4}>
+        <ScrollReveal delay={0.15}>
           <div className="text-center mt-12">
             <p className="text-gray-400 mb-4">
               ¿Querés ser parte de la familia NAIK?

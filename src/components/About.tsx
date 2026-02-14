@@ -1,55 +1,31 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 
+const ESTUDIO_IMAGES = [
+  { src: "/estudio/estudio-1.jpg", alt: "Naik Dance Studio - Sala de ensayo" },
+  { src: "/estudio/estudio-2.jpg", alt: "Naik Dance Studio - Clase en curso" },
+  { src: "/estudio/estudio-3.jpg", alt: "Naik Dance Studio - Espacio" },
+  { src: "/estudio/estudio-4.jpg", alt: "Naik Dance Studio - Nuestro estudio" },
+];
+
+const ROTATION_MS = 4500;
+
 export default function About() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [transitionKey, setTransitionKey] = useState(0);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const playVideo = async () => {
-      try {
-        video.muted = true;
-        video.playbackRate = 0.8;
-        await video.play();
-      } catch {
-        setTimeout(() => {
-          video.muted = true;
-          video.playbackRate = 0.8;
-          video.play().catch(() => {});
-        }, 300);
-      }
-    };
-
-    const clipEnd = 6;
-    const handleTimeUpdate = () => {
-      if (video.currentTime >= clipEnd) {
-        video.currentTime = 0;
-        void video.play();
-      }
-    };
-
-    const onCanPlay = () => {
-      if (video.paused) playVideo();
-    };
-
-    video.muted = true;
-    if (video.paused) playVideo();
-    video.addEventListener("loadeddata", playVideo);
-    video.addEventListener("canplay", onCanPlay);
-    video.addEventListener("canplaythrough", onCanPlay);
-    video.addEventListener("timeupdate", handleTimeUpdate);
-
-    return () => {
-      video.removeEventListener("loadeddata", playVideo);
-      video.removeEventListener("canplay", onCanPlay);
-      video.removeEventListener("canplaythrough", onCanPlay);
-      video.removeEventListener("timeupdate", handleTimeUpdate);
-    };
+    const id = setInterval(() => {
+      setCurrentIndex((i) => (i + 1) % ESTUDIO_IMAGES.length);
+      setTransitionKey((k) => k + 1);
+    }, ROTATION_MS);
+    return () => clearInterval(id);
   }, []);
+
+  const current = ESTUDIO_IMAGES[currentIndex];
 
   return (
     <section id="nosotros" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
@@ -66,20 +42,29 @@ export default function About() {
             </p>
           </div>
         </ScrollReveal>
-        <ScrollReveal direction="right" delay={0.2}>
-          <div className="relative min-h-[280px] rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              playsInline
-              disablePictureInPicture
-              preload="auto"
-              poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='100%25' height='100%25' fill='%23080808'/%3E%3C/svg%3E"
-            >
-              <source src="/about-vertical.mp4" type="video/mp4" />
-            </video>
+        <ScrollReveal direction="right" delay={0.08}>
+          <div className="relative min-h-[280px] aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md">
+            <Image
+              key={transitionKey}
+              src={current.src}
+              alt={current.alt}
+              fill
+              className="object-cover animate-fade-in"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority={currentIndex === 0}
+            />
+            {/* Indicadores */}
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">
+              {ESTUDIO_IMAGES.map((_, i) => (
+                <span
+                  key={i}
+                  className={`block h-1.5 rounded-full transition-all duration-300 ${
+                    i === currentIndex ? "w-6 bg-naik-gold" : "w-1.5 bg-white/40"
+                  }`}
+                  aria-hidden
+                />
+              ))}
+            </div>
           </div>
         </ScrollReveal>
       </div>

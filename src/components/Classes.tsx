@@ -132,19 +132,16 @@ export default function Classes() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {classesData.map((clase, index) => (
-            <ScrollReveal key={clase.id} delay={index * 0.1}>
+            <ScrollReveal key={clase.id} delay={index * 0.04}>
               <button 
-                onClick={() => {
-                  console.log('Clicked:', clase.name);
-                  setSelectedClass(clase);
-                }}
+                onClick={() => setSelectedClass(clase)}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-naik-gold transition-all duration-500 aspect-[4/5] cursor-pointer hover:shadow-[0_0_30px_rgba(255,215,0,0.3)] w-full"
               >
                 <Image
                   src={clase.image}
                   alt={clase.name}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 380px"
                   className="object-cover transition-transform duration-700 group-hover:scale-110 pointer-events-none"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none" />
@@ -165,28 +162,45 @@ export default function Classes() {
 
       {/* MODAL DE DETALLE DE CLASE */}
       {selectedClass && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-black/90 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedClass(null)}>
-          <div className="bg-[#111] border border-naik-gold/30 rounded-xl md:rounded-2xl max-w-3xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            {/* Imagen Header */}
-            <div className="relative h-48 md:h-80">
-              <Image
-                src={selectedClass.image}
-                alt={selectedClass.name}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-black/50 to-transparent" />
+        <div
+          className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 bg-black/95 md:bg-black/90 backdrop-blur-sm animate-fade-in min-h-[100dvh]"
+          onClick={() => setSelectedClass(null)}
+          aria-modal="true"
+          role="dialog"
+          aria-label="Detalle de clase"
+        >
+          <div
+            className="relative bg-[#111] border border-naik-gold/30 rounded-t-2xl md:rounded-2xl max-w-3xl w-full h-[94dvh] md:max-h-[90vh] md:h-auto flex flex-col shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* X siempre visible: absoluta sobre el modal (no corta la imagen ni quita espacio) */}
+            <div className="absolute top-0 right-0 z-20 flex justify-end p-3 md:p-0 md:top-4 md:right-4" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
               <button
                 onClick={() => setSelectedClass(null)}
-                className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full transition-all backdrop-blur-sm z-10"
+                className="flex items-center justify-center w-12 h-12 md:w-10 md:h-10 rounded-full bg-white text-black hover:bg-gray-200 transition-colors shadow-lg md:bg-black/70 md:text-white md:hover:bg-black/90"
+                aria-label="Cerrar"
               >
-                <X size={20} className="md:hidden" />
+                <X size={26} className="md:hidden" />
                 <X size={24} className="hidden md:block" />
               </button>
-              <h2 className="absolute bottom-4 left-4 md:bottom-6 md:left-6 text-3xl md:text-5xl lg:text-6xl font-black text-white uppercase font-oswald border-l-4 border-naik-gold pl-3 md:pl-4 pr-4">
-                {selectedClass.name}
-              </h2>
             </div>
+
+            {/* Contenido scrolleable (sin -mt para no cortar la imagen) */}
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+              {/* Imagen Header */}
+              <div className="relative h-48 md:h-80 shrink-0">
+                <Image
+                  src={selectedClass.image}
+                  alt={selectedClass.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-black/50 to-transparent" />
+                <h2 className="absolute bottom-4 left-4 md:bottom-6 md:left-6 text-3xl md:text-5xl lg:text-6xl font-black text-white uppercase font-oswald border-l-4 border-naik-gold pl-3 md:pl-4 pr-4">
+                  {selectedClass.name}
+                </h2>
+              </div>
 
             {/* Contenido */}
             <div className="p-5 md:p-8 space-y-5 md:space-y-6">
@@ -235,6 +249,7 @@ export default function Classes() {
                   Ver Profesores
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>

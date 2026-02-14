@@ -21,11 +21,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2">
-            <Image 
-              src="/logo.png" 
-              alt="Naik Dance Studio" 
-              width={200} 
+            <Image
+              src="/logo.png"
+              alt="Naik Dance Studio"
+              width={200}
               height={70}
+              sizes="112px"
               className="h-14 w-auto object-contain"
               priority
             />

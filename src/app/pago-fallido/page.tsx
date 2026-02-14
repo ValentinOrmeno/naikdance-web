@@ -14,6 +14,7 @@ export default function PagoFallido() {
             src="/logo.png"
             alt="Naik Dance Studio"
             fill
+            sizes="160px"
             className="object-contain opacity-90"
           />
         </div>

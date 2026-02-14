@@ -4,8 +4,7 @@ import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageLoader from "@/components/PageLoader";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
+import DeferredVercel from "@/components/DeferredVercel";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +27,7 @@ const bebas = Bebas_Neue({
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  weight: "400",
   variable: "--font-montserrat",
   display: "swap",
 });
@@ -114,11 +113,11 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} ${oswald.variable} ${bebas.variable} ${montserrat.variable}`}>
       <head>
         <JsonLd />
+        <link rel="preconnect" href="https://www.transparenttextures.com" crossOrigin="anonymous" />
       </head>
       <body className="font-inter bg-naik-black text-white antialiased">
         <GoogleAnalytics />
-        <SpeedInsights />
-        <Analytics />
+        <DeferredVercel />
         <PageLoader />
         {children}
       </body>

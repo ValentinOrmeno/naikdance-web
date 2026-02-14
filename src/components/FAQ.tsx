@@ -78,7 +78,7 @@ export default function FAQ() {
 
         <div className="space-y-4">
           {faqData.map((faq, index) => (
-            <ScrollReveal key={faq.id} delay={index * 0.05}>
+            <ScrollReveal key={faq.id} delay={index * 0.03}>
               <div
                 className={`bg-naik-dark/70 border rounded-2xl overflow-hidden backdrop-blur-md transition-all duration-300 ${
                   openId === faq.id
@@ -118,7 +118,7 @@ export default function FAQ() {
           ))}
         </div>
 
-        <ScrollReveal delay={0.6}>
+        <ScrollReveal delay={0.2}>
           <div className="mt-12 text-center p-8 bg-gradient-to-r from-naik-gold/10 via-naik-neon/5 to-naik-gold/10 rounded-2xl border border-naik-gold/20">
             <p className="text-white text-lg mb-4 font-bold">
               ¿Tenes otra pregunta?

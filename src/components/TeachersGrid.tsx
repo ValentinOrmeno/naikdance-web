@@ -1,10 +1,12 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { teachers } from '@/data/teachers';
 import ScrollReveal from './ScrollReveal';
+
+const SEARCH_DEBOUNCE_MS = 250;
 
 const categories = [
   { id: 'all', label: 'Todos', keywords: [] },
@@ -17,7 +19,13 @@ const categories = [
 
 export default function TeachersGrid() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const filteredTeachers = useMemo(() => {
     let filtered = teachers;
@@ -25,23 +33,24 @@ export default function TeachersGrid() {
     // Filtro por categoria
     if (selectedCategory !== 'all') {
       const category = categories.find(c => c.id === selectedCategory);
-      filtered = filtered.filter(t => 
-        category?.keywords.some(keyword => 
+      filtered = filtered.filter(t =>
+        category?.keywords.some(keyword =>
           t.style.toLowerCase().includes(keyword)
         )
       );
     }
 
-    // Filtro por busqueda
-    if (searchTerm) {
-      filtered = filtered.filter(t => 
-        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.style.toLowerCase().includes(searchTerm.toLowerCase())
+    // Filtro por busqueda (debounced para mejor INP)
+    if (debouncedSearch) {
+      const term = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(t =>
+        t.name.toLowerCase().includes(term) ||
+        t.style.toLowerCase().includes(term)
       );
     }
 
     return filtered;
-  }, [searchTerm, selectedCategory]);
+  }, [debouncedSearch, selectedCategory]);
 
 
   return (
@@ -59,7 +68,7 @@ export default function TeachersGrid() {
         </ScrollReveal>
 
         {/* Buscador */}
-        <ScrollReveal delay={0.2}>
+        <ScrollReveal delay={0.06}>
           <div className="max-w-2xl mx-auto mb-8 relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD700] to-[#00BFFF] rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
             <div className="relative flex items-center bg-[#111] rounded-2xl border border-white/10 p-2">
@@ -78,7 +87,7 @@ export default function TeachersGrid() {
         </ScrollReveal>
 
         {/* Filtros por categoria */}
-        <ScrollReveal delay={0.3}>
+        <ScrollReveal delay={0.1}>
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             {categories.map((category) => (
               <button
@@ -98,7 +107,7 @@ export default function TeachersGrid() {
         </ScrollReveal>
 
         {/* Contador de resultados */}
-        <ScrollReveal delay={0.35}>
+        <ScrollReveal delay={0.12}>
           <div className="text-center mb-8">
             <p className="text-gray-400 text-sm">
               Mostrando <span className="text-naik-gold font-bold">{filteredTeachers.length}</span> {filteredTeachers.length === 1 ? 'profesor' : 'profesores'}
@@ -109,7 +118,7 @@ export default function TeachersGrid() {
         {/* Grid de profesores */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {filteredTeachers.map((teacher, index) => (
-            <ScrollReveal key={teacher.id} delay={index * 0.05}>
+            <ScrollReveal key={teacher.id} delay={index * 0.03}>
               <Link
                 href={`/profesores/${teacher.id}`}
                 className="group cursor-pointer relative max-w-[220px] w-full mx-auto"
@@ -139,7 +148,7 @@ export default function TeachersGrid() {
 
         {/* Mensaje si no hay resultados */}
         {filteredTeachers.length === 0 && (
-          <ScrollReveal delay={0.2}>
+          <ScrollReveal delay={0.08}>
             <div className="text-center py-20">
               <p className="text-gray-400 text-lg mb-4">No se encontraron profesores con ese criterio</p>
               <button

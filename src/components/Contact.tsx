@@ -12,7 +12,7 @@ export default function Contact() {
         </h2>
       </ScrollReveal>
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto mb-16">
-        <ScrollReveal direction="left" delay={0.2}>
+        <ScrollReveal direction="left" delay={0.08}>
           <div className="bg-naik-dark/70 border border-green-500/45 p-8 text-center flex flex-col gap-4 items-center rounded-2xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
             <div className="w-14 h-14 rounded-xl inline-flex items-center justify-center bg-white/10 text-3xl">
               <FaWhatsapp />
@@ -33,7 +33,7 @@ export default function Contact() {
           </div>
         </ScrollReveal>
         
-        <ScrollReveal direction="right" delay={0.2}>
+        <ScrollReveal direction="right" delay={0.08}>
           <div className="bg-naik-dark/70 border border-naik-blue/45 p-8 text-center flex flex-col gap-4 items-center rounded-2xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
             <div className="w-14 h-14 rounded-xl inline-flex items-center justify-center bg-white/10 text-3xl">
               <FaEnvelope />
@@ -55,10 +55,20 @@ export default function Contact() {
         </ScrollReveal>
       </div>
 
-      <ScrollReveal delay={0.3}>
-        <div className="text-center text-white font-anton uppercase tracking-[0.2rem] mt-10 mb-4 text-sm">
+      <ScrollReveal delay={0.12}>
+        <div className="text-center text-white font-anton uppercase tracking-[0.2rem] mt-10 mb-2 text-sm">
           Nuestra Sede
         </div>
+        <p className="text-center text-gray-300 text-base md:text-lg mb-4">
+          <a
+            href="https://maps.google.com/maps?q=Av.+Bartolom%C3%A9+Mitre+3257,+Moreno"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-naik-gold hover:text-yellow-400 transition-colors underline underline-offset-2"
+          >
+            Av. Bartolomé Mitre 3257, Moreno
+          </a>
+        </p>
         <div className="relative w-full max-w-5xl mx-auto h-0 pb-[40%] rounded-2xl overflow-hidden border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
           <iframe
             className="absolute top-0 left-0 w-full h-full border-0"

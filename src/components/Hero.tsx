@@ -10,8 +10,11 @@ function useVideoAutoplay(ref: React.RefObject<HTMLVideoElement | null>) {
     if (!video) return;
 
     const playVideo = async () => {
+      // iOS/Safari móvil: forzar muted y playsInline en JS antes de play()
+      video.muted = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
       try {
-        video.muted = true;
         await video.play();
       } catch {
         setTimeout(() => {
@@ -30,10 +33,17 @@ function useVideoAutoplay(ref: React.RefObject<HTMLVideoElement | null>) {
     video.addEventListener('loadeddata', playVideo);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('canplaythrough', onCanPlay);
+
+    // Móvil: reintentos por si el video tarda en estar listo (conexión lenta o política del navegador)
+    const t1 = setTimeout(playVideo, 600);
+    const t2 = setTimeout(playVideo, 1500);
+
     return () => {
       video.removeEventListener('loadeddata', playVideo);
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('canplaythrough', onCanPlay);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, [ref]);
 }
@@ -54,11 +64,13 @@ export default function Hero() {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         disablePictureInPicture
         className="absolute inset-0 z-0 w-full h-full object-cover opacity-40 pointer-events-none md:hidden"
+        aria-label="Video decorativo de fondo"
       >
         <source src="/hero-mobile.mp4" type="video/mp4" />
+        <track kind="metadata" src="/captions-hero.vtt" srcLang="es" label="Español" />
       </video>
 
       {/* Video desktop */}
@@ -68,12 +80,13 @@ export default function Hero() {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         className="absolute inset-0 z-0 w-full h-full object-cover opacity-40 pointer-events-none hidden md:block"
+        aria-label="Video decorativo de fondo"
       >
         <source src="/intro2.mp4" type="video/mp4" />
-        <source src="/about-vertical.mp4" type="video/mp4" />
+        <track kind="metadata" src="/captions-hero.vtt" srcLang="es" label="Español" />
       </video>
 
       {/* Overlay: gradiente en movil (arriba suave, abajo mas oscuro) + solido en desktop */}
@@ -87,23 +100,27 @@ export default function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 text-center px-4 pointer-events-auto">
-        <div className="flex items-center justify-center mb-8">
-          <Image 
-            src="/logo.png" 
-            alt="Naik Dance Studio" 
-            width={700} 
+      <div className="relative z-10 text-center px-4 pointer-events-auto flex flex-col items-center">
+        {/* Contenedor logo: espacio fijo para evitar CLS (contain + overflow + flex-none) */}
+        <div className="flex items-center justify-center mb-8 w-full max-w-[95%] md:max-w-[1050px] mx-auto shrink-0 overflow-hidden aspect-[700/300] min-h-[180px] md:min-h-[340px]">
+          <Image
+            src="/logo.png"
+            alt="Naik Dance Studio"
+            width={700}
             height={300}
-            className="w-auto h-auto max-w-[90%] md:max-w-[700px] drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]"
+            className="block w-full h-full object-contain drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]"
             priority
+            fetchPriority="high"
+            sizes="(max-width: 768px) 95vw, 900px"
           />
         </div>
-        <p className="text-xl md:text-2xl text-white/90 font-inter max-w-2xl mx-auto mb-8">
+        {/* Min-height reserva espacio cuando cargan las fuentes (Inter/Oswald) */}
+        <p className="text-xl md:text-2xl text-white/90 font-inter max-w-2xl mx-auto mb-8 min-h-[3.5rem] flex items-center justify-center text-center px-3">
           Donde la técnica, la energía y la comunidad van juntas
         </p>
         <a
           href="#clases"
-          className="inline-block bg-naik-gold text-black font-oswald font-bold uppercase tracking-wide px-8 py-4 text-lg hover:bg-yellow-400 hover:scale-105 transition-all duration-300 shadow-glow-gold-sm hover:shadow-glow-gold rounded-sm"
+          className="inline-block bg-naik-gold text-black font-oswald font-bold uppercase tracking-wide px-8 py-4 text-lg min-h-[3.25rem] flex items-center justify-center hover:bg-yellow-400 hover:scale-105 transition-all duration-300 shadow-glow-gold-sm hover:shadow-glow-gold rounded-sm"
         >
           VER CLASES
         </a>
@@ -112,9 +129,10 @@ export default function Hero() {
       {/* Scroll Indicator */}
       <a
         href="#nosotros"
+        aria-label="Ir a sección Nosotros"
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-naik-gold animate-bounce hover:text-naik-neon transition-colors"
       >
-        <ChevronDown size={32} />
+        <ChevronDown size={32} aria-hidden />
       </a>
     </section>
   );
