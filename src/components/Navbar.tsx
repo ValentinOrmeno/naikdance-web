@@ -13,7 +13,7 @@ export default function Navbar() {
     { href: '#aranceles', label: 'Aranceles' },
     { href: '#nosotros', label: 'Nosotros' },
     { href: '#faq', label: 'FAQ' },
-    { href: '#contacto', label: 'Contacto' },
+    { href: '#redes', label: 'Redes' },
   ];
 
   return (
