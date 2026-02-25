@@ -13,7 +13,7 @@ const Contact = dynamic(() => import('@/components/Contact'), { ssr: true });
 
 export default function Home() {
   return (
-    <main className="nd-main">
+    <main className="nd-main overflow-x-hidden min-w-0">
       <div className="nd-global-glow" aria-hidden="true" />
       <div className="nd-global-noise" aria-hidden="true" />
       <Navbar />

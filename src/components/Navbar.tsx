@@ -17,9 +17,9 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-naik-gold/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-naik-gold/20 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto w-full min-w-0 px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="/logo.png"

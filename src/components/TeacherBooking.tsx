@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Calendar, ChevronDown, Home, Clock } from 'lucide-react';
 import { createReservation } from '@/lib/supabase-admin';
 import { getAllAvailability, getClassSchedules } from '@/lib/supabase-admin-extended';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [email, setEmail] = useState('');
@@ -183,8 +184,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 - Clase: ${claseInfo}
 - Duracion: ${selectedSchedule.duration} minutos`;
 
-    const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(getWhatsAppUrl(message), '_blank');
   };
 
   const handleComprarClase = async () => {
@@ -504,7 +504,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                       Contactanos por WhatsApp para coordinar.
                     </p>
                     <a
-                      href={`https://wa.me/5491168582586?text=${encodeURIComponent(`Hola! Me interesa coordinar una clase con ${teacher.name}`)}`}
+                      href={getWhatsAppUrl(`Hola! Me interesa coordinar una clase con ${teacher.name}`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all"

@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 function ClaseReservadaContent() {
   const searchParams = useSearchParams();
@@ -84,7 +85,7 @@ Fecha: ${fechaLabel}
 Confirmo mi reserva. Gracias!`;
             }
 
-            window.location.href = `https://wa.me/5491168582586?text=${encodeURIComponent(message)}`;
+            window.location.href = getWhatsAppUrl(message);
             
             // Limpiar sessionStorage después de usar
             sessionStorage.removeItem('paymentUserName');
@@ -132,7 +133,7 @@ Confirmo mi reserva. Gracias!`;
                 Volver al Inicio
               </Link>
               <a
-                href="https://wa.me/5491168582586?text=Hola! Mi pago está pendiente, ¿pueden ayudarme?"
+                href={getWhatsAppUrl('Hola! Mi pago está pendiente, ¿pueden ayudarme?')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl uppercase transition-all flex items-center justify-center gap-2"
@@ -253,7 +254,7 @@ Confirmo mi reserva. Gracias!`;
             {/* Botones */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`https://wa.me/5491168582586?text=${encodeURIComponent(
+                href={getWhatsAppUrl(
                   context === 'pack'
                     ? (() => {
                         const label =
@@ -282,7 +283,7 @@ Fecha: ${fechaLabel}
 
 Confirmo mi reserva. Gracias!`;
                       })()
-                )}`}
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl uppercase transition-all shadow-[0_0_30px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2"

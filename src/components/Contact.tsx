@@ -1,11 +1,12 @@
 'use client';
 
-import { FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import ScrollReveal from "./ScrollReveal";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 export default function Contact() {
   return (
-    <section id="contacto" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
+    <section id="contacto" className="py-20 px-3 sm:px-4 bg-transparent relative z-10 scroll-mt-24 overflow-x-hidden">
       <ScrollReveal>
         <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-12 tracking-wide">
           Contacto
@@ -23,7 +24,7 @@ export default function Contact() {
             <p className="text-gray-300">Escribinos para coordinar clases y pagos.</p>
             <div className="flex gap-3 flex-wrap justify-center w-full">
               <a
-                href="https://wa.me/5491168582586"
+                href={getWhatsAppUrl()}
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full uppercase font-extrabold tracking-wider text-sm border border-transparent bg-naik-gold text-black transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
               >
                 <FaWhatsapp className="w-4 h-4" />
@@ -34,21 +35,23 @@ export default function Contact() {
         </ScrollReveal>
         
         <ScrollReveal direction="right" delay={0.08}>
-          <div className="bg-naik-dark/70 border border-naik-blue/45 p-8 text-center flex flex-col gap-4 items-center rounded-2xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
+          <div className="bg-naik-dark/70 border border-naik-pink/45 p-8 text-center flex flex-col gap-4 items-center rounded-2xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
             <div className="w-14 h-14 rounded-xl inline-flex items-center justify-center bg-white/10 text-3xl">
-              <FaEnvelope />
+              <FaInstagram />
             </div>
             <h3 className="m-0 font-anton uppercase tracking-widest text-white text-xl">
-              Gmail
+              Instagram
             </h3>
-            <p className="text-gray-300">naikdance@gmail.com</p>
+            <p className="text-gray-300">Seguinos en @naikdance</p>
             <div className="flex gap-3 flex-wrap justify-center w-full">
               <a
-                href="mailto:naikdance@gmail.com"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full uppercase font-extrabold tracking-wider text-sm border border-transparent bg-naik-blue text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
+                href="https://www.instagram.com/naikdance/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full uppercase font-extrabold tracking-wider text-sm border border-transparent bg-naik-pink text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
               >
-                <FaEnvelope className="w-4 h-4" />
-                Enviar Correo
+                <FaInstagram className="w-4 h-4" />
+                Ver Instagram
               </a>
             </div>
           </div>

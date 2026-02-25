@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 const faqData = [
   {
@@ -65,8 +66,8 @@ export default function FAQ() {
   };
 
   return (
-    <section id="faq" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
-      <div className="max-w-4xl mx-auto">
+    <section id="faq" className="py-20 px-3 sm:px-4 bg-transparent relative z-10 scroll-mt-24 overflow-x-hidden">
+      <div className="max-w-4xl mx-auto w-full min-w-0">
         <ScrollReveal>
           <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-4 tracking-wide">
             Preguntas <span className="text-naik-gold">Frecuentes</span>
@@ -127,7 +128,7 @@ export default function FAQ() {
               Escribinos por WhatsApp y te respondemos al toque
             </p>
             <a
-              href="https://wa.me/5491168582586?text=Hola!%20Tengo%20una%20consulta%20sobre%20las%20clases"
+              href={getWhatsAppUrl('Hola! Tengo una consulta sobre las clases')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-naik-gold text-black font-bold uppercase px-8 py-4 rounded-xl hover:bg-yellow-400 hover:scale-105 transition-all duration-300 shadow-glow-gold-sm hover:shadow-glow-gold"

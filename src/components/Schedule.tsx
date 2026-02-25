@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Clock, User, Award } from 'lucide-react';
 import { schedules, getAllDays, getSchedulesByDay } from '@/data/schedules';
 import ScrollReveal from './ScrollReveal';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 export default function Schedule() {
   const [selectedDay, setSelectedDay] = useState('Lunes');
@@ -11,12 +12,12 @@ export default function Schedule() {
 
   const generateWhatsAppLink = (className: string, day: string, time: string) => {
     const message = `Hola! Quiero reservar la clase de *${className}* el ${day} a las ${time}`;
-    return `https://wa.me/5491168582586?text=${encodeURIComponent(message)}`;
+    return getWhatsAppUrl(message);
   };
 
   return (
-    <section id="horarios" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
-      <div className="max-w-7xl mx-auto">
+    <section id="horarios" className="py-20 px-3 sm:px-4 bg-transparent relative z-10 scroll-mt-24 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto w-full min-w-0">
         <ScrollReveal>
           <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-4 tracking-wide">
             Horarios de <span className="text-naik-gold">Clases</span>

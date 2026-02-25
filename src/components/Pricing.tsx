@@ -4,6 +4,7 @@ import { SiMercadopago } from "react-icons/si";
 import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 const priceCards = [
   {
@@ -96,8 +97,7 @@ export default function Pricing() {
   const handleEfectivoClick = useCallback((title: string, name: string) => {
     const packFormatted = formatPackName(title, name);
     const whatsappMessage = `Hola! Vengo de la web. Quiero ${packFormatted} en EFECTIVO`;
-    const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
-    window.open(whatsappUrl, "_blank");
+    window.open(getWhatsAppUrl(whatsappMessage), "_blank");
   }, [formatPackName]);
 
   // Pre-rellenar datos del usuario si los tiene guardados
@@ -191,13 +191,13 @@ export default function Pricing() {
 
   return (
     <>
-      <section id="aranceles" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
+      <section id="aranceles" className="py-20 px-3 sm:px-4 bg-transparent relative z-10 scroll-mt-24 overflow-x-hidden">
         <ScrollReveal>
           <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-12 tracking-wide">
             Aranceles <span className="text-naik-gold">2026</span>
           </h2>
         </ScrollReveal>
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[1400px] mx-auto">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full max-w-[min(1400px,95vw)] mx-auto px-1">
           {priceCards.map((card, index) => (
             <ScrollReveal key={card.title} delay={index * 0.04}>
               <div

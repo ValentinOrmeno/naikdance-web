@@ -881,11 +881,11 @@ export default function AdminPanel() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden min-w-0 p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl md:text-5xl font-black uppercase">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase">
             Panel de <span className="text-naik-gold">Admin</span>
           </h1>
           <button
@@ -898,14 +898,14 @@ export default function AdminPanel() {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold uppercase transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold uppercase text-xs sm:text-base transition-all ${
                   activeTab === tab.id
                     ? 'bg-naik-gold text-black'
                     : 'bg-white/10 text-white hover:bg-white/20'
@@ -1341,8 +1341,8 @@ export default function AdminPanel() {
 
       {/* Modal de Detalles de Reservas por Profesor */}
       {detailModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-4xl w-full p-6 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,56rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-2xl font-black text-white uppercase">
@@ -1431,9 +1431,9 @@ export default function AdminPanel() {
 
       {/* Modal de Gestion de Horarios */}
       {scheduleModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-5xl max-h-[90vh] flex flex-col p-4 md:p-6 my-8">
-            <div className="flex justify-between items-center mb-4 md:mb-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-[min(95vw,80rem)] max-h-[min(90vh,900px)] flex flex-col p-3 sm:p-4 md:p-6 my-4 sm:my-8 shrink-0">
+            <div className="flex justify-between items-center mb-3 sm:mb-4 md:mb-6 shrink-0">
               <div>
                 <h3 className="text-2xl font-black text-white uppercase">
                   Horarios de {scheduleModal.teacherName}
@@ -1459,11 +1459,11 @@ export default function AdminPanel() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-6 mt-2 md:mt-4 pr-1">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-4 md:space-y-6 mt-2 md:mt-4 pr-1">
               {/* Formulario para agregar / editar horario */}
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6">
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <h4 className="text-lg font-bold uppercase text-naik-gold flex items-center gap-2">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 md:p-6 min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-3 sm:mb-4">
+                  <h4 className="text-base sm:text-lg font-bold uppercase text-naik-gold flex items-center gap-2">
                     <Plus size={20} />
                     {editingSchedule ? "Editar Horario" : "Agregar Nuevo Horario"}
                   </h4>
@@ -1488,12 +1488,12 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Calendario para seleccionar día */}
-                <div className="mb-6">
-                  <label className="block text-sm font-bold uppercase mb-3 text-white">
+                <div className="mb-4 md:mb-6 min-w-0">
+                  <label className="block text-sm font-bold uppercase mb-2 sm:mb-3 text-white">
                     Seleccionar Día *
                   </label>
-                  <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                    <div className="grid grid-cols-7 gap-1">
+                  <div className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 overflow-x-auto">
+                    <div className="grid grid-cols-7 gap-0.5 sm:gap-1 min-w-0 w-full max-w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
                       {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
                         const isSelected =
                           newScheduleDays.includes(day) || newSchedule.day === String(day);
@@ -1519,7 +1519,7 @@ export default function AdminPanel() {
                                 setNewSchedule({ ...newSchedule, day: String(day) });
                               }}
                             className={`
-                              aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                              w-full min-w-0 aspect-square flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-all
                               ${
                                 isDisabled
                                   ? "bg-white/5 text-gray-600 cursor-not-allowed opacity-40" +
@@ -1742,8 +1742,8 @@ export default function AdminPanel() {
 
       {/* Modal de Confirmacion */}
       {confirmModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-md w-full p-6">
+<div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-x-hidden">
+        <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-black text-white uppercase">
                 {confirmModal.action === 'confirm' ? 'Confirmar Reserva' : 'Cancelar Reserva'}
@@ -1786,8 +1786,8 @@ export default function AdminPanel() {
 
       {/* Modal: sugerir descuento automático de pack */}
       {packConfirmModal.show && packConfirmModal.pack && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#111] border border-naik-gold/40 rounded-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-x-hidden">
+          <div className="bg-[#111] border border-naik-gold/40 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-black text-white uppercase">
                 Usar crédito de pack
@@ -1867,8 +1867,8 @@ export default function AdminPanel() {
 
       {/* Modal Agregar Disponibilidad */}
       {addAvailabilityModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-2xl w-full p-6 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,36rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-black text-white uppercase">
                 Agregar Disponibilidad
@@ -1926,7 +1926,7 @@ export default function AdminPanel() {
               <div>
                 <label className="block text-sm font-bold uppercase mb-3 text-naik-gold">Días Disponibles</label>
                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5 sm:gap-1 min-w-0 w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
                     {Array.from({length: 31}, (_, i) => i + 1).map(day => {
                       const isSelected = addAvailabilityModal.days.includes(day);
                       const isPast = isDayPast(day, selectedMonth);
@@ -1991,8 +1991,8 @@ export default function AdminPanel() {
 
       {/* Modal Crear Clase Rápida */}
       {quickClassModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-2xl w-full p-6 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,36rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-black text-white uppercase">
                 Crear Clase Rápida
@@ -2057,7 +2057,7 @@ export default function AdminPanel() {
                   Días de la clase (podés elegir varios)
                 </label>
                 <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5 sm:gap-1 min-w-0 w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
                     {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
                       const isSelected = quickClassDays.includes(day);
                       const isPast = isDayPast(day, quickClassModal.month);

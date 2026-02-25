@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 export const dynamic = 'force-dynamic';
 
@@ -79,8 +80,7 @@ export default function PagoFallido() {
             <button
               onClick={() => {
                 const whatsappMessage = `Hola! Tuve un problema con el pago por Mercado Pago. ¿Me pueden ayudar?`;
-                const whatsappUrl = `https://wa.me/5491168582586?text=${encodeURIComponent(whatsappMessage)}`;
-                window.open(whatsappUrl, "_blank");
+                window.open(getWhatsAppUrl(whatsappMessage), "_blank");
               }}
               className="block w-full bg-transparent hover:bg-white/10 text-white font-bold uppercase py-4 px-6 rounded-xl transition-all duration-200 hover:-translate-y-0.5 border-2 border-white/30 hover:border-white/50"
             >
