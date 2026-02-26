@@ -6,7 +6,7 @@ Disallow: /_next/
 Disallow: /admin/
 
 # Sitemap
-Sitemap: https://naikdance-web.vercel.app/sitemap.xml
+Sitemap: https://naikdance.com/sitemap.xml
 
 # Bots específicos
 User-agent: Googlebot

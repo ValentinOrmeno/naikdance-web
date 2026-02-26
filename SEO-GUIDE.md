@@ -26,7 +26,7 @@
 
 #### Registrar tu sitio:
 1. Ir a: https://search.google.com/search-console
-2. Agregar propiedad → **naikdance-web.vercel.app**
+2. Agregar propiedad → **https://naikdance.com/**
 3. Verificar propiedad:
    - Método recomendado: **Etiqueta HTML**
    - Te darán un código como: `<meta name="google-site-verification" content="ABC123...">`
@@ -34,17 +34,17 @@
 
 #### Enviar el sitemap:
 1. En Google Search Console → **Sitemaps**
-2. Agregar nuevo sitemap: `https://naikdance-web.vercel.app/sitemap.xml`
+2. Agregar nuevo sitemap: `https://naikdance.com/sitemap.xml`
 3. Enviar
 
 #### Solicitar indexación:
-1. **Inspección de URL** → Pegar: `https://naikdance-web.vercel.app`
+1. **Inspección de URL** → Pegar: `https://naikdance.com/`
 2. Click en **"Solicitar indexación"**
 3. Repetir para las páginas importantes:
-   - `https://naikdance-web.vercel.app/#clases`
-   - `https://naikdance-web.vercel.app/#horarios`
-   - `https://naikdance-web.vercel.app/#aranceles`
-   - `https://naikdance-web.vercel.app/#staff`
+   - `https://naikdance.com/#clases`
+   - `https://naikdance.com/#horarios`
+   - `https://naikdance.com/#aranceles`
+   - `https://naikdance.com/#staff`
 
 ---
 
@@ -58,7 +58,7 @@
    - ✅ Categoría: **Escuela de baile** / **Academia de danza**
    - ✅ Dirección exacta en Moreno
    - ✅ Teléfono: `+54 9 11 6858-2586`
-   - ✅ Sitio web: `https://naikdance-web.vercel.app`
+- ✅ Sitio web: `https://naikdance.com`
    - ✅ Horarios (Lun-Vie: 17:00-22:00, Sab: 10:00-18:00)
    - ✅ Fotos del estudio (mínimo 10)
    - ✅ Fotos de clases
@@ -110,7 +110,7 @@
 
 #### Redes sociales (Google las toma en cuenta):
 1. **Instagram** (https://www.instagram.com/naikdance/): 
-   - Agregar enlace en bio → `https://naikdance-web.vercel.app`
+   - Agregar enlace en bio → `https://naikdance.com`
    - Publicar contenido regularmente con link al sitio
 2. **Facebook** (opcional): Crear página con link al sitio
 3. **TikTok** (opcional): Crear cuenta y agregar link en bio
@@ -185,7 +185,7 @@ Cuando tengas tu ID de Google Analytics:
 
 ## ✅ Checklist Final
 
-- [x] Dominio apuntando a Vercel (https://naikdance-web.vercel.app)
+- [x] Dominio apuntando a Vercel (https://naikdance.com)
 - [ ] Google Search Console registrado
 - [ ] Sitemap enviado a Google
 - [ ] Google My Business creado

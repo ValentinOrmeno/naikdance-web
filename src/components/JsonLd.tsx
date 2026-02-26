@@ -4,9 +4,9 @@ export default function JsonLd() {
     '@type': 'SportsActivityLocation',
     name: 'Naik Dance Studio',
     description: 'Estudio de danza urbana en Moreno, Buenos Aires. Clases de Reggaeton, Urbano, K-Pop, Hip Hop, Femme y más.',
-    image: 'https://naikdance-web.vercel.app/logo.png',
-    '@id': 'https://naikdance-web.vercel.app',
-    url: 'https://naikdance-web.vercel.app',
+    image: 'https://naikdance.com/logo.png',
+    '@id': 'https://naikdance.com',
+    url: 'https://naikdance.com',
     telephone: '+54 9 11 3863-8020',
     address: {
       '@type': 'PostalAddress',

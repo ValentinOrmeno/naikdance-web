@@ -57,11 +57,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://naikdance-web.vercel.app'),
+  metadataBase: new URL('https://naikdance.com'),
   openGraph: {
     title: "Naik Dance Studio | Academia de Danza Urbana en Moreno",
     description: "🔥 Clases de Reggaeton, Urbano, K-Pop, Hip Hop, Femme y más. Staff profesional. ¡Reservá tu clase!",
-    url: 'https://naikdance-web.vercel.app',
+    url: 'https://naikdance.com',
     siteName: 'Naik Dance Studio',
     images: [
       {

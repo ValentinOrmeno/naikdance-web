@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title,
       description,
       images: [teacher.image],
-      url: `https://naikdance-web.vercel.app/profesores/${teacher.id}`,
+      url: `https://naikdance.com/profesores/${teacher.id}`,
       type: 'profile',
     },
     twitter: {

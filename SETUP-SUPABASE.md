@@ -56,7 +56,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # Mercado Pago (ya las tenías)
 NEXT_PUBLIC_MP_PUBLIC_KEY=APP_USR-xxxxx
 MP_ACCESS_TOKEN=APP_USR-xxxxx
-NEXT_PUBLIC_SITE_URL=https://naikdance-web.vercel.app
+NEXT_PUBLIC_SITE_URL=https://naikdance.com
 ```
 
 3. **Guarda** el archivo

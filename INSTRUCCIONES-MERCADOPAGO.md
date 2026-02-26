@@ -94,7 +94,7 @@ npm run dev
 # Reemplazá TEST- por las credenciales reales
 NEXT_PUBLIC_MP_PUBLIC_KEY=APP_USR-tu-public-key-real
 MP_ACCESS_TOKEN=APP_USR-tu-access-token-real
-NEXT_PUBLIC_SITE_URL=https://naikdance-web.vercel.app
+NEXT_PUBLIC_SITE_URL=https://naikdance.com
 ```
 
 3. **En Vercel, agregá las variables de entorno:**
