@@ -5,6 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageLoader from "@/components/PageLoader";
 import DeferredVercel from "@/components/DeferredVercel";
+import GlobalBackground from "@/components/GlobalBackground";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -119,6 +120,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <DeferredVercel />
         <PageLoader />
+        <GlobalBackground />
         {children}
       </body>
     </html>

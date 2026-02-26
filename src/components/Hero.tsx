@@ -64,7 +64,7 @@ export default function Hero() {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         className="absolute inset-0 z-0 w-full h-full object-cover opacity-40 pointer-events-none md:hidden"
         aria-label="Video decorativo de fondo"
@@ -127,13 +127,15 @@ export default function Hero() {
       </div>
 
       {/* Scroll Indicator */}
-      <a
-        href="#nosotros"
-        aria-label="Ir a sección Nosotros"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-naik-gold animate-bounce hover:text-naik-neon transition-colors"
-      >
-        <ChevronDown size={32} aria-hidden />
-      </a>
+      <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center">
+        <a
+          href="#nosotros"
+          aria-label="Ir a sección Nosotros"
+          className="text-naik-gold animate-bounce hover:text-naik-neon transition-colors"
+        >
+          <ChevronDown size={32} aria-hidden />
+        </a>
+      </div>
     </section>
   );
 }

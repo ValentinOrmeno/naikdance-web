@@ -54,9 +54,7 @@ export default function TeachersGrid() {
 
 
   return (
-    <section className="py-20 bg-[#050505] text-white relative overflow-hidden" id="staff">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
-
+    <section className="py-20 bg-transparent text-white relative overflow-hidden" id="staff">
       <div className="container mx-auto w-full min-w-0 px-3 sm:px-4 relative z-10">
         
         <ScrollReveal>
