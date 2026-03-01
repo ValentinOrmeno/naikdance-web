@@ -3,18 +3,24 @@ import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { teachers } from '@/data/teachers';
+import { teachers, MARCH_SCHEDULE_TEACHER_IDS } from '@/data/teachers';
 import ScrollReveal from './ScrollReveal';
 
 const SEARCH_DEBOUNCE_MS = 250;
 
+// Categorías alineadas con los estilos del horario de clases (schedules)
 const categories = [
   { id: 'all', label: 'Todos', keywords: [] },
   { id: 'reggaeton', label: 'Reggaeton', keywords: ['reggaeton', 'femme', 'twerk', 'fusion'] },
-  { id: 'urbano', label: 'Urbano', keywords: ['urbano', 'hip hop', 'street', 'freestyle', 'coreografia', 'montaje'] },
+  { id: 'urbano', label: 'Urbano', keywords: ['urbano', 'hip hop', 'street', 'freestyle', 'coreografia', 'montaje', 'waacking', 'voguing'] },
   { id: 'kpop', label: 'K-Pop', keywords: ['k-pop', 'kpop', 'k pop'] },
-  { id: 'contemporaneo', label: 'Contemporaneo', keywords: ['contemporaneo', 'lyrical', 'jazz', 'contempo'] },
-  { id: 'kids', label: 'Kids', keywords: ['kids', 'infantil', 'acro'] },
+  { id: 'jazz', label: 'Jazz / Ballet', keywords: ['jazz', 'lyrical', 'ballet', 'teatro', 'comedia', 'contempo', 'contemporaneo', 'theatre'] },
+  { id: 'acrobacia', label: 'Acrobacia / Telas', keywords: ['acrobacia', 'acro', 'telas', 'flex'] },
+  { id: 'ritmos', label: 'Ritmos', keywords: ['ritmos', 'bachata', 'salsa', 'árabe', 'arabe', 'axe'] },
+  { id: 'zumba', label: 'Zumba', keywords: ['zumba'] },
+  { id: 'fitness', label: 'Fitness', keywords: ['fitness', 'elongacion', 'funcional', 'técnica', 'tecnica'] },
+  { id: 'taekwondo', label: 'Taekwondo / Contacto', keywords: ['taekwondo', 'contacto', 'muay thai'] },
+  { id: 'kids', label: 'Kids', keywords: ['kids', 'infantil', 'baby'] },
 ];
 
 export default function TeachersGrid() {
@@ -28,7 +34,10 @@ export default function TeachersGrid() {
   }, [searchTerm]);
 
   const filteredTeachers = useMemo(() => {
-    let filtered = teachers;
+    // Solo profes que están en el horario de marzo
+    const marchIds = new Set(MARCH_SCHEDULE_TEACHER_IDS);
+    const marchTeachers = teachers.filter((t) => marchIds.has(t.id));
+    let filtered = marchTeachers;
 
     // Filtro por categoria
     if (selectedCategory !== 'all') {

@@ -64,8 +64,19 @@ export default function Footer() {
           </a>
         </div>
       </div>
-      <div className="text-center mt-6 text-xs text-gray-400 tracking-widest uppercase">
-        © 2026 Naik Dance Studio · Moreno, Bs As.
+      <div className="text-center mt-6 text-xs text-gray-400 tracking-widest uppercase space-y-1">
+        <div>© 2026 Naik Dance Studio · Moreno, Bs As.</div>
+        <div className="text-[10px] tracking-[0.25em]">
+          Desarrollado por{" "}
+          <a
+            href="https://portfolio-vln.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-naik-gold hover:text-yellow-400 no-underline"
+          >
+            Valentín Ormeño
+          </a>
+        </div>
       </div>
     </footer>
   );

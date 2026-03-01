@@ -114,7 +114,6 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} ${oswald.variable} ${bebas.variable} ${montserrat.variable}`}>
       <head>
         <JsonLd />
-        <link rel="preconnect" href="https://www.transparenttextures.com" crossOrigin="anonymous" />
       </head>
       <body className="font-inter bg-naik-black text-white antialiased">
         <GoogleAnalytics />

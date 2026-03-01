@@ -51,7 +51,7 @@ export default function About() {
               fill
               className="object-cover animate-fade-in"
               sizes="(max-width: 768px) 100vw, 50vw"
-              priority={currentIndex === 0}
+              loading="lazy"
             />
             {/* Indicadores */}
             <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">

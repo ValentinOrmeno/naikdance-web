@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const LOADER_DURATION_MS = 250;
@@ -8,13 +8,15 @@ const LOADER_DURATION_MS = 250;
 export default function PageLoader() {
   const [loading, setLoading] = useState(false);
   const pathname = usePathname();
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
     setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, LOADER_DURATION_MS);
-
+    const timer = setTimeout(() => setLoading(false), LOADER_DURATION_MS);
     return () => clearTimeout(timer);
   }, [pathname]);
 

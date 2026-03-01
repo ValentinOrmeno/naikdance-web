@@ -10,6 +10,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '#clases', label: 'Clases' },
+    { href: '#horarios', label: 'Horarios' },
     { href: '#aranceles', label: 'Aranceles' },
     { href: '#nosotros', label: 'Nosotros' },
     { href: '#faq', label: 'FAQ' },

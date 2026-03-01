@@ -3,9 +3,10 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
 
-// Below-the-fold: lazy load para reducir JS inicial (FCP/LCP) y ahorro ~54 KiB
+// Below-the-fold: lazy load para reducir JS inicial (FCP/LCP)
 const About = dynamic(() => import('@/components/About'), { ssr: true });
 const Classes = dynamic(() => import('@/components/Classes'), { ssr: true });
+const Schedule = dynamic(() => import('@/components/Schedule'), { ssr: true });
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: true });
 const TeachersGrid = dynamic(() => import('@/components/TeachersGrid'), { ssr: true });
 const FAQ = dynamic(() => import('@/components/FAQ'), { ssr: true });
@@ -18,6 +19,7 @@ export default function Home() {
       <Hero />
       <About />
       <Classes />
+      <Schedule />
       <Pricing />
       <TeachersGrid />
       <FAQ />
