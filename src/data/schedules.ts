@@ -166,6 +166,46 @@ export const schedules: ClassSchedule[] = RAW_SCHEDULE.flatMap(({ dia, clases })
   }))
 );
 
+// Mapeo entre el nombre que figura en la grilla de horarios
+// y el id del profesor usado en `/profesores/[id]`
+const TEACHER_ID_BY_NAME: Record<string, string> = {
+  'Naik Ludueña': 'naik-ludueña',
+  'Paul Castro': 'paul-castro',
+  'Flor Gonzalez': 'flor-gonzalez',
+  'Mati Diaz': 'matias-diaz',
+  'Naiu Bernasconi': 'naiu-bernasconi',
+  'Flor Lizarraga': 'flor-lizarraga',
+  'Catha Galeano': 'catha-galeano',
+  'Flor Ostoich': 'flor-ostoich',
+  'Zuly Silveyra': 'zuly-silveira',
+  'Ana Pepino': 'ana-pepino',
+  'Mili Gonzalez': 'mili-gonzalez',
+  'Fran Benitez': 'fran-benitez',
+  'Marco Oga': 'marco-oga',
+  'Dany Navarro': 'dany-navarro',
+  'Ingrid Iripino': 'ingrid-iripino',
+  'Sasha Nuñez': 'sasha-nuñez',
+  'Giuli Grimaldi': 'giuli-grimaldi',
+  'Diego-Naik-Giuli': 'diego-naik-giuli',
+  'Ludmi Salvo': 'ludmi-salvo',
+  'Benja-Gian': 'benja-gian',
+  'Indira Nahir': 'indira-nahir',
+  'Bri Aquino': 'bri-aquino',
+  'Sele Chaile': 'sele-chaile',
+  'Sofi Fiorillo': 'sofi-fiorillo',
+  'Cami Ortega': 'cami-ortega',
+  'Jenn Mendoza': 'jenn-mendoza',
+  'Alan Guttierrez': 'alan-guttierrez',
+  'Mili Mereles': 'mili-mereles',
+  'Bren Ocampo': 'bren-ocampo',
+  'Tincho Nuñez': 'tincho-nuñez',
+  'Fran Cabaña': 'fran-cabaña',
+};
+
+export const getTeacherIdForScheduleTeacher = (name: string): string | null => {
+  return TEACHER_ID_BY_NAME[name] ?? null;
+};
+
 export const getSchedulesByDay = (day: string) => {
   return schedules
     .filter((s) => s.day === day)

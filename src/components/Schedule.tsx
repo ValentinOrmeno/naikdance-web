@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, Award } from 'lucide-react';
-import { schedules, getAllDays, getSchedulesByDay } from '@/data/schedules';
+import type { ClassSchedule } from '@/data/schedules';
+import { getAllDays, getSchedulesByDay, getTeacherIdForScheduleTeacher } from '@/data/schedules';
 import ScrollReveal from './ScrollReveal';
 import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 export default function Schedule() {
   const [selectedDay, setSelectedDay] = useState('Lunes');
   const days = getAllDays();
+  const router = useRouter();
 
   const generateWhatsAppLink = (className: string, day: string, time: string) => {
     const message = `Hola! Quiero reservar la clase de *${className}* el ${day} a las ${time}`;
@@ -19,6 +22,15 @@ export default function Schedule() {
     cls.level === 'GRUPO CERRADO' ||
     cls.style === 'Crew' ||
     (cls.notes?.toUpperCase().includes('GRUPO CERRADO') ?? false);
+
+  const handleReserve = (cls: ClassSchedule) => {
+    const teacherId = getTeacherIdForScheduleTeacher(cls.teacher);
+    if (!teacherId) {
+      window.open(generateWhatsAppLink(cls.name, cls.day, cls.time), '_blank');
+      return;
+    }
+    router.push(`/profesores/${teacherId}`);
+  };
 
   return (
     <section id="horarios" className="py-20 px-3 sm:px-4 bg-transparent relative z-10 scroll-mt-24 overflow-x-hidden">
@@ -89,14 +101,13 @@ export default function Schedule() {
                   <p className="text-white/80 text-xs mb-3 italic">{cls.notes}</p>
                 )}
                 {!isClosedGroup(cls) && (
-                  <a
-                    href={generateWhatsAppLink(cls.name, cls.day, cls.time)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => handleReserve(cls)}
                     className="block w-full bg-black/40 hover:bg-black/60 text-white font-bold text-center py-2.5 rounded-lg uppercase text-xs transition-all duration-300"
                   >
                     Reservar
-                  </a>
+                  </button>
                 )}
               </div>
             ))}

@@ -19,7 +19,7 @@ export const teachers: Teacher[] = [
   {
     id: "fran-benitez",
     name: "Fran Benitez",
-    style: "Urbano / Coreografia",
+    style: "Zumba / Urbano",
     image: "/profes/fran-benitez.png",
     classes: ["Martes 19:00 - Urbano Mix", "Jueves 20:00 - Coreo"],
     availability: {
@@ -62,7 +62,7 @@ export const teachers: Teacher[] = [
   {
     id: "mili-mereles",
     name: "Mili Mereles",
-    style: "Waacking / Voguing",
+    style: "Urbano / Waacking",
     image: "/profes/mili-mereles.jpg",
     classes: ["Lunes 20:00 - Waacking", "Sabado 14:00 - Voguing"],
   },
@@ -98,7 +98,7 @@ export const teachers: Teacher[] = [
     id: "catha-galeano",
     name: "Catha Galeano",
     style: "Reggaeton",
-    image: "/profes/catha-galeano.png",
+    image: "/profes/catha-galeano.jpg",
     classes: ["Lunes 19:00 - Reggaeton"],
   },
   {
@@ -111,14 +111,14 @@ export const teachers: Teacher[] = [
   {
     id: "flor-gonzalez",
     name: "Flor Gonzalez",
-    style: "Twerk",
+    style: "Acrobacia / Flexibilidad",
     image: "/profes/flor-gonzalez.png",
     classes: ["Lunes 17:00 - Twerk"],
   },
   {
     id: "flor-lizarraga",
     name: "Flor Lizarraga",
-    style: "Hip Hop",
+    style: "Jazz / Comedia Musical",
     image: "/profes/flor-lizarraga.jpg",
     classes: ["Martes 18:00 - Hip Hop"],
   },
@@ -126,14 +126,14 @@ export const teachers: Teacher[] = [
     id: "flor-parra",
     name: "Flor Parra",
     style: "Reggaeton",
-    image: "/profes/flor-parra.png",
+    image: "/profes/flor-parra.jpg",
     classes: ["Viernes 18:00 - Reggaeton"],
   },
   {
     id: "rocio-canchi",
     name: "Rocio Canchi",
     style: "K-Pop / Femme",
-    image: "/profes/rocio-canchi-k-pop.png",
+    image: "/profes/rocio-canchi.jpg",
     classes: ["Martes 19:00 - K-Pop", "Jueves 19:00 - Femme"],
   },
   {
@@ -146,7 +146,7 @@ export const teachers: Teacher[] = [
   {
     id: "vicky-martini",
     name: "Vicky Martini",
-    style: "Contemporaneo",
+    style: "Reggaeton Femme",
     image: "/profes/vicky-martini.jpg",
     classes: ["Domingo 17:00 - Contempo"],
   },
@@ -161,7 +161,7 @@ export const teachers: Teacher[] = [
     id: "mili-gonzalez",
     name: "Mili Gonzalez",
     style: "Reggaeton Fusion",
-    image: "/profes/milagros-gonzalez.png",
+    image: "/profes/mily-gonzalez.jpg",
     classes: ["Miercoles 18:00 - Reggaeton", "Viernes 19:00 - Fusion"],
   },
   {
@@ -176,7 +176,7 @@ export const teachers: Teacher[] = [
     id: "naik-ludueña",
     name: "Naik Ludueña",
     style: "Urbano / Jazz / Reggaeton / Acrobacia / Fitness",
-    image: "/profes/placeholder.svg",
+    image: "/profes/naik-regg-femme.jpg",
     classes: ["Elongación", "Jazz Kids", "Reggaeton", "Acrobacia", "Funcional", "Femme Style"],
   },
   {
@@ -197,21 +197,21 @@ export const teachers: Teacher[] = [
     id: "flor-ostoich",
     name: "Flor Ostoich",
     style: "Acrobacia",
-    image: "/profes/placeholder.svg",
+    image: "/profes/flor-ostouch.jpg",
     classes: ["Acrobacia Juv"],
   },
   {
     id: "cande-ortega",
     name: "Cande Ortega",
     style: "Femme",
-    image: "/profes/placeholder.svg",
+    image: "/profes/cande-ortega.jpg",
     classes: ["Femme-Heels"],
   },
   {
     id: "ana-pepino",
     name: "Ana Pepino",
     style: "Ballet",
-    image: "/profes/placeholder.svg",
+    image: "/profes/ana-pepino.jpg",
     classes: ["Ballet"],
   },
   {
@@ -232,7 +232,7 @@ export const teachers: Teacher[] = [
     id: "ingrid-iripino",
     name: "Ingrid Iripino",
     style: "Urbano",
-    image: "/profes/placeholder.svg",
+    image: "/profes/ingrid-iripino.jpg",
     classes: ["Urbano INF A"],
   },
   {
@@ -246,14 +246,14 @@ export const teachers: Teacher[] = [
     id: "diego-naik-giuli",
     name: "Diego-Naik-Giuli",
     style: "Acrobacia",
-    image: "/profes/placeholder.svg",
+    image: "/profes/diego-gonzalez.jpg",
     classes: ["Acrobacia INF MIX"],
   },
   {
     id: "ludmi-salvo",
     name: "Ludmi Salvo",
     style: "Waacking / Urbano",
-    image: "/profes/placeholder.svg",
+    image: "/profes/ludmila-salvo.jpg",
     classes: ["Waacking"],
   },
   {
@@ -267,7 +267,7 @@ export const teachers: Teacher[] = [
     id: "indira-nahir",
     name: "Indira Nahir",
     style: "Ritmos / Árabe",
-    image: "/profes/placeholder.svg",
+    image: "/profes/indira.jpg",
     classes: ["Árabe"],
   },
   {
@@ -281,7 +281,7 @@ export const teachers: Teacher[] = [
     id: "sofi-fiorillo",
     name: "Sofi Fiorillo",
     style: "Reggaeton",
-    image: "/profes/placeholder.svg",
+    image: "/profes/sofia-fiorilo.jpg",
     classes: ["Reggaeton Femme PRINC"],
   },
   {
