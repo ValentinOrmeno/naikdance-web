@@ -8,19 +8,18 @@ import ScrollReveal from './ScrollReveal';
 
 const SEARCH_DEBOUNCE_MS = 250;
 
-// Categorías alineadas con los estilos del horario de clases (schedules)
+// Solo categorías que aparecen en la grilla de horarios (estilos de schedules)
 const categories = [
   { id: 'all', label: 'Todos', keywords: [] },
-  { id: 'reggaeton', label: 'Reggaeton', keywords: ['reggaeton', 'femme', 'twerk', 'fusion'] },
-  { id: 'urbano', label: 'Urbano', keywords: ['urbano', 'hip hop', 'street', 'freestyle', 'coreografia', 'montaje', 'waacking', 'voguing'] },
+  { id: 'reggaeton', label: 'Reggaeton', keywords: ['reggaeton', 'femme', 'fusion'] },
+  { id: 'urbano', label: 'Urbano', keywords: ['urbano', 'hip hop', 'street', 'coreografia', 'waacking', 'voguing'] },
   { id: 'kpop', label: 'K-Pop', keywords: ['k-pop', 'kpop', 'k pop'] },
   { id: 'jazz', label: 'Jazz / Ballet', keywords: ['jazz', 'lyrical', 'ballet', 'teatro', 'comedia', 'contempo', 'contemporaneo', 'theatre'] },
-  { id: 'acrobacia', label: 'Acrobacia / Telas', keywords: ['acrobacia', 'acro', 'telas', 'flex'] },
+  { id: 'acrobacia', label: 'Acrobacia / Telas', keywords: ['acrobacia', 'acro', 'telas'] },
   { id: 'ritmos', label: 'Ritmos', keywords: ['ritmos', 'bachata', 'salsa', 'árabe', 'arabe', 'axe'] },
   { id: 'zumba', label: 'Zumba', keywords: ['zumba'] },
   { id: 'fitness', label: 'Fitness', keywords: ['fitness', 'elongacion', 'funcional', 'técnica', 'tecnica'] },
   { id: 'taekwondo', label: 'Taekwondo / Contacto', keywords: ['taekwondo', 'contacto', 'muay thai'] },
-  { id: 'kids', label: 'Kids', keywords: ['kids', 'infantil', 'baby'] },
 ];
 
 export default function TeachersGrid() {
