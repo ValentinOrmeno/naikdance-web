@@ -8,8 +8,7 @@ const DAYS_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sába
 
 type AgeCategoryId =
   | 'babys'
-  | 'infA'
-  | 'infB'
+  | 'infantil'
   | 'infMix'
   | 'juvTecnicas'
   | 'juvUrbanas'
@@ -25,8 +24,8 @@ type AgeCategory = {
 };
 
 const isBabyLevel = (cls: ClassSchedule) => cls.level.toUpperCase().includes('BABY');
-const isInfALevel = (cls: ClassSchedule) => cls.level.toUpperCase() === 'INF A';
-const isInfBLevel = (cls: ClassSchedule) => cls.level.toUpperCase() === 'INF B';
+const isInfantilLevel = (cls: ClassSchedule) =>
+  ['INF A', 'INF B'].includes(cls.level.toUpperCase());
 const isInfMixLevel = (cls: ClassSchedule) => cls.level.toUpperCase() === 'INF MIX';
 const isJuvAdulto = (cls: ClassSchedule) => cls.level.toUpperCase().includes('JUV-ADULTO');
 const isPrincipiante = (cls: ClassSchedule) =>
@@ -54,18 +53,11 @@ const AGE_CATEGORIES: AgeCategory[] = [
     filter: (cls) => isBabyLevel(cls),
   },
   {
-    id: 'infA',
-    title: 'Infantil A',
-    subtitle: '6 a 8 años',
-    description: 'Clases para peques que empiezan a incorporar técnica básica.',
-    filter: (cls) => isInfALevel(cls),
-  },
-  {
-    id: 'infB',
-    title: 'Infantil B',
-    subtitle: '9 a 11 años',
-    description: 'Más coordinación, memoria coreográfica y desafío.',
-    filter: (cls) => isInfBLevel(cls),
+    id: 'infantil',
+    title: 'Infantil',
+    subtitle: 'INF A / INF B · 6 a 11 años',
+    description: 'Clases para peques que incorporan técnica, coordinación y memoria coreográfica.',
+    filter: (cls) => isInfantilLevel(cls),
   },
   {
     id: 'infMix',
@@ -81,8 +73,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     description: 'Enfoque en técnica, alineación y entrenamiento.',
     filter: (cls) =>
       !isBabyLevel(cls) &&
-      !isInfALevel(cls) &&
-      !isInfBLevel(cls) &&
+      !isInfantilLevel(cls) &&
       !isInfMixLevel(cls) &&
       !isJuvAdulto(cls) &&
       (isPrincipiante(cls) || isAllLevels(cls)) &&
@@ -95,8 +86,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     description: 'Clases de calle, coreos y mucho flow para juveniles.',
     filter: (cls) =>
       !isBabyLevel(cls) &&
-      !isInfALevel(cls) &&
-      !isInfBLevel(cls) &&
+      !isInfantilLevel(cls) &&
       !isInfMixLevel(cls) &&
       !isJuvAdulto(cls) &&
       (isPrincipiante(cls) || isAllLevels(cls)) &&
@@ -110,8 +100,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     description: 'Clases enfocadas en fem, presencia escénica y actitud.',
     filter: (cls) =>
       !isBabyLevel(cls) &&
-      !isInfALevel(cls) &&
-      !isInfBLevel(cls) &&
+      !isInfantilLevel(cls) &&
       !isInfMixLevel(cls) &&
       !isJuvAdulto(cls) &&
       (isPrincipiante(cls) || isAllLevels(cls)) &&
@@ -123,7 +112,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     subtitle: '+16 años / Juv-Adulto',
     description: 'Clases para jóvenes y adultos que ya entrenan o quieren empezar.',
     filter: (cls) => isJuvAdulto(cls),
-  },
+  },  
 ];
 
 const sortByDayAndTime = (a: ClassSchedule, b: ClassSchedule) => {
