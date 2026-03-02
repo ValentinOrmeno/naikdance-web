@@ -20,6 +20,8 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'mp' | 'pack' | 'cash'>('mp');
+  /** Filtro por tipo de clase: solo se usa cuando el profesor tiene varios estilos */
+  const [selectedStyleFilter, setSelectedStyleFilter] = useState<string>('all');
   const [feedbackModal, setFeedbackModal] = useState<{
     show: boolean;
     title: string;
@@ -103,6 +105,37 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
     loadData();
   }, [currentMonth, teacher.id]);
+
+  /** Estilos del profesor para filtrar (solo si tiene más de uno) */
+  const styleFilters = useMemo(() => {
+    const raw = (teacher?.style ?? '').split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
+    return raw.length >= 2 ? raw : [];
+  }, [teacher?.style]);
+
+  /** Horarios del día seleccionado, opcionalmente filtrados por tipo de clase */
+  const schedulesForSelectedDay = useMemo(() => {
+    if (!selectedDay) return [];
+    let list = schedules.filter((s) => s.day === selectedDay);
+    if (selectedStyleFilter !== 'all' && styleFilters.length >= 2) {
+      const term = selectedStyleFilter.toLowerCase();
+      list = list.filter((s) => (s.class_name ?? '').toLowerCase().includes(term));
+    }
+    return list.sort((a, b) => a.time.localeCompare(b.time));
+  }, [schedules, selectedDay, selectedStyleFilter, styleFilters.length]);
+
+  // Si el horario seleccionado ya no está en la lista filtrada, limpiar selección
+  useEffect(() => {
+    if (!selectedSchedule || !selectedDay) return;
+    const list = schedules.filter((s) => s.day === selectedDay);
+    const filtered =
+      selectedStyleFilter === 'all'
+        ? list
+        : list.filter((s) =>
+            (s.class_name ?? '').toLowerCase().includes(selectedStyleFilter.toLowerCase())
+          );
+    const stillVisible = filtered.some((s) => s.id === selectedSchedule.id);
+    if (!stillVisible) setSelectedSchedule(null);
+  }, [selectedSchedule, selectedDay, selectedStyleFilter, schedules]);
 
   // Obtener datos del mes actual
   const monthData = useMemo(() => {
@@ -502,6 +535,41 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                 
                 {monthData.availability && schedules.length > 0 && (
                   <>
+                    {/* Filtro por tipo de clase: arriba del calendario (solo si el profesor tiene varios estilos) */}
+                    {styleFilters.length >= 2 && (
+                      <div className="mb-5">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                          Tipo de clase
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedStyleFilter('all')}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
+                              selectedStyleFilter === 'all'
+                                ? 'bg-[#FFD700] text-black'
+                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            }`}
+                          >
+                            Todos
+                          </button>
+                          {styleFilters.map((styleName) => (
+                            <button
+                              key={styleName}
+                              type="button"
+                              onClick={() => setSelectedStyleFilter(styleName)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
+                                selectedStyleFilter === styleName
+                                  ? 'bg-[#FFD700] text-black'
+                                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                              }`}
+                            >
+                              {styleName}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div className="mb-4 flex justify-center">
                       {(() => {
                         // Asegurar que cupos_reservados nunca sea negativo
@@ -529,9 +597,11 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                       {[...Array(monthData.daysInMonth)].map((_, i) => {
                         const day = i + 1;
                         const isSelected = selectedDay === day;
-                        
-                        // Verificar si hay horarios configurados para este día
-                        const hasSchedules = schedules.some(s => s.day === day);
+                        const term = selectedStyleFilter !== 'all' ? selectedStyleFilter.toLowerCase() : '';
+                        // Verificar si hay horarios para este día (respetando el filtro por tipo de clase)
+                        const hasSchedules = term
+                          ? schedules.some(s => s.day === day && (s.class_name ?? '').toLowerCase().includes(term))
+                          : schedules.some(s => s.day === day);
                         
                         // Verificar cupos disponibles (asegurar que reservados nunca sea negativo)
                         const hasCupos = monthData.availability 
@@ -576,11 +646,13 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                             Seleccioná tu horario - Día {selectedDay}
                           </h4>
                         </div>
+                        {schedulesForSelectedDay.length === 0 ? (
+                          <p className="text-gray-400 text-sm py-4 text-center">
+                            No hay clases de &quot;{selectedStyleFilter}&quot; este día. Probá otro filtro o otro día.
+                          </p>
+                        ) : (
                         <div className="space-y-2">
-                          {schedules
-                            .filter(s => s.day === selectedDay)
-                            .sort((a, b) => a.time.localeCompare(b.time))
-                            .map((schedule, idx) => {
+                          {schedulesForSelectedDay.map((schedule, idx) => {
                               const isSelected = selectedSchedule?.id === schedule.id;
                               return (
                                 <button
@@ -612,6 +684,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                               );
                             })}
                         </div>
+                        )}
                       </div>
                     )}
                     
