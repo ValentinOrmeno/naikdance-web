@@ -120,8 +120,8 @@ const AGE_CATEGORIES: AgeCategory[] = [
   {
     id: 'adultas',
     title: 'Adultas',
-    subtitle: '+14 años / Juv-Adulto',
-    description: 'Clases para jóvenes y adultas que ya entrenan o quieren empezar.',
+    subtitle: '+16 años / Juv-Adulto',
+    description: 'Clases para jóvenes y adultos que ya entrenan o quieren empezar.',
     filter: (cls) => isJuvAdulto(cls),
   },
 ];
@@ -132,9 +132,6 @@ const sortByDayAndTime = (a: ClassSchedule, b: ClassSchedule) => {
   if (dayIndexA !== dayIndexB) return dayIndexA - dayIndexB;
   return a.time.localeCompare(b.time);
 };
-
-const formatLine = (cls: ClassSchedule) =>
-  `${cls.day} ${cls.time} · ${cls.teacher}`;
 
 export default function Classes() {
   const categorized = AGE_CATEGORIES.map((cat) => {
@@ -166,23 +163,9 @@ export default function Classes() {
                     {cat.subtitle}
                   </p>
                 </div>
-                <p className="text-gray-300 text-sm mb-4">{cat.description}</p>
-                {cat.classes.length === 0 ? (
-                  <p className="text-xs text-gray-500 italic">
-                    No hay clases activas de este nivel en el horario actual.
-                  </p>
-                ) : (
-                  <ul className="space-y-2 text-sm text-gray-100">
-                    {cat.classes.map((cls) => (
-                      <li key={cls.id} className="flex flex-col">
-                        <span className="font-semibold">{cls.name}</span>
-                        <span className="text-[11px] text-gray-400">
-                          {formatLine(cls)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <p className="text-gray-300 text-sm">
+                  {cat.description}
+                </p>
               </div>
             </ScrollReveal>
           ))}

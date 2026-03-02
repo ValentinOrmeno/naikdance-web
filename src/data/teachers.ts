@@ -239,7 +239,7 @@ export const teachers: Teacher[] = [
     id: "sasha-nuñez",
     name: "Sasha Nuñez",
     style: "Reggaeton",
-    image: "/profes/placeholder.svg",
+    image: "/profes/sasha-nuñez.jpg",
     classes: ["Reggaeton INF A"],
   },
   {
