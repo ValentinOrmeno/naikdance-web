@@ -35,7 +35,7 @@ export default function TeachersGrid() {
 
   const filteredTeachers = useMemo(() => {
     // Solo profes que están en el horario de marzo
-    const marchIds = new Set(MARCH_SCHEDULE_TEACHER_IDS);
+    const marchIds = new Set<string>(MARCH_SCHEDULE_TEACHER_IDS);
     const marchTeachers = teachers.filter((t) => marchIds.has(t.id));
     let filtered = marchTeachers;
 
