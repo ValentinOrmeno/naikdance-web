@@ -119,6 +119,45 @@ export default function Schedule() {
           </div>
         </ScrollReveal>
 
+        {/* Leyenda de niveles por edad */}
+        <ScrollReveal delay={0.14}>
+          <div className="mt-10 max-w-4xl mx-auto text-xs text-gray-300 space-y-2">
+            <p className="uppercase tracking-[0.18em] text-[11px] text-gray-400 font-bold">
+              Niveles y edades
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">Babys</span>
+                <span className="text-gray-400"> · 3 a 5 años</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">INF A</span>
+                <span className="text-gray-400"> · 6 a 8 años</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">INF B</span>
+                <span className="text-gray-400"> · 9 a 11 años</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">INF MIX</span>
+                <span className="text-gray-400"> · 6 a 11 años</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">PRINC / PRINC INT</span>
+                <span className="text-gray-400"> · Juveniles</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">ALL LEVELS</span>
+                <span className="text-gray-400"> · Juveniles multinivel</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                <span className="font-bold text-white">JUV-ADULTO</span>
+                <span className="text-gray-400"> · +14 años / Adultas</span>
+              </span>
+            </div>
+          </div>
+        </ScrollReveal>
+
         <ScrollReveal delay={0.15}>
           <div className="mt-12 text-center">
             <p className="text-gray-400 text-sm">
