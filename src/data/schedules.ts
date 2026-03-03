@@ -176,6 +176,7 @@ const TEACHER_ID_BY_NAME: Record<string, string> = {
   'Naiu Bernasconi': 'naiu-bernasconi',
   'Flor Lizarraga': 'flor-lizarraga',
   'Catha Galeano': 'catha-galeano',
+  'Camilo Gonzalez': 'camilo-gonzalez',
   'Flor Ostoich': 'flor-ostoich',
   'Zuly Silveyra': 'zuly-silveira',
   'Ana Pepino': 'ana-pepino',
@@ -191,6 +192,7 @@ const TEACHER_ID_BY_NAME: Record<string, string> = {
   'Benja-Gian': 'benja-gian',
   'Indira Nahir': 'indira-nahir',
   'Bri Aquino': 'bri-aquino',
+  'Rocio Canchi': 'rocio-canchi',
   'Sele Chaile': 'sele-chaile',
   'Sofi Fiorillo': 'sofi-fiorillo',
   'Cami Ortega': 'cami-ortega',
@@ -200,6 +202,8 @@ const TEACHER_ID_BY_NAME: Record<string, string> = {
   'Bren Ocampo': 'bren-ocampo',
   'Tincho Nuñez': 'tincho-nuñez',
   'Fran Cabaña': 'fran-cabaña',
+  'Daichu Alderete': 'daichu-alderete',
+  'Vicky Martini': 'vicky-martini',
 };
 
 export const getTeacherIdForScheduleTeacher = (name: string): string | null => {
