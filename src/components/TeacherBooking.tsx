@@ -556,7 +556,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                           >
                             Todos
                           </button>
-                          {styleFilters.map((styleName) => (
+                          {styleFilters.map((styleName: string) => (
                             <button
                               key={styleName}
                               type="button"
