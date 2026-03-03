@@ -83,27 +83,40 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
   // Cargar disponibilidad y horarios desde Supabase
   useEffect(() => {
+    let isCurrent = true;
+    const month = currentMonth;
+
     const loadData = async () => {
       setLoadingData(true);
       try {
         // Cargar availability del mes actual
-        const allAvailability = await getAllAvailability(currentMonth);
+        const allAvailability = await getAllAvailability(month);
+        if (!isCurrent) return;
+
         const teacherAvailability = allAvailability?.find(
-          (a: any) => a.teacher_id === teacher.id && a.month === currentMonth
+          (a: any) => a.teacher_id === teacher.id && a.month === month
         );
         setAvailability(teacherAvailability || null);
 
         // Cargar schedules del mes actual
-        const teacherSchedules = await getClassSchedules(teacher.id, currentMonth);
+        const teacherSchedules = await getClassSchedules(teacher.id, month);
+        if (!isCurrent) return;
         setSchedules(teacherSchedules || []);
       } catch (error) {
         console.error('Error al cargar datos:', error);
       } finally {
-        setLoadingData(false);
+        if (isCurrent) {
+          setLoadingData(false);
+        }
       }
     };
 
     loadData();
+
+    // Evitar que respuestas viejas sobreescriban el estado al cambiar de mes/profesor
+    return () => {
+      isCurrent = false;
+    };
   }, [currentMonth, teacher.id]);
 
   /** Estilos del profesor para filtrar (solo si tiene más de uno) */
