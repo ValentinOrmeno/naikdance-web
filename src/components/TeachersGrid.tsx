@@ -94,13 +94,13 @@ export default function TeachersGrid() {
 
         {/* Filtros por categoria */}
         <ScrollReveal delay={0.1}>
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
             {categories.map((category) => (
               <button
                 key={category.id}
                 data-filter={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-5 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 ${
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-300 ${
                   selectedCategory === category.id
                     ? 'bg-naik-gold text-black shadow-glow-gold-sm'
                     : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/10'
