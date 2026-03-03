@@ -51,7 +51,9 @@ export default function AdminPanel() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [reservasFilter, setReservasFilter] = useState<"todas" | "pendiente" | "confirmada">("pendiente");
+  const [reservasSearch, setReservasSearch] = useState("");
   const [packPurchases, setPackPurchases] = useState<PackPurchase[]>([]);
+  const [packSearch, setPackSearch] = useState("");
   const [packConfirmModal, setPackConfirmModal] = useState<{
     show: boolean;
     reservationId: string | null;
@@ -135,6 +137,49 @@ export default function AdminPanel() {
   });
   const [editingSchedule, setEditingSchedule] = useState<string | null>(null);
   const [newScheduleDays, setNewScheduleDays] = useState<number[]>([]);
+
+  const filteredReservations = useMemo(() => {
+    // Filtrar por estado primero
+    let base =
+      reservasFilter === "todas"
+        ? reservations
+        : reservations.filter((r) => r.status === reservasFilter);
+
+    const term = reservasSearch.trim().toLowerCase();
+    if (!term) return base;
+
+    return base.filter((r) => {
+      const nombre = (r.nombre || "").toLowerCase();
+      const email = (r.email || "").toLowerCase();
+      const teacher = (r.teacher_id || "").toLowerCase();
+      const clase = (r.clase || "").toLowerCase();
+      const fecha = (r.fecha || "").toLowerCase();
+      return (
+        nombre.includes(term) ||
+        email.includes(term) ||
+        teacher.includes(term) ||
+        clase.includes(term) ||
+        fecha.includes(term)
+      );
+    });
+  }, [reservations, reservasFilter, reservasSearch]);
+
+  const filteredPackPurchases = useMemo(() => {
+    const term = packSearch.trim().toLowerCase();
+    if (!term) return packPurchases;
+    return packPurchases.filter((pack) => {
+      const nombre = (pack.alumno_nombre || "").toLowerCase();
+      const email = (pack.alumno_email || "").toLowerCase();
+      const packName = (pack.pack_name || "").toLowerCase();
+      const packType = (pack.pack_type || "").toLowerCase();
+      return (
+        nombre.includes(term) ||
+        email.includes(term) ||
+        packName.includes(term) ||
+        packType.includes(term)
+      );
+    });
+  }, [packPurchases, packSearch]);
   const [addAvailabilityModal, setAddAvailabilityModal] = useState({
     show: false,
     teacherId: '',
@@ -1083,25 +1128,36 @@ export default function AdminPanel() {
         {/* TAB: RESERVAS (con filtros) */}
         {activeTab === 'reservas' && (
           <div className="space-y-4">
-            {/* Filtros de estado */}
-            <div className="flex flex-wrap gap-2 mb-2">
-              {[
-                { id: 'pendiente', label: 'Pendientes' },
-                { id: 'confirmada', label: 'Confirmadas' },
-                { id: 'todas', label: 'Todas' },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setReservasFilter(f.id as any)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all ${
-                    reservasFilter === f.id
-                      ? 'bg-naik-gold text-black'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+            {/* Filtros de estado + búsqueda */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'pendiente', label: 'Pendientes' },
+                  { id: 'confirmada', label: 'Confirmadas' },
+                  { id: 'todas', label: 'Todas' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setReservasFilter(f.id as any)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all ${
+                      reservasFilter === f.id
+                        ? 'bg-naik-gold text-black'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              <div className="w-full md:w-80">
+                <input
+                  type="text"
+                  placeholder="Buscar por alumno, email, profe, clase..."
+                  value={reservasSearch}
+                  onChange={(e) => setReservasSearch(e.target.value)}
+                  className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold focus:border-naik-gold"
+                />
+              </div>
             </div>
 
             {loading && (
@@ -1110,9 +1166,11 @@ export default function AdminPanel() {
               </div>
             )}
 
-            {!loading && reservations.length === 0 && (
+            {!loading && filteredReservations.length === 0 && (
               <div className="text-center py-12 text-gray-400">
-                {reservasFilter === 'pendiente'
+                {reservasSearch.trim()
+                  ? 'No se encontraron reservas para ese término de búsqueda'
+                  : reservasFilter === 'pendiente'
                   ? 'No hay reservas pendientes'
                   : reservasFilter === 'confirmada'
                   ? 'No hay reservas confirmadas'
@@ -1120,7 +1178,7 @@ export default function AdminPanel() {
               </div>
             )}
 
-            {!loading && reservations.map((reservation) => (
+            {!loading && filteredReservations.map((reservation) => (
               <div
                 key={reservation.id}
                 className="bg-[#111] border border-white/20 rounded-xl p-6 hover:border-naik-gold/50 transition-all"
@@ -1205,20 +1263,36 @@ export default function AdminPanel() {
         {/* TAB: ALUMNOS Y CRÉDITOS (packs/cuponeras) */}
         {activeTab === "creditos" && (
           <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className="text-xl font-black uppercase tracking-wide text-white">
+                Alumnos y créditos
+              </h2>
+              <div className="w-full sm:w-80">
+                <input
+                  type="text"
+                  placeholder="Buscar por alumno, email o pack..."
+                  value={packSearch}
+                  onChange={(e) => setPackSearch(e.target.value)}
+                  className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold focus:border-naik-gold"
+                />
+              </div>
+            </div>
             {loading && (
               <div className="text-center py-12 text-gray-400">
                 Cargando packs y cuponeras...
               </div>
             )}
 
-            {!loading && packPurchases.length === 0 && (
+            {!loading && filteredPackPurchases.length === 0 && (
               <div className="text-center py-12 text-gray-400">
-                Todavía no hay compras de packs o cuponeras registradas
+                {packSearch.trim()
+                  ? "No se encontraron alumnos para ese término de búsqueda"
+                  : "Todavía no hay compras de packs o cuponeras registradas"}
               </div>
             )}
 
             {!loading &&
-              packPurchases.map((pack) => {
+              filteredPackPurchases.map((pack) => {
                 const usadas = pack.clases_usadas;
                 const total = pack.clases_incluidas;
                 const restantes =
@@ -1311,8 +1385,8 @@ export default function AdminPanel() {
 
                             alert(
                               total === null
-                                ? `Se registro 1 uso. Lleva ${usadas} clases tomadas con este pack.`
-                                : `Se registro 1 uso. Lleva ${usadas}/${total} clases (restan ${restantes}).`
+                                ? `Se registró 1 uso. Lleva ${usadas} clases tomadas con este pack.`
+                                : `Se registró 1 uso. Lleva ${usadas}/${total} clases (restan ${restantes}).`
                             );
                           } catch (error) {
                             console.error("Error al usar crédito del pack:", error);
@@ -1322,6 +1396,40 @@ export default function AdminPanel() {
                         className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all"
                       >
                         Usar 1 crédito
+                      </button>
+
+                      <button
+                        disabled={pack.clases_usadas <= 0}
+                        onClick={async () => {
+                          if (pack.clases_usadas <= 0) {
+                            alert("Este pack todavía no tiene clases usadas para devolver.");
+                            return;
+                          }
+                          try {
+                            const updated = await incrementPackUsage(pack.id, -1);
+                            if (!updated) return;
+                            setPackPurchases((prev) =>
+                              prev.map((p) => (p.id === pack.id ? updated : p))
+                            );
+
+                            const total = updated.clases_incluidas;
+                            const usadas = updated.clases_usadas;
+                            const restantes =
+                              total === null ? "∞" : Math.max(total - usadas, 0).toString();
+
+                            alert(
+                              total === null
+                                ? `Se devolvió 1 crédito. Lleva ${usadas} clases tomadas con este pack.`
+                                : `Se devolvió 1 crédito. Lleva ${usadas}/${total} clases (restan ${restantes}).`
+                            );
+                          } catch (error) {
+                            console.error("Error al devolver crédito del pack:", error);
+                            alert("Error al devolver un crédito del pack");
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-transparent border border-yellow-400 text-yellow-300 hover:bg-yellow-500/10 disabled:border-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
+                      >
+                        Devolver 1 crédito
                       </button>
 
                       <button

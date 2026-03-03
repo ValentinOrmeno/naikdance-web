@@ -176,11 +176,18 @@ export async function incrementPackUsage(
 
     const current = (data || {}) as PackPurchase;
     const total = current.clases_incluidas ?? null;
-    const newUsadas = current.clases_usadas + amount;
+    // Evitar valores negativos y permitir devolver créditos usando amount negativo
+    let newUsadas = current.clases_usadas + amount;
+    if (newUsadas < 0) {
+      newUsadas = 0;
+    }
 
     let newStatus: PackPurchase['status'] = current.status;
     if (total !== null && newUsadas >= total) {
       newStatus = 'completo';
+    } else if (total !== null && newUsadas < total && current.status !== 'vencido') {
+      // Si vuelve a haber clases disponibles y el pack no está vencido por fecha, marcarlo como activo
+      newStatus = 'activo';
     }
 
     const { data: updated, error: updateError } = await supabase
