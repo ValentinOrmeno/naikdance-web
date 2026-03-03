@@ -108,7 +108,10 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
 
   /** Estilos del profesor para filtrar (solo si tiene más de uno) */
   const styleFilters = useMemo(() => {
-    const raw = (teacher?.style ?? '').split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
+    const raw = (teacher?.style ?? '')
+      .split(/\s*\/\s*/)
+      .map((s: string) => s.trim())
+      .filter(Boolean);
     return raw.length >= 2 ? raw : [];
   }, [teacher?.style]);
 
