@@ -105,6 +105,27 @@ export default function AdminPanel() {
     schedules: [],
     availableDays: []
   });
+  // Bloquear scroll global cuando hay modales abiertos
+  useEffect(() => {
+    const modalOpen =
+      confirmModal.show ||
+      detailModal.show ||
+      scheduleModal.show ||
+      packConfirmModal.show;
+
+    if (modalOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [confirmModal.show, detailModal.show, scheduleModal.show, packConfirmModal.show]);
   const [newSchedule, setNewSchedule] = useState({
     day: '',
     time: '',
@@ -959,7 +980,7 @@ export default function AdminPanel() {
             </div>
 
             {/* Lista de profesores y horarios */}
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {loading && (
                 <div className="text-center py-12 text-gray-400">
                   Cargando clases y horarios...
@@ -983,7 +1004,7 @@ export default function AdminPanel() {
                   return (
                     <div
                       key={`${item.teacher_id}-${item.month}`}
-                      className="bg-[#111] border border-white/20 rounded-xl p-6 hover:border-naik-gold/50 transition-all"
+                      className="bg-[#111] border border-white/20 rounded-xl p-5 sm:p-6 hover:border-naik-gold/50 transition-all h-full flex flex-col justify-between"
                     >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         {/* Info del profesor */}
@@ -1431,8 +1452,8 @@ export default function AdminPanel() {
 
       {/* Modal de Gestion de Horarios */}
       {scheduleModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
-          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-[min(95vw,80rem)] max-h-[min(90vh,900px)] flex flex-col p-3 sm:p-4 md:p-6 my-4 sm:my-8 shrink-0">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden px-2 sm:px-4">
+          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-4xl flex flex-col p-3 sm:p-4 md:p-6 my-6 sm:my-10">
             <div className="flex justify-between items-center mb-3 sm:mb-4 md:mb-6 shrink-0">
               <div>
                 <h3 className="text-2xl font-black text-white uppercase">
@@ -1459,7 +1480,7 @@ export default function AdminPanel() {
               </button>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-4 md:space-y-6 mt-2 md:mt-4 pr-1">
+            <div className="space-y-4 md:space-y-6 mt-2 md:mt-4">
               {/* Formulario para agregar / editar horario */}
               <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 md:p-6 min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-3 sm:mb-4">
@@ -1492,8 +1513,8 @@ export default function AdminPanel() {
                   <label className="block text-sm font-bold uppercase mb-2 sm:mb-3 text-white">
                     Seleccionar Día *
                   </label>
-                  <div className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 overflow-x-auto">
-                    <div className="grid grid-cols-7 gap-0.5 sm:gap-1 min-w-0 w-full max-w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
+                  <div className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 overflow-x-auto max-w-xl mx-auto">
+                    <div className="grid grid-cols-7 gap-0.5 sm:gap-1 min-w-0 w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
                       {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
                         const isSelected =
                           newScheduleDays.includes(day) || newSchedule.day === String(day);
@@ -1519,7 +1540,7 @@ export default function AdminPanel() {
                                 setNewSchedule({ ...newSchedule, day: String(day) });
                               }}
                             className={`
-                              w-full min-w-0 aspect-square flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-all
+                              w-full min-w-0 h-7 sm:h-8 flex items-center justify-center rounded-lg text-[11px] sm:text-xs font-bold transition-all
                               ${
                                 isDisabled
                                   ? "bg-white/5 text-gray-600 cursor-not-allowed opacity-40" +
