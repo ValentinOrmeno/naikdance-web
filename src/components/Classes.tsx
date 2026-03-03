@@ -146,6 +146,14 @@ export default function Classes() {
     ? categorized.find((cat) => cat.id === activeCategoryId) ?? null
     : null;
 
+  const handleOpenCategory = (id: AgeCategoryId) => {
+    setActiveCategoryId(id);
+    const section = document.getElementById('clases');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   // Bloquear scroll detrás del modal
   useEffect(() => {
     if (!activeCategory) {
@@ -198,7 +206,7 @@ export default function Classes() {
             <ScrollReveal key={cat.id} delay={index * 0.04}>
               <button
                 type="button"
-                onClick={() => setActiveCategoryId(cat.id)}
+                onClick={() => handleOpenCategory(cat.id)}
                 className="group h-[260px] md:h-[280px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden flex flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-naik-gold focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                 aria-label={`Ver clases de ${cat.title}`}
               >
@@ -236,7 +244,7 @@ export default function Classes() {
 
         {activeCategory && (
           <div
-            className="fixed inset-0 z-40 flex items-start justify-center px-2 sm:px-4 pt-20 pb-6 bg-black overflow-y-auto"
+            className="fixed inset-0 z-[60] flex items-start justify-center px-2 sm:px-4 pt-20 pb-6 bg-black overflow-y-auto"
             role="dialog"
             aria-modal="true"
             tabIndex={-1}
@@ -257,7 +265,7 @@ export default function Classes() {
                     backgroundPosition: 'center',
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
                 <div className="absolute top-3 right-3">
                   <button
                     type="button"

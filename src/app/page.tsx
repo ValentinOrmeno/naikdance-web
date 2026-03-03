@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 const About = dynamic(() => import('@/components/About'), { ssr: true });
 const Classes = dynamic(() => import('@/components/Classes'), { ssr: true });
 const Schedule = dynamic(() => import('@/components/Schedule'), { ssr: true });
-const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: true });
+const PricingSummary = dynamic(() => import('@/components/PricingSummary'), { ssr: true });
 const TeachersGrid = dynamic(() => import('@/components/TeachersGrid'), { ssr: true });
 const FAQ = dynamic(() => import('@/components/FAQ'), { ssr: true });
 const Contact = dynamic(() => import('@/components/Contact'), { ssr: true });
@@ -20,7 +20,7 @@ export default function Home() {
       <About />
       <Classes />
       <Schedule />
-      <Pricing />
+      <PricingSummary />
       <TeachersGrid />
       <FAQ />
       <Contact />
