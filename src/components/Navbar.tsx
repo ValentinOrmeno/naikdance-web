@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   const navLinks = [
     { href: '#clases', label: 'Clases' },
@@ -16,6 +18,11 @@ export default function Navbar() {
     { href: '#faq', label: 'FAQ' },
     { href: '#redes', label: 'Redes' },
   ];
+
+  const getResolvedHref = (href: string) => {
+    if (!href.startsWith('#')) return href;
+    return pathname === '/' ? href : `/${href}`;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-naik-gold/20 overflow-x-hidden">
@@ -35,13 +42,13 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                href={getResolvedHref(link.href)}
                 className="text-white hover:text-naik-gold transition-colors duration-300 font-inter text-sm uppercase tracking-wide"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -59,14 +66,14 @@ export default function Navbar() {
         <div className="md:hidden bg-black border-t border-naik-gold/20">
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                href={getResolvedHref(link.href)}
                 onClick={() => setIsOpen(false)}
                 className="block text-white hover:text-naik-gold transition-colors font-inter text-sm uppercase tracking-wide"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
