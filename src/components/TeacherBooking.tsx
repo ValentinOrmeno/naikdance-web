@@ -437,8 +437,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                 <h2 className="font-bold text-3xl text-white font-['Oswald'] uppercase">Reservá tu clase</h2>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Elegí el día y horario que más te convenga y reservá tu clase con {teacher.name} en NAIK Dance Studio. 
-                Clases de {teacher.style.toLowerCase()} en Moreno, Buenos Aires.
+                Elegí el día y horario que más te convenga y reservá tu clase con {teacher.name} en NAIK Dance Studio.
               </p>
             </div>
 
