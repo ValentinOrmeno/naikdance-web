@@ -132,7 +132,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     title: 'Adultas y otras',
     subtitle: 'Juv-Adulto · +16 años',
     description: 'Clases para jóvenes y adultos (funcional, zumba, taekwondo, ritmos y más).',
-    image: '/profes/zuly-silveira.jpg',
+    image: '/profes/zuly-silveira.JPG',
     filter: (cls) => isJuvAdulto(cls),
   },  
 ];

@@ -140,7 +140,7 @@ export const teachers: Teacher[] = [
     id: "sele-chaile",
     name: "Sele Chaile",
     style: "Urbano",
-    image: "/profes/sele-chaile.jpg",
+    image: "/profes/sele-chaile.JPG",
     classes: ["Miercoles 20:00 - Urbano"],
   },
   {
@@ -154,7 +154,7 @@ export const teachers: Teacher[] = [
     id: "zuly-silveira",
     name: "Zuly Silveira",
     style: "Reggaeton",
-    image: "/profes/zuly-silveira.jpg",
+    image: "/profes/zuly-silveira.JPG",
     classes: ["Lunes 18:00 - Reggaeton"],
   },
   {
