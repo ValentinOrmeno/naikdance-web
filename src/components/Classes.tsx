@@ -82,7 +82,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
   {
     id: 'juvTecnicas',
     title: 'Juveniles · Danzas Técnicas',
-    subtitle: 'Jazz, acro, telas, theatre · PRINC / ALL LEVELS',
+    subtitle: '12 a 16 años',
     description: 'Entrenamiento técnico en jazz, acro, telas y theatre jazz para juveniles.',
     image: '/clases/tecnicas.png',
     filter: (cls) =>
@@ -100,7 +100,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
   {
     id: 'juvUrbanas',
     title: 'Juveniles Urbano',
-    subtitle: 'Reggaeton, urbano, k-pop · PRINC / ALL LEVELS',
+    subtitle: '12 a 16 años',
     description: 'Clases urbanas de reggaeton, urbano, k-pop y ritmos con mucho flow.',
     image: '/clases/juvenil.png',
     filter: (cls) =>
@@ -116,7 +116,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
   {
     id: 'juvFem',
     title: 'Juveniles Femme Style',
-    subtitle: 'Femme style y reggaeton femme · PRINC / PRINC-INT / ALL LEVELS',
+    subtitle: '12 a 16 años',
     description: 'Clases de femme style y reggaeton femme con foco en presencia escénica y actitud.',
     image: '/clases/juvenil.png',
     filter: (cls) =>
