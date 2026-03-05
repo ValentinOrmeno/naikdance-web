@@ -112,7 +112,7 @@ export const teachers: Teacher[] = [
     id: "flor-gonzalez",
     name: "Flor Gonzalez",
     style: "Acrobacia / Flexibilidad",
-    image: "/profes/flor-gonzalez.PNG",
+    image: "/profes/flor-gonzalez.jpg",
     classes: ["Lunes 17:00 - Twerk"],
   },
   {
