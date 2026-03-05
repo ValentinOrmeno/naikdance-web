@@ -37,11 +37,11 @@ const RAW_SCHEDULE = [
   {
     dia: 'Lunes',
     clases: [
-      { hora: '16:00', nombre: 'Elongacion Kids', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Urbano' },
+      { hora: '16:00', nombre: 'Elongacion Mix', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Urbano' },
       { hora: '16:30', nombre: 'Tecnica Jazz', nivel: 'PRINC-INT', profesor: 'Paul Castro', notas: 'Hasta las 18:00 HS', estilo: 'Jazz' },
-      { hora: '17:00', nombre: 'Jazz Kids', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Jazz' },
-      { hora: '18:00', nombre: 'Reggaeton Kids', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Reggaeton' },
-      { hora: '18:00', nombre: 'Acro-Flex', nivel: 'ALL LEVELS', profesor: 'Flor Gonzalez', estilo: 'Acrobacia' },
+      { hora: '17:00', nombre: 'Jazz Mix', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Jazz' },
+      { hora: '18:00', nombre: 'Reggaeton Mix', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Reggaeton' },
+      { hora: '18:00', nombre: 'Acro Flex', nivel: 'ALL LEVELS', profesor: 'Flor Gonzalez', estilo: 'Acrobacia' },
       { hora: '19:00', nombre: 'Acrobacia Kids', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Acrobacia' },
       { hora: '19:00', nombre: 'Reggaeton', nivel: 'PRINC-INT', profesor: 'Naiu Bernasconi', notas: 'Solo del 9 al 23 de Marzo', estilo: 'Reggaeton' },
       { hora: '20:00', nombre: 'Comedia Musical', nivel: 'INF MIX', profesor: 'Flor Lizarraga', estilo: 'Comedia' },
@@ -52,7 +52,7 @@ const RAW_SCHEDULE = [
   {
     dia: 'Martes',
     clases: [
-      { hora: '16:00', nombre: 'Acrobacia Juv', nivel: 'ALL LEVELS', profesor: 'Flor Ostoich', estilo: 'Acrobacia' },
+      { hora: '16:00', nombre: 'Acrobacia', nivel: 'ALL LEVELS', profesor: 'Flor Ostoich', estilo: 'Acrobacia' },
       { hora: '16:00', nombre: 'Femme-Heels', nivel: 'PRINC', profesor: 'Cande Ortega', estilo: 'Femme' },
       { hora: '17:00', nombre: 'Theatre Jazz', nivel: 'ALL LEVELS', profesor: 'Zuly Silveyra', estilo: 'Jazz' },
       { hora: '17:00', nombre: 'Ballet', nivel: 'BABY', profesor: 'Ana Pepino', estilo: 'Ballet' },
@@ -62,7 +62,6 @@ const RAW_SCHEDULE = [
       { hora: '19:00', nombre: 'Zumba', nivel: 'JUV-ADULTO', profesor: 'Fran Benitez', estilo: 'Zumba' },
       { hora: '20:00', nombre: 'Urban Street', nivel: 'ALL LEVELS', profesor: 'Naik Ludueña', estilo: 'Urbano' },
       { hora: '20:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 22:00 HS', estilo: 'Taekwondo' },
-      { hora: '21:00', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', estilo: 'Taekwondo' },
     ],
   },
   {
@@ -71,7 +70,6 @@ const RAW_SCHEDULE = [
       { hora: '09:00', nombre: 'Elongacion', nivel: 'JUV-ADULTO', profesor: 'Naik Ludueña', estilo: 'Fitness' },
       { hora: '09:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 11:00 HS', estilo: 'Taekwondo' },
       { hora: '10:00', nombre: 'Zumba', nivel: 'JUV-ADULTO', profesor: 'Dany Navarro', estilo: 'Zumba' },
-      { hora: '10:00', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', estilo: 'Taekwondo' },
       { hora: '16:00', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '17:00', nombre: 'Urbano', nivel: 'INF A', profesor: 'Ingrid Iripino', estilo: 'Urbano' },
       { hora: '17:30', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', notas: 'Hasta las 19:00 HS', estilo: 'Crew' },
@@ -96,7 +94,6 @@ const RAW_SCHEDULE = [
       { hora: '20:00', nombre: 'Reggaeton Femme', nivel: 'PRINC-INT', profesor: 'Flor Parra', estilo: 'Reggaeton' },
       { hora: '20:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 22:00 HS', estilo: 'Taekwondo' },
       { hora: '21:00', nombre: 'Salsa', nivel: 'JUV-ADULTO', profesor: 'Mati-Zoe', estilo: 'Ritmos' },
-      { hora: '21:00', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', estilo: 'Taekwondo' },
     ],
   },
   {
@@ -105,7 +102,6 @@ const RAW_SCHEDULE = [
       { hora: '09:00', nombre: 'Funcional', nivel: 'JUV-ADULTO', profesor: 'Naik Ludueña', estilo: 'Fitness' },
       { hora: '09:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 11:00 HS', estilo: 'Taekwondo' },
       { hora: '10:00', nombre: 'Femme Style', nivel: 'JUV-ADULTO', profesor: 'Naik Ludueña', estilo: 'Femme' },
-      { hora: '10:00', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', estilo: 'Taekwondo' },
       { hora: '16:00', nombre: 'Reggaeton Femme', nivel: 'PRINC', profesor: 'Sele Chaile', estilo: 'Reggaeton' },
       { hora: '16:00', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '17:00', nombre: 'Reggaeton Femme', nivel: 'PRINC', profesor: 'Sofi Fiorillo', estilo: 'Reggaeton' },
@@ -113,11 +109,11 @@ const RAW_SCHEDULE = [
       { hora: '19:00', nombre: 'K-Pop', nivel: 'PRINC-INT', profesor: 'Rocio Canchi', estilo: 'K-Pop' },
       { hora: '19:00', nombre: 'Tik Tok', nivel: 'INF B', profesor: 'Jenn Mendoza', estilo: 'Urbano' },
       { hora: '19:00', nombre: 'Femme Heels', nivel: 'PRINC-INT', profesor: 'Alan Guttierrez', notas: 'Solo del 6 al 13 de Marzo', estilo: 'Femme' },
-      { hora: '19:00', nombre: 'Coreografia', nivel: 'INF B', profesor: 'Mili Mereles', estilo: 'Urbano' },
+      { hora: '19:00', nombre: 'Reggaeton', nivel: 'INF B', profesor: 'Mili Mereles', estilo: 'Urbano' },
       { hora: '20:00', nombre: 'Femme Heels', nivel: 'PRINC-INT', profesor: 'Rocio Canchi', estilo: 'Femme' },
       { hora: '20:00', nombre: 'Telas', nivel: 'INF B', profesor: 'Bren Ocampo', estilo: 'Acrobacia' },
-      { hora: '20:00', nombre: 'Axe', nivel: 'JUV-ADULTO', profesor: 'Tincho Nuñez', estilo: 'Ritmos' },
-      { hora: '20:00', nombre: 'Muay Thai', nivel: 'JUV-ADULTO', profesor: 'Fran Cabaña', estilo: 'Contacto' },
+      { hora: '21:00', nombre: 'Axe', nivel: 'JUV-ADULTO', profesor: 'Tincho Nuñez', estilo: 'Ritmos' },
+      { hora: '21:00', nombre: 'Muay Thai', nivel: 'JUV-ADULTO', profesor: 'Fran Cabaña', estilo: 'Contacto' },
     ],
   },
   {
@@ -125,7 +121,6 @@ const RAW_SCHEDULE = [
     clases: [
       { hora: '09:00', nombre: 'Carrera Jazz Contempo', nivel: 'PROFESORADO', profesor: 'A definir', notas: 'GRUPO CERRADO', estilo: 'Jazz' },
       { hora: '09:00', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
-      { hora: '10:30', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '10:30', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
       { hora: '12:00', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
       { hora: '13:30', nombre: 'Carrera Reggaeton', nivel: 'PROFESORADO', profesor: 'A definir', notas: 'GRUPO CERRADO', estilo: 'Reggaeton' },
@@ -190,6 +185,7 @@ const TEACHER_ID_BY_NAME: Record<string, string> = {
   'Diego-Naik-Giuli': 'diego-naik-giuli',
   'Ludmi Salvo': 'ludmi-salvo',
   'Benja-Gian': 'benja-gian',
+  'Mati-Zoe': 'mati-zoe',
   'Indira Nahir': 'indira-nahir',
   'Bri Aquino': 'bri-aquino',
   'Rocio Canchi': 'rocio-canchi',

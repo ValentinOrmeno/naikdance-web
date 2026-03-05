@@ -679,13 +679,18 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                                       : 'bg-white/5 hover:bg-white/10 text-white hover:ring-2 hover:ring-[#FFD700]/50'
                                   }`}
                                 >
-                                  <div className="text-left">
+                                  <div className="text-left space-y-0.5">
                                     <p className={`font-bold ${isSelected ? 'text-black' : 'text-[#FFD700]'}`}>
                                       {schedule.time}
                                     </p>
                                     <p className={`text-sm font-bold ${isSelected ? 'text-black' : 'text-white'}`}>
                                       {schedule.class_name}
                                     </p>
+                                    {schedule.level && (
+                                      <p className={`text-[10px] font-bold tracking-[0.16em] uppercase ${isSelected ? 'text-black/70' : 'text-gray-400'}`}>
+                                        {schedule.level}
+                                      </p>
+                                    )}
                                   </div>
                                   <div className="text-right">
                                     <p className={`text-xs ${isSelected ? 'text-black/70' : 'text-gray-400'}`}>

@@ -40,6 +40,12 @@ const isAllLevels = (cls: ClassSchedule) =>
 const isTecnicaStyle = (cls: ClassSchedule) =>
   ['Jazz', 'Acrobacia', 'Ballet', 'Comedia', 'Teatro'].includes(cls.style);
 
+const isArabeTecnico = (cls: ClassSchedule) =>
+  cls.name === 'Arabe' && cls.teacher === 'Indira Nahir';
+
+const isUrbanoAbruTecnico = (cls: ClassSchedule) =>
+  cls.teacher === 'Abru Villalba' && cls.style === 'Urbano';
+
 const isUrbanoStyle = (cls: ClassSchedule) =>
   ['Reggaeton', 'Urbano', 'Zumba', 'K-Pop', 'Ritmos', 'Fitness', 'Contacto'].includes(
     cls.style
@@ -54,45 +60,49 @@ const AGE_CATEGORIES: AgeCategory[] = [
     title: 'Babys',
     subtitle: '3 a 5 años',
     description: 'Primer contacto con la danza desde el juego y el movimiento.',
-    image: '/profes/ana-pepino.jpg',
+    image: '/clases/portada_babys.jpg',
     filter: (cls) => isBabyLevel(cls),
   },
   {
     id: 'infantil',
-    title: 'Infantil',
-    subtitle: 'INF A / INF B · 6 a 11 años',
-    description: 'Clases para peques que incorporan técnica, coordinación y memoria coreográfica.',
-    image: '/profes/sasha-nuñez.jpg',
+    title: 'Infantiles',
+    subtitle: 'INF A · 6 a 8 años · INF B · 9 a 11 años',
+    description: 'Clases infantiles por niveles que suman técnica, coordinación y memoria coreográfica.',
+    image: '/clases/infantil_a.jpg',
     filter: (cls) => isInfantilLevel(cls),
   },
   {
     id: 'infMix',
-    title: 'Infantil Mix',
-    subtitle: '6 a 11 años',
-    description: 'Grupos mixtos de niñas y niños en etapa infantil.',
-    image: '/profes/ingrid-iripino.jpg',
+    title: 'Infantiles Mix',
+    subtitle: 'INF MIX · 6 a 11 años',
+    description: 'Grupos INF MIX para niñas y niños que comparten nivel y energía.',
+    image: '/clases/infantil_b.png',
     filter: (cls) => isInfMixLevel(cls),
   },
   {
     id: 'juvTecnicas',
-    title: 'Juveniles Técnicas',
-    subtitle: 'Jazz, acro, telas, theatre…',
-    description: 'Enfoque en técnica, alineación y entrenamiento.',
-    image: '/profes/flor-lizarraga.jpg',
+    title: 'Juveniles · Danzas Técnicas',
+    subtitle: 'Jazz, acro, telas, theatre · PRINC / ALL LEVELS',
+    description: 'Entrenamiento técnico en jazz, acro, telas y theatre jazz para juveniles.',
+    image: '/clases/tecnicas.png',
     filter: (cls) =>
-      !isBabyLevel(cls) &&
-      !isInfantilLevel(cls) &&
-      !isInfMixLevel(cls) &&
-      !isJuvAdulto(cls) &&
-      (isPrincipiante(cls) || isAllLevels(cls)) &&
-      isTecnicaStyle(cls),
+      (
+        !isBabyLevel(cls) &&
+        !isInfantilLevel(cls) &&
+        !isInfMixLevel(cls) &&
+        !isJuvAdulto(cls) &&
+        (isPrincipiante(cls) || isAllLevels(cls)) &&
+        isTecnicaStyle(cls)
+      ) ||
+      isArabeTecnico(cls) ||
+      isUrbanoAbruTecnico(cls),
   },
   {
     id: 'juvUrbanas',
-    title: 'Juveniles Urbanas',
-    subtitle: 'Reggaeton, urbano, k-pop…',
-    description: 'Clases de calle, coreos y mucho flow para juveniles.',
-    image: '/profes/mili-mereles.jpg',
+    title: 'Juveniles Urbano',
+    subtitle: 'Reggaeton, urbano, k-pop · PRINC / ALL LEVELS',
+    description: 'Clases urbanas de reggaeton, urbano, k-pop y ritmos con mucho flow.',
+    image: '/clases/juvenil.png',
     filter: (cls) =>
       !isBabyLevel(cls) &&
       !isInfantilLevel(cls) &&
@@ -100,14 +110,15 @@ const AGE_CATEGORIES: AgeCategory[] = [
       !isJuvAdulto(cls) &&
       (isPrincipiante(cls) || isAllLevels(cls)) &&
       isUrbanoStyle(cls) &&
-      !isFemClass(cls),
+      !isFemClass(cls) &&
+      cls.teacher !== 'Abru Villalba',
   },
   {
     id: 'juvFem',
-    title: 'Juveniles Fem',
-    subtitle: 'Femme style y reggaeton femme',
-    description: 'Clases enfocadas en fem, presencia escénica y actitud.',
-    image: '/profes/cande-ortega.jpg',
+    title: 'Juveniles Femme Style',
+    subtitle: 'Femme style y reggaeton femme · PRINC / PRINC-INT / ALL LEVELS',
+    description: 'Clases de femme style y reggaeton femme con foco en presencia escénica y actitud.',
+    image: '/clases/juvenil.png',
     filter: (cls) =>
       !isBabyLevel(cls) &&
       !isInfantilLevel(cls) &&
@@ -118,9 +129,9 @@ const AGE_CATEGORIES: AgeCategory[] = [
   },
   {
     id: 'adultas',
-    title: 'Adultas',
-    subtitle: '+16 años / Juv-Adulto',
-    description: 'Clases para jóvenes y adultos que ya entrenan o quieren empezar.',
+    title: 'Adultas y otras',
+    subtitle: 'Juv-Adulto · +16 años',
+    description: 'Clases para jóvenes y adultos (funcional, zumba, taekwondo, ritmos y más).',
     image: '/profes/zuly-silveira.JPG',
     filter: (cls) => isJuvAdulto(cls),
   },  
