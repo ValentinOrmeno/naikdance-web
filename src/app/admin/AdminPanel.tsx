@@ -107,13 +107,31 @@ export default function AdminPanel() {
     schedules: [],
     availableDays: []
   });
+  const [addAvailabilityModal, setAddAvailabilityModal] = useState({
+    show: false,
+    teacherId: '',
+    cupos: 15,
+    days: [] as number[]
+  });
+  const [quickClassModal, setQuickClassModal] = useState({
+    show: false,
+    teacherId: '',
+    month: getCurrentMonth(),
+    day: '',
+    className: '',
+    time: '',
+    duration: '60',
+    cupos: 15,
+  });
   // Bloquear scroll global cuando hay modales abiertos
   useEffect(() => {
     const modalOpen =
       confirmModal.show ||
       detailModal.show ||
       scheduleModal.show ||
-      packConfirmModal.show;
+      packConfirmModal.show ||
+      quickClassModal.show ||
+      addAvailabilityModal.show;
 
     if (modalOpen) {
       document.body.style.overflow = 'hidden';
@@ -127,7 +145,14 @@ export default function AdminPanel() {
       document.body.style.overflow = 'unset';
       document.documentElement.style.overflow = 'unset';
     };
-  }, [confirmModal.show, detailModal.show, scheduleModal.show, packConfirmModal.show]);
+  }, [
+    confirmModal.show,
+    detailModal.show,
+    scheduleModal.show,
+    packConfirmModal.show,
+    quickClassModal.show,
+    addAvailabilityModal.show,
+  ]);
   const [newSchedule, setNewSchedule] = useState({
     day: '',
     time: '',
@@ -180,22 +205,6 @@ export default function AdminPanel() {
       );
     });
   }, [packPurchases, packSearch]);
-  const [addAvailabilityModal, setAddAvailabilityModal] = useState({
-    show: false,
-    teacherId: '',
-    cupos: 15,
-    days: [] as number[]
-  });
-  const [quickClassModal, setQuickClassModal] = useState({
-    show: false,
-    teacherId: '',
-    month: getCurrentMonth(),
-    day: '',
-    className: '',
-    time: '',
-    duration: '60',
-    cupos: 15,
-  });
   const [quickClassDays, setQuickClassDays] = useState<number[]>([]);
   const [scheduleDaysByKey, setScheduleDaysByKey] = useState<Record<string, { count: number; days: number[] }>>(
     {}
@@ -2120,8 +2129,8 @@ export default function AdminPanel() {
 
       {/* Modal Crear Clase Rápida */}
       {quickClassModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,36rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,36rem)] w-full p-4 sm:p-6 my-4 sm:my-8 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-black text-white uppercase">
                 Crear Clase Rápida
