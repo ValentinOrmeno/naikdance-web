@@ -425,6 +425,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover object-top hover:scale-105 transition-transform duration-700"
                 priority
+                unoptimized={teacher.image.startsWith('/profes/')}
               />
             </div>
           </div>

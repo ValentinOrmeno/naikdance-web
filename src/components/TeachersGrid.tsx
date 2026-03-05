@@ -136,6 +136,7 @@ export default function TeachersGrid() {
                     fill
                     sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    unoptimized={teacher.image.startsWith('/profes/')}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90" />
                   <div className="absolute bottom-0 left-0 w-full p-3">
