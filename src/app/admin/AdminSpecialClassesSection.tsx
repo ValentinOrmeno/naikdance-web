@@ -267,14 +267,20 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
                 key={item.id}
                 className="bg-[#111] border border-white/20 rounded-xl overflow-hidden hover:border-naik-gold/50 transition-all"
               >
-                <div className="relative aspect-[9/16] max-h-64 bg-black/50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className="relative aspect-[9/16] max-h-64 bg-black/50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {item.image ? (
                   <img
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover object-top"
                   />
-                </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[11px] text-gray-400">
+                    Sin imagen
+                  </div>
+                )}
+              </div>
                 <div className="p-4">
                   <p className="text-naik-gold text-xs font-bold uppercase tracking-wider mb-1">
                     {item.dateLabel}
