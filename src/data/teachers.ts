@@ -281,7 +281,7 @@ export const teachers: Teacher[] = [
     id: "pipi-echeverria",
     name: "Pipi Echeverria",
     style: "Clase Juvenil Urbana",
-    image: "/profes/placeholder.svg",
+    image: "/profes/pipi-echeverria.jpg",
     classes: ["Sáb 28/3 · 13:30 - Clase Juvenil Urbana"],
   },
   {

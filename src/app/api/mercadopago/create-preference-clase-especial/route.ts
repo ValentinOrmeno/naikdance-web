@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     ).replace(/\/$/, '');
     const isLocalhost = siteUrl.includes('localhost');
 
-    const preferenceData: Record<string, unknown> = {
+    const preferenceData = {
       items: [
         {
           id: special_class_id,
@@ -65,11 +65,8 @@ export async function POST(request: NextRequest) {
         email,
         telefono: telefono || '',
       },
+      ...(isLocalhost ? {} : { auto_return: 'approved' as const }),
     };
-
-    if (!isLocalhost) {
-      preferenceData.auto_return = 'approved';
-    }
 
     const response = await preference.create({ body: preferenceData });
 
