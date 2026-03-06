@@ -70,7 +70,6 @@ const RAW_SCHEDULE = [
       { hora: '09:00', nombre: 'Elongacion', nivel: 'JUV-ADULTO', profesor: 'Naik Ludueña', estilo: 'Fitness' },
       { hora: '09:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 11:00 HS', estilo: 'Taekwondo' },
       { hora: '10:00', nombre: 'Zumba', nivel: 'JUV-ADULTO', profesor: 'Dany Navarro', estilo: 'Zumba' },
-      { hora: '16:00', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '17:00', nombre: 'Urbano', nivel: 'INF A', profesor: 'Ingrid Iripino', estilo: 'Urbano' },
       { hora: '17:30', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', notas: 'Hasta las 19:00 HS', estilo: 'Crew' },
       { hora: '18:00', nombre: 'Reggaeton', nivel: 'INF A', profesor: 'Sasha Nuñez', estilo: 'Reggaeton' },
@@ -85,9 +84,9 @@ const RAW_SCHEDULE = [
     dia: 'Jueves',
     clases: [
       { hora: '16:00', nombre: 'Waacking', nivel: 'ALL LEVELS', profesor: 'Ludmi Salvo', notas: 'NUEVA CLASE', estilo: 'Urbano' },
+      { hora: '16:00', nombre: 'Urbano All Levels', nivel: 'ALL LEVELS', profesor: 'Abru Villalba', estilo: 'Urbano' },
       { hora: '17:00', nombre: 'Reggaeton', nivel: 'PRINC-INT', profesor: 'Benja-Gian', estilo: 'Reggaeton' },
       { hora: '17:00', nombre: 'Arabe', nivel: 'JUV-ADULTO', profesor: 'Indira Nahir', estilo: 'Ritmos' },
-      { hora: '18:00', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '18:00', nombre: 'Reggaeton', nivel: 'BABY', profesor: 'Bri Aquino', estilo: 'Reggaeton' },
       { hora: '19:00', nombre: 'Coreografia', nivel: 'INTER', profesor: 'Camilo Gonzalez', notas: 'Solo del 5 al 19 de Marzo', estilo: 'Urbano' },
       { hora: '19:00', nombre: 'Zumba', nivel: 'JUV-ADULTO', profesor: 'Fran Benitez', estilo: 'Zumba' },
@@ -103,7 +102,6 @@ const RAW_SCHEDULE = [
       { hora: '09:30', nombre: 'Taekwondo', nivel: 'JUV-ADULTO', profesor: 'Marco Oga', notas: 'Hasta las 11:00 HS', estilo: 'Taekwondo' },
       { hora: '10:00', nombre: 'Femme Style', nivel: 'JUV-ADULTO', profesor: 'Naik Ludueña', estilo: 'Femme' },
       { hora: '16:00', nombre: 'Reggaeton Femme', nivel: 'PRINC', profesor: 'Sele Chaile', estilo: 'Reggaeton' },
-      { hora: '16:00', nombre: 'Nueva Clase', nivel: 'ALL LEVELS', profesor: 'A definir', notas: 'NUEVA CLASE', estilo: 'Urbano' },
       { hora: '17:00', nombre: 'Reggaeton Femme', nivel: 'PRINC', profesor: 'Sofi Fiorillo', estilo: 'Reggaeton' },
       { hora: '17:00', nombre: 'Reggaeton', nivel: 'INF B', profesor: 'Cami Ortega', estilo: 'Reggaeton' },
       { hora: '19:00', nombre: 'K-Pop', nivel: 'PRINC-INT', profesor: 'Rocio Canchi', estilo: 'K-Pop' },
@@ -123,7 +121,7 @@ const RAW_SCHEDULE = [
       { hora: '09:00', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
       { hora: '10:30', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
       { hora: '12:00', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
-      { hora: '13:30', nombre: 'Carrera Reggaeton', nivel: 'PROFESORADO', profesor: 'A definir', notas: 'GRUPO CERRADO', estilo: 'Reggaeton' },
+      { hora: '13:30', nombre: 'Clase Juvenil Urbana', nivel: 'ALL LEVELS', profesor: 'Pipi Echeverria', notas: 'Sáb 28/3 · 13:30 hs · Valor $15.000 · Solo 15 cupos', estilo: 'Urbano' },
       { hora: '13:30', nombre: 'Crew Naik Dance', nivel: 'GRUPO CERRADO', profesor: 'Naik Dance', estilo: 'Crew' },
       { hora: '15:00', nombre: 'Reggaeton', nivel: 'INF MIX', profesor: 'Naik Ludueña', estilo: 'Reggaeton' },
       { hora: '15:00', nombre: 'Coreografia', nivel: 'ALL LEVELS', profesor: 'Daichu Alderete', estilo: 'Urbano' },
@@ -200,6 +198,7 @@ const TEACHER_ID_BY_NAME: Record<string, string> = {
   'Fran Cabaña': 'fran-cabaña',
   'Daichu Alderete': 'daichu-alderete',
   'Vicky Martini': 'vicky-martini',
+  'Pipi Echeverria': 'pipi-echeverria',
 };
 
 export const getTeacherIdForScheduleTeacher = (name: string): string | null => {

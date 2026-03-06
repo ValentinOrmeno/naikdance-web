@@ -30,7 +30,7 @@ export const teachers: Teacher[] = [
   {
     id: "giuli-grimaldi",
     name: "Giuli Grimaldi",
-    style: "Reggaeton / Femme",
+    style: "Acrobacia / Telas",
     image: "/profes/giuli-grimaldi.jpg",
     classes: ["Lunes 18:00 - Reggaeton Inicial", "Miercoles 19:00 - Femme"],
     availability: {
@@ -48,7 +48,7 @@ export const teachers: Teacher[] = [
   {
     id: "jenn-mendoza",
     name: "Jenn Mendoza",
-    style: "Street Jazz / K-Pop",
+    style: "Tik Tok / Urbano",
     image: "/profes/jenn-mendoza.jpg",
     classes: ["Martes 17:00 - K-Pop", "Jueves 18:00 - Street Jazz"],
   },
@@ -62,7 +62,7 @@ export const teachers: Teacher[] = [
   {
     id: "mili-mereles",
     name: "Mili Mereles",
-    style: "Urbano / Waacking",
+    style: "Reggaeton / Waacking",
     image: "/profes/mili-mereles.jpg",
     classes: ["Lunes 20:00 - Waacking", "Sabado 14:00 - Voguing"],
   },
@@ -153,7 +153,7 @@ export const teachers: Teacher[] = [
   {
     id: "zuly-silveira",
     name: "Zuly Silveira",
-    style: "Reggaeton",
+    style: "Theatre Jazz All Levels",
     image: "/profes/zuly-silveira.JPG",
     classes: ["Lunes 18:00 - Reggaeton"],
   },
@@ -276,6 +276,13 @@ export const teachers: Teacher[] = [
     style: "Reggaeton",
     image: "/profes/bri-aquino.jpg",
     classes: ["Reggaeton Baby"],
+  },
+  {
+    id: "pipi-echeverria",
+    name: "Pipi Echeverria",
+    style: "Clase Juvenil Urbana",
+    image: "/profes/placeholder.svg",
+    classes: ["Sáb 28/3 · 13:30 - Clase Juvenil Urbana"],
   },
   {
     id: "sofi-fiorillo",

@@ -5,10 +5,11 @@ import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 
 const ESTUDIO_IMAGES = [
-  { src: "/estudio/estudio-1.jpg", alt: "Naik Dance Studio - Sala de ensayo" },
-  { src: "/estudio/estudio-2.jpg", alt: "Naik Dance Studio - Clase en curso" },
-  { src: "/estudio/estudio-3.jpg", alt: "Naik Dance Studio - Espacio" },
-  { src: "/estudio/estudio-4.jpg", alt: "Naik Dance Studio - Nuestro estudio" },
+  { src: "/estudio/estudio-5.jpeg", alt: "Naik Dance Studio - Presentación en escenario" },
+  { src: "/estudio/estudio-6.jpeg", alt: "Naik Dance Studio - Grupo de bailarines" },
+  { src: "/estudio/estudio-7.jpeg", alt: "Naik Dance Studio - Ensayo de coreografía" },
+  { src: "/estudio/estudio-8.jpeg", alt: "Naik Dance Studio - Clase infantil" },
+  { src: "/estudio/estudio-9.jpeg", alt: "Naik Dance Studio - Show en vivo" },
 ];
 
 const ROTATION_MS = 4500;

@@ -155,6 +155,11 @@ export async function POST(request: NextRequest) {
               { status: 500 }
             );
           }
+        } else if (metaType === 'clase_especial') {
+          console.log('=== PAGO APROBADO - CLASE ESPECIAL ===');
+          console.log('Clase especial:', metadata.special_class_id, metadata.special_class_title);
+          console.log('Alumno:', metadata.nombre, metadata.email);
+          // El pago queda registrado en Mercado Pago; opcionalmente podés guardar en una tabla propia más adelante.
         } else if (metaType === 'pack' || (metadata.category && !metaType)) {
           console.log('=== PAGO APROBADO - REGISTRANDO PACK/CUPONERA ===');
 

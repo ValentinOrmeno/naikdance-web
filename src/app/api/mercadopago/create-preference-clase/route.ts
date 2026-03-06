@@ -25,10 +25,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = (
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    ).replace(/\/$/, '');
 
     // Crear preferencia de pago
-    const preferenceData = {
+    const isLocalhost = siteUrl.includes('localhost');
+
+    const preferenceData: any = {
       items: [
         {
           id: schedule_id,
@@ -51,7 +56,6 @@ export async function POST(request: NextRequest) {
         failure: `${siteUrl}/pago-fallido`,
         pending: `${siteUrl}/clase-reservada?status=pending`,
       },
-      auto_return: 'approved',
       statement_descriptor: 'NAIK DANCE - CLASE',
       external_reference: `clase-${schedule_id}-${Date.now()}`,
       notification_url: `${siteUrl}/api/mercadopago/webhook`,
@@ -68,6 +72,12 @@ export async function POST(request: NextRequest) {
         type: 'clase_suelta'
       },
     };
+
+    // auto_return solo con URLs públicas válidas (no localhost),
+    // para evitar el error "auto_return invalid. back_url.success must be defined"
+    if (!isLocalhost) {
+      preferenceData.auto_return = 'approved';
+    }
 
     const response = await preference.create({ body: preferenceData });
 

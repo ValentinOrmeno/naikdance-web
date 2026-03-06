@@ -36,6 +36,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { teachers } from "@/data/teachers";
+// Clases especiales: ver AdminSpecialClassesSection.tsx para integrar cuando sea necesario.
 
 type Tab = "dashboard" | "reservas" | "clases" | "creditos";
 
@@ -122,6 +123,11 @@ export default function AdminPanel() {
     time: '',
     duration: '60',
     cupos: 15,
+    details: '',
+    nivel: '',
+    categoria: '',
+    precioEfectivo: '',
+    precioMercadoPago: '',
   });
   // Bloquear scroll global cuando hay modales abiertos
   useEffect(() => {
@@ -291,6 +297,11 @@ export default function AdminPanel() {
       time: '',
       duration: '60',
       cupos: 15,
+      details: '',
+      nivel: '',
+      categoria: '',
+      precioEfectivo: '',
+      precioMercadoPago: '',
     });
     setQuickClassDays([]);
   };
@@ -321,7 +332,7 @@ export default function AdminPanel() {
   };
 
   const handleCreateQuickClass = async () => {
-    const { teacherId, month, day, className, time, duration, cupos } = quickClassModal;
+    const { teacherId, month, day, className, time, duration, cupos, details, nivel, categoria, precioEfectivo, precioMercadoPago } = quickClassModal;
 
     if (!teacherId || !month || !className || !time) {
       alert('Completa profesor, hora y nombre de la clase');
@@ -380,6 +391,16 @@ export default function AdminPanel() {
         days: mergedDays,
       });
 
+      // Construir nombre de clase: nombre + nivel + categoría + detalle libre + precio efectivo
+      const parts = [className.trim()];
+      if (nivel.trim()) parts.push(nivel.trim());
+      if (categoria.trim()) parts.push(categoria.trim());
+      if (details.trim()) parts.push(details.trim());
+      if (precioEfectivo.trim()) parts.push(`Efectivo ${precioEfectivo.trim()}`);
+      const fullClassName = parts.join(' · ');
+      const priceNum = precioMercadoPago.trim() ? parseInt(precioMercadoPago.replace(/\D/g, ''), 10) : undefined;
+      const priceForDb = priceNum != null && !Number.isNaN(priceNum) && priceNum >= 0 ? priceNum : undefined;
+
       // Crear un horario por cada día
       await Promise.all(
         daysToInsert.map((d) =>
@@ -388,9 +409,10 @@ export default function AdminPanel() {
             month,
             day: d,
             time,
-            class_name: className,
+            class_name: fullClassName,
             duration: parseInt(duration, 10) || 60,
             max_students: cupos,
+            ...(priceForDb != null && { price: priceForDb }),
           })
         )
       );
@@ -406,6 +428,11 @@ export default function AdminPanel() {
         time: '',
         duration: '60',
         cupos: 15,
+        details: '',
+        nivel: '',
+        categoria: '',
+        precioEfectivo: '',
+        precioMercadoPago: '',
       });
       setQuickClassDays([]);
 
@@ -2146,6 +2173,11 @@ export default function AdminPanel() {
                     time: '',
                     duration: '60',
                     cupos: 15,
+                    details: '',
+                    nivel: '',
+                    categoria: '',
+                    precioEfectivo: '',
+                    precioMercadoPago: '',
                   })
                 }
                 className="text-gray-400 hover:text-white transition-colors"
@@ -2316,22 +2348,118 @@ export default function AdminPanel() {
                   />
                 </div>
               </div>
+
+              {/* Nivel y categoría (pequeños) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase mb-1.5 text-gray-400">
+                    Nivel
+                  </label>
+                  <input
+                    id="quick-class-nivel"
+                    name="nivel"
+                    type="text"
+                    value={quickClassModal.nivel}
+                    onChange={(e) =>
+                      setQuickClassModal({ ...quickClassModal, nivel: e.target.value })
+                    }
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500"
+                    placeholder="Ej: Principiante, ALL LEVELS"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase mb-1.5 text-gray-400">
+                    Categoría
+                  </label>
+                  <input
+                    id="quick-class-categoria"
+                    name="categoria"
+                    type="text"
+                    value={quickClassModal.categoria}
+                    onChange={(e) =>
+                      setQuickClassModal({ ...quickClassModal, categoria: e.target.value })
+                    }
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500"
+                    placeholder="Ej: Juvenil, Infantil"
+                  />
+                </div>
+              </div>
+
+              {/* Precios */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase mb-1.5 text-gray-400">
+                    Precio efectivo
+                  </label>
+                  <input
+                    id="quick-class-precio-efectivo"
+                    name="precioEfectivo"
+                    type="text"
+                    value={quickClassModal.precioEfectivo}
+                    onChange={(e) =>
+                      setQuickClassModal({ ...quickClassModal, precioEfectivo: e.target.value })
+                    }
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500"
+                    placeholder="Ej: $15.000"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">Se muestra en el nombre de la clase.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase mb-1.5 text-gray-400">
+                    Precio Mercado Pago
+                  </label>
+                  <input
+                    id="quick-class-precio-mp"
+                    name="precioMercadoPago"
+                    type="text"
+                    value={quickClassModal.precioMercadoPago}
+                    onChange={(e) =>
+                      setQuickClassModal({ ...quickClassModal, precioMercadoPago: e.target.value })
+                    }
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500"
+                    placeholder="Ej: 15000 (número)"
+                  />
+                </div>
+              </div>
+
+              {/* Detalle libre (opcional) */}
+              <div>
+                <label className="block text-xs font-bold uppercase mb-1.5 text-gray-400">
+                  Otro detalle (opcional)
+                </label>
+                <textarea
+                  id="quick-class-details"
+                  name="details"
+                  rows={2}
+                  value={quickClassModal.details}
+                  onChange={(e) =>
+                    setQuickClassModal({ ...quickClassModal, details: e.target.value })
+                  }
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white outline-none resize-y placeholder:text-gray-500"
+                  placeholder="Ej: Solo 15 cupos, Sáb 28/3"
+                />
+              </div>
             </div>
 
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() =>
                   {
-                    setQuickClassModal({
-                      show: false,
-                      teacherId: '',
-                      month: selectedMonth,
-                      day: '',
-                      className: '',
-                      time: '',
-                      duration: '60',
-                      cupos: 15,
-                    });
+      setQuickClassModal({
+        show: false,
+        teacherId: '',
+        month: selectedMonth,
+        day: '',
+        className: '',
+        time: '',
+        duration: '60',
+        cupos: 15,
+        details: '',
+        nivel: '',
+        categoria: '',
+        precioEfectivo: '',
+        precioMercadoPago: '',
+      });
                     setQuickClassDays([]);
                   }
                 }

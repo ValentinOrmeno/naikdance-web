@@ -277,11 +277,24 @@ export async function createClassSchedule(schedule: {
   class_name: string;
   duration?: number;
   max_students?: number;
+  price?: number;
 }) {
   try {
-    const { data, error } = await supabase
+    const row: Record<string, unknown> = {
+      teacher_id: schedule.teacher_id,
+      month: schedule.month,
+      day: schedule.day,
+      time: schedule.time,
+      class_name: schedule.class_name,
+      duration: schedule.duration ?? 60,
+      max_students: schedule.max_students ?? 15,
+    };
+    if (schedule.price != null && schedule.price >= 0) {
+      row.price = schedule.price;
+    }
+    const { error } = await supabase
       .from('class_schedules')
-      .insert([schedule]);
+      .insert([row]);
 
     if (error) {
       console.error('Error al crear horario:', error);
