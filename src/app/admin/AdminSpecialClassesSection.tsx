@@ -119,7 +119,7 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
       price_amount: item.priceAmount != null ? String(item.priceAmount) : "",
       promo_note: item.promoNote ?? "",
       valid_until: item.validUntil ? item.validUntil.slice(0, 16) : "",
-      image_url: item.image,
+      image_url: item.image ?? "",
       whatsapp_message: item.whatsappMessage,
       imageFile: null,
     });
