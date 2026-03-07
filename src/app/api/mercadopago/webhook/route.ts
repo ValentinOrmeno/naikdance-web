@@ -150,6 +150,10 @@ export async function POST(request: NextRequest) {
             });
           } catch (error) {
             console.error('Error al crear reserva:', error);
+            const msg = error instanceof Error ? error.message : '';
+            if (msg.includes('Ya tenés una reserva')) {
+              return NextResponse.json({ success: false, duplicate: true }, { status: 200 });
+            }
             return NextResponse.json(
               { error: 'Error creating reservation' },
               { status: 500 }

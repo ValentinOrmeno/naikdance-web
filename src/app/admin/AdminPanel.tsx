@@ -16,6 +16,9 @@ import {
   fixNegativeCupos,
   getAllPackPurchases,
   incrementPackUsage,
+  markPackAsVencido,
+  createPackPurchase,
+  getReservationsByEmail,
   deleteExpiredWhatsappReservations,
 } from "@/lib/supabase-admin-extended";
 import type { Reservation, Availability, ClassSchedule, PackPurchase } from "@/lib/supabase";
@@ -64,6 +67,24 @@ export default function AdminPanel() {
     reservationId: null,
     pack: null,
   });
+  const [addPackModal, setAddPackModal] = useState({
+    show: false,
+    alumno_nombre: '',
+    alumno_email: '',
+    alumno_telefono: '',
+    pack_type: 'Cuponera',
+    pack_name: '',
+    clases_incluidas: '' as string | number,
+    cuponeraPreset: '' as '' | '4' | '8' | '12' | 'otro',
+    packPreset: '' as '' | '4' | '8' | '12' | 'otro',
+    caducidad: '',
+  });
+  const [packClasesModal, setPackClasesModal] = useState<{
+    show: boolean;
+    pack: PackPurchase | null;
+    reservas: Reservation[];
+    loading: boolean;
+  }>({ show: false, pack: null, reservas: [], loading: false });
   
   // Generar mes actual por defecto
   const getCurrentMonth = () => {
@@ -137,7 +158,9 @@ export default function AdminPanel() {
       scheduleModal.show ||
       packConfirmModal.show ||
       quickClassModal.show ||
-      addAvailabilityModal.show;
+      addAvailabilityModal.show ||
+      addPackModal.show ||
+      packClasesModal.show;
 
     if (modalOpen) {
       document.body.style.overflow = 'hidden';
@@ -158,6 +181,8 @@ export default function AdminPanel() {
     packConfirmModal.show,
     quickClassModal.show,
     addAvailabilityModal.show,
+    addPackModal.show,
+    packClasesModal.show,
   ]);
   const [newSchedule, setNewSchedule] = useState({
     day: '',
@@ -1303,14 +1328,36 @@ export default function AdminPanel() {
               <h2 className="text-xl font-black uppercase tracking-wide text-white">
                 Alumnos y créditos
               </h2>
-              <div className="w-full sm:w-80">
-                <input
-                  type="text"
-                  placeholder="Buscar por alumno, email o pack..."
-                  value={packSearch}
-                  onChange={(e) => setPackSearch(e.target.value)}
-                  className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold focus:border-naik-gold"
-                />
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:items-center">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAddPackModal({
+                      show: true,
+                      alumno_nombre: '',
+                      alumno_email: '',
+                      alumno_telefono: '',
+                      pack_type: 'Cuponera',
+                      pack_name: '',
+                      clases_incluidas: '',
+                      cuponeraPreset: '',
+                      packPreset: '',
+                      caducidad: '',
+                    })
+                  }
+                  className="px-4 py-2 rounded-lg bg-naik-gold text-black font-bold text-sm uppercase hover:bg-yellow-400 transition-colors"
+                >
+                  + Agregar pack / cuponera
+                </button>
+                <div className="w-full sm:w-80">
+                  <input
+                    type="text"
+                    placeholder="Buscar por alumno, email o pack..."
+                    value={packSearch}
+                    onChange={(e) => setPackSearch(e.target.value)}
+                    className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold focus:border-naik-gold"
+                  />
+                </div>
               </div>
             </div>
             {loading && (
@@ -1401,9 +1448,34 @@ export default function AdminPanel() {
                           </span>
                         </div>
                       </div>
+                      {pack.expires_at && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          Caduca:{" "}
+                          {new Date(pack.expires_at).toLocaleDateString("es-AR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
+                        </p>
+                      )}
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setPackClasesModal({ show: true, pack, reservas: [], loading: true });
+                          try {
+                            const reservas = await getReservationsByEmail(pack.alumno_email);
+                            setPackClasesModal((prev) => ({ ...prev, reservas, loading: false }));
+                          } catch {
+                            setPackClasesModal((prev) => ({ ...prev, reservas: [], loading: false }));
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all"
+                      >
+                        Ver clases
+                      </button>
                       <button
                         disabled={pack.status !== "activo"}
                         onClick={async () => {
@@ -1496,6 +1568,29 @@ export default function AdminPanel() {
                       >
                         WhatsApp saldo
                       </button>
+
+                      {pack.status === 'activo' || pack.status === 'completo' ? (
+                        <button
+                          onClick={async () => {
+                            if (!confirm('¿Dar de baja este pack/cuponera? El alumno dejará de aparecer como activo para usar créditos.')) return;
+                            try {
+                              const updated = await markPackAsVencido(pack.id);
+                              if (updated) {
+                                setPackPurchases((prev) =>
+                                  prev.map((p) => (p.id === pack.id ? updated : p))
+                                );
+                                alert('Pack/cuponera dada de baja.');
+                              }
+                            } catch (error) {
+                              console.error('Error al dar de baja:', error);
+                              alert('Error al dar de baja.');
+                            }
+                          }}
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/30 transition-all"
+                        >
+                          Dar de baja
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 );
@@ -1503,6 +1598,354 @@ export default function AdminPanel() {
           </div>
         )}
       </div>
+
+      {/* Modal Agregar pack / cuponera */}
+      {addPackModal.show && (
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-black text-white uppercase">
+                Agregar pack / cuponera
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAddPackModal({ ...addPackModal, show: false })}
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Cerrar"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              Para alumnos que ya tenían cuponera antes de la web o compraron en efectivo.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Nombre del alumno</label>
+                <input
+                  type="text"
+                  value={addPackModal.alumno_nombre}
+                  onChange={(e) => setAddPackModal({ ...addPackModal, alumno_nombre: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  placeholder="Ej: María García"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={addPackModal.alumno_email}
+                  onChange={(e) => setAddPackModal({ ...addPackModal, alumno_email: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  placeholder="maria@ejemplo.com"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Teléfono (opcional)</label>
+                <input
+                  type="text"
+                  value={addPackModal.alumno_telefono}
+                  onChange={(e) => setAddPackModal({ ...addPackModal, alumno_telefono: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  placeholder="11 1234-5678"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Tipo</label>
+                <select
+                  value={addPackModal.pack_type}
+                  onChange={(e) =>
+                    setAddPackModal({
+                      ...addPackModal,
+                      pack_type: e.target.value,
+                      cuponeraPreset: '',
+                      packPreset: '',
+                    })
+                  }
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                >
+                  <option value="Cuponera" style={{ backgroundColor: '#111', color: '#fff' }}>
+                    Cuponera
+                  </option>
+                  <option value="Pack" style={{ backgroundColor: '#111', color: '#fff' }}>
+                    Pack mensual
+                  </option>
+                  <option
+                    value="Pase Libre / Full"
+                    style={{ backgroundColor: '#111', color: '#fff' }}
+                  >
+                    Pase Libre / Full
+                  </option>
+                </select>
+              </div>
+              {((addPackModal.pack_type === 'Cuponera' && addPackModal.cuponeraPreset === 'otro') ||
+                (addPackModal.pack_type === 'Pack' && addPackModal.packPreset === 'otro')) && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                    Nombre del pack (ej. Cuponera 5 clases)
+                  </label>
+                  <input
+                    type="text"
+                    value={addPackModal.pack_name}
+                    onChange={(e) =>
+                      setAddPackModal({ ...addPackModal, pack_name: e.target.value })
+                    }
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                    placeholder="Ej: Cuponera 5 clases"
+                  />
+                </div>
+              )}
+              {addPackModal.pack_type === 'Cuponera' && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                    Tipo de cuponera
+                  </label>
+                  <select
+                    value={addPackModal.cuponeraPreset}
+                    onChange={(e) => {
+                      const value = e.target.value as '' | '4' | '8' | '12' | 'otro';
+                      if (value === '4' || value === '8' || value === '12') {
+                        const num = parseInt(value, 10);
+                        setAddPackModal({
+                          ...addPackModal,
+                          cuponeraPreset: value,
+                          pack_name: `Cuponera ${num} clases`,
+                          clases_incluidas: num,
+                        });
+                      } else {
+                        setAddPackModal({
+                          ...addPackModal,
+                          cuponeraPreset: value,
+                        });
+                      }
+                    }}
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  >
+                    <option value="" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Seleccionar...
+                    </option>
+                    <option value="4" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Cuponera 4 clases
+                    </option>
+                    <option value="8" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Cuponera 8 clases
+                    </option>
+                    <option value="12" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Cuponera 12 clases
+                    </option>
+                    <option value="otro" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Otra / personalizada
+                    </option>
+                    </select>
+                </div>
+              )}
+              {addPackModal.pack_type === 'Pack' && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                    Qué pack tiene
+                  </label>
+                  <select
+                    value={addPackModal.packPreset}
+                    onChange={(e) => {
+                      const value = e.target.value as '' | '4' | '8' | '12' | 'otro';
+                      if (value === '4' || value === '8' || value === '12') {
+                        const num = parseInt(value, 10);
+                        setAddPackModal({
+                          ...addPackModal,
+                          packPreset: value,
+                          pack_name: `Pack mensual ${num} clases`,
+                          clases_incluidas: num,
+                        });
+                      } else {
+                        setAddPackModal({
+                          ...addPackModal,
+                          packPreset: value,
+                        });
+                      }
+                    }}
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  >
+                    <option value="" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Seleccionar...
+                    </option>
+                    <option value="4" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Pack mensual 4 clases
+                    </option>
+                    <option value="8" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Pack mensual 8 clases
+                    </option>
+                    <option value="12" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Pack mensual 12 clases
+                    </option>
+                    <option value="otro" style={{ backgroundColor: '#111', color: '#fff' }}>
+                      Otro / personalizado
+                    </option>
+                  </select>
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                  Total de clases del pack (vacío = ilimitado)
+                </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Cantidad de clases que incluye el pack, no las que ya usó.
+                </p>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={addPackModal.clases_incluidas === '' ? '' : addPackModal.clases_incluidas}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    setAddPackModal({ ...addPackModal, clases_incluidas: v === '' ? '' : (parseInt(v, 10) || 0) });
+                  }}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
+                  placeholder="Ej: 8"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                  Caducidad (opcional)
+                </label>
+                <input
+                  type="date"
+                  value={addPackModal.caducidad}
+                  onChange={(e) => setAddPackModal({ ...addPackModal, caducidad: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-naik-gold [color-scheme:dark]"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setAddPackModal({ ...addPackModal, show: false })}
+                className="flex-1 py-3 rounded-xl font-bold uppercase bg-white/10 hover:bg-white/20 text-white transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const { alumno_nombre, alumno_email, pack_type, pack_name, clases_incluidas } = addPackModal;
+                  if (!alumno_nombre.trim() || !alumno_email.trim()) {
+                    alert('Completá nombre y email del alumno.');
+                    return;
+                  }
+                  if (pack_type === 'Cuponera' && !addPackModal.cuponeraPreset) {
+                    alert('Seleccioná el tipo de cuponera (4, 8, 12 clases u otra).');
+                    return;
+                  }
+                  if (pack_type === 'Pack' && !addPackModal.packPreset) {
+                    alert('Seleccioná qué pack tiene (4, 8, 12 clases u otro).');
+                    return;
+                  }
+                  const isOtroCuponera = pack_type === 'Cuponera' && addPackModal.cuponeraPreset === 'otro';
+                  const isOtroPack = pack_type === 'Pack' && addPackModal.packPreset === 'otro';
+                  let finalPackName: string;
+                  if (pack_type === 'Pase Libre / Full') {
+                    finalPackName = 'Pase Libre / Full';
+                  } else if (pack_type === 'Cuponera' && addPackModal.cuponeraPreset !== 'otro' && addPackModal.cuponeraPreset !== '') {
+                    const n = addPackModal.cuponeraPreset === '4' ? 4 : addPackModal.cuponeraPreset === '8' ? 8 : 12;
+                    finalPackName = `Cuponera ${n} clases`;
+                  } else if (pack_type === 'Pack' && addPackModal.packPreset !== 'otro' && addPackModal.packPreset !== '') {
+                    const n = addPackModal.packPreset === '4' ? 4 : addPackModal.packPreset === '8' ? 8 : 12;
+                    finalPackName = `Pack mensual ${n} clases`;
+                  } else if (isOtroCuponera || isOtroPack) {
+                    if (!pack_name.trim()) {
+                      alert('Completá el nombre del pack (ej. Cuponera 5 clases).');
+                      return;
+                    }
+                    finalPackName = pack_name.trim();
+                  } else {
+                    finalPackName = pack_name.trim() || pack_type;
+                  }
+                  const numClases = clases_incluidas === '' ? null : (typeof clases_incluidas === 'number' ? clases_incluidas : parseInt(String(clases_incluidas), 10));
+                  if (clases_incluidas !== '' && (numClases == null || isNaN(numClases) || numClases < 0)) {
+                    alert('Total de clases del pack debe ser un número positivo o vacío.');
+                    return;
+                  }
+                  try {
+                    setLoading(true);
+                    const expiresAt =
+                      addPackModal.caducidad.trim() !== ''
+                        ? new Date(addPackModal.caducidad + 'T23:59:59.999Z').toISOString()
+                        : undefined;
+                    await createPackPurchase({
+                      alumno_nombre: alumno_nombre.trim(),
+                      alumno_email: alumno_email.trim(),
+                      alumno_telefono: addPackModal.alumno_telefono.trim() || undefined,
+                      pack_type: pack_type.trim(),
+                      pack_name: finalPackName,
+                      clases_incluidas: numClases ?? null,
+                      origin: 'manual',
+                      expires_at: expiresAt ?? null,
+                    });
+                    setAddPackModal({ ...addPackModal, show: false });
+                    await loadPackPurchases();
+                    alert('Pack/cuponera agregado correctamente.');
+                  } catch (error) {
+                    console.error('Error al agregar pack:', error);
+                    alert('Error al agregar. Revisá que el email sea válido.');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="flex-1 py-3 rounded-xl font-bold uppercase bg-naik-gold hover:bg-yellow-400 text-black transition-all"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Ver clases (reservas del alumno del pack) */}
+      {packClasesModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-md w-full p-5 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-white uppercase">
+                Clases en las que se anotó
+                {packClasesModal.pack && (
+                  <span className="block text-sm font-normal text-gray-400 mt-1">
+                    {packClasesModal.pack.alumno_nombre}
+                  </span>
+                )}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setPackClasesModal({ show: false, pack: null, reservas: [], loading: false })}
+                className="text-gray-400 hover:text-white transition-colors p-1"
+                aria-label="Cerrar"
+              >
+                <X size={22} />
+              </button>
+            </div>
+            {packClasesModal.loading ? (
+              <p className="text-gray-400 text-sm">Cargando reservas...</p>
+            ) : packClasesModal.reservas.length === 0 ? (
+              <p className="text-gray-500 text-sm">No hay reservas con este email.</p>
+            ) : (
+              <ul className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                {packClasesModal.reservas.map((r) => {
+                  const teacherInfo = teachers.find((t) => t.id === r.teacher_id);
+                  return (
+                    <li
+                      key={r.id}
+                      className="bg-white/5 border border-white/10 rounded-lg p-3 text-sm"
+                    >
+                      <p className="font-bold text-naik-gold">{r.fecha}</p>
+                      <p className="text-white">{r.clase}</p>
+                      <p className="text-xs text-gray-400">
+                        {teacherInfo?.name ?? r.teacher_id} · {r.status}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Modal de Detalles de Reservas por Profesor */}
       {detailModal.show && (

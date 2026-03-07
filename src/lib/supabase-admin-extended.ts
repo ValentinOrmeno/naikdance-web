@@ -31,6 +31,7 @@ export type PackPurchase = {
   origin: 'mercado_pago' | 'efectivo' | 'manual';
   payment_id?: string;
   created_at: string;
+  expires_at?: string | null;
 };
 
 /**
@@ -73,9 +74,10 @@ export async function createPackPurchase(input: {
   clases_incluidas: number | null;
   origin: 'mercado_pago' | 'efectivo' | 'manual';
   payment_id?: string;
+  expires_at?: string | null;
 }): Promise<PackPurchase> {
   try {
-    const payload = {
+    const payload: Record<string, unknown> = {
       alumno_email: input.alumno_email,
       alumno_nombre: input.alumno_nombre,
       alumno_telefono: input.alumno_telefono ?? null,
@@ -85,6 +87,9 @@ export async function createPackPurchase(input: {
       origin: input.origin,
       payment_id: input.payment_id ?? null,
     };
+    if (input.expires_at != null && input.expires_at !== '') {
+      payload.expires_at = input.expires_at;
+    }
 
     const { data, error } = await supabase
       .from('pack_purchases')
@@ -106,24 +111,27 @@ export async function createPackPurchase(input: {
 
 /**
  * Marca como "vencidos" los packs/cuponeras que tengan más de 30 días
- * desde su creación y que aún estén en estado "activo".
+ * desde su creación, o que tengan expires_at ya pasado.
  */
 async function expireOldPacksIfNeeded() {
   try {
-    const now = Date.now();
+    const nowIso = new Date().toISOString();
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    const cutoffIso = new Date(now - THIRTY_DAYS_MS).toISOString();
+    const cutoffIso = new Date(Date.now() - THIRTY_DAYS_MS).toISOString();
 
-    const { error } = await supabase
+    const { error: err1 } = await supabase
       .from('pack_purchases')
       .update({ status: 'vencido' })
       .lt('created_at', cutoffIso)
       .eq('status', 'activo');
+    if (err1) console.error('Error al marcar packs vencidos por antigüedad:', err1);
 
-    if (error) {
-      console.error('Error al marcar packs vencidos:', error);
-      // No lanzamos error para no romper el flujo principal; solo logueamos
-    }
+    const { error: err2 } = await supabase
+      .from('pack_purchases')
+      .update({ status: 'vencido' })
+      .lt('expires_at', nowIso)
+      .eq('status', 'activo');
+    if (err2) console.error('Error al marcar packs vencidos por caducidad:', err2);
   } catch (error: any) {
     console.error('Error en expireOldPacksIfNeeded:', error);
   }
@@ -208,6 +216,53 @@ export async function incrementPackUsage(
     return updated as PackPurchase;
   } catch (error: any) {
     console.error('Error en incrementPackUsage:', error);
+    throw error;
+  }
+}
+
+/**
+ * Marca un pack/cuponera como vencido (dar de baja). No borra el registro.
+ */
+export async function markPackAsVencido(id: string): Promise<PackPurchase | null> {
+  try {
+    const { data, error } = await supabase
+      .from('pack_purchases')
+      .update({ status: 'vencido' })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error al marcar pack como vencido:', error);
+      throw new Error(error.message);
+    }
+    return data as PackPurchase;
+  } catch (error: any) {
+    console.error('Error en markPackAsVencido:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene reservas por email del alumno (para mostrar "clases en las que se anotó")
+ */
+export async function getReservationsByEmail(email: string) {
+  try {
+    const normalized = email.trim().toLowerCase();
+    const { data, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .ilike('email', normalized)
+      .order('fecha', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error al obtener reservas por email:', error);
+      throw new Error(error.message);
+    }
+    return data ?? [];
+  } catch (error: any) {
+    console.error('Error en getReservationsByEmail:', error);
     throw error;
   }
 }

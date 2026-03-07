@@ -300,7 +300,8 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
       }
     } catch (error) {
       console.error('Error al crear reserva sin pago MP:', error);
-      alert('Error al registrar la reserva. Por favor intenta nuevamente o consultá por WhatsApp.');
+      const message = error instanceof Error ? error.message : 'Error al registrar la reserva. Por favor intenta nuevamente o consultá por WhatsApp.';
+      setFeedbackModal({ show: true, title: 'No se pudo registrar', message });
     }
   };
 
@@ -592,23 +593,24 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                         </div>
                       </div>
                     )}
-                    <div className="mb-4 flex justify-center">
-                      {(() => {
-                        // Asegurar que cupos_reservados nunca sea negativo
-                        const reservados = Math.max(0, monthData.availability.reservas);
-                        const total = monthData.availability.cupos;
-                        // Calcular disponibles y asegurar que no exceda el total
-                        const available = Math.min(total, Math.max(0, total - reservados));
-                        const colors = getCuposColor(available, total);
-                        return (
-                          <div className={`px-4 py-2 rounded-full ${colors.bg} ${colors.text} border ${colors.border} backdrop-blur-sm`}>
-                            <span className="text-xs font-bold uppercase">
-                              Cupos: {available}/{total} disponibles
-                            </span>
-                          </div>
-                        );
-                      })()}
-                    </div>
+                    {/* Chip de cupos: solo cuando ya eligieron día y horario */}
+                    {selectedDay && selectedSchedule && (
+                      <div className="mb-4 flex justify-center">
+                        {(() => {
+                          const reservados = Math.max(0, monthData.availability.reservas);
+                          const total = monthData.availability.cupos;
+                          const available = Math.min(total, Math.max(0, total - reservados));
+                          const colors = getCuposColor(available, total);
+                          return (
+                            <div className={`px-4 py-2 rounded-full ${colors.bg} ${colors.text} border ${colors.border} backdrop-blur-sm`}>
+                              <span className="text-xs font-bold uppercase">
+                                Cupos disponibles para este horario: {available}/{total}
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-7 text-center text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">
                       <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span><span>Do</span>
@@ -619,6 +621,11 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                       {[...Array(monthData.daysInMonth)].map((_, i) => {
                         const day = i + 1;
                         const isSelected = selectedDay === day;
+                        const [y, m] = currentMonth.split('-').map(Number);
+                        const dateOfDay = new Date(y, m - 1, day);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const isPastDate = dateOfDay < today;
                         const term = selectedStyleFilter !== 'all' ? selectedStyleFilter.toLowerCase() : '';
                         // Verificar si hay horarios para este día (respetando el filtro por tipo de clase)
                         const hasSchedules = term
@@ -630,13 +637,21 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                           ? (monthData.availability.cupos - Math.max(0, monthData.availability.reservas)) > 0 
                           : false;
                         
-                        // Solo puede reservar si tiene horarios configurados Y hay cupos
-                        const canBook = hasSchedules && hasCupos;
+                        // Solo puede reservar si tiene horarios, hay cupos y la fecha no es pasada
+                        const canBook = hasSchedules && hasCupos && !isPastDate;
 
+                        const disabledTitle = isPastDate
+                          ? 'Fecha pasada'
+                          : hasSchedules && !hasCupos
+                            ? 'Sin cupos'
+                            : !hasSchedules
+                              ? 'Sin horarios este día'
+                              : '';
                         return (
                           <button
                             key={day}
                             disabled={!canBook}
+                            title={!canBook ? disabledTitle : undefined}
                             onClick={() => {
                               setSelectedDay(day);
                               setSelectedSchedule(null); // Limpiar horario al cambiar de día
@@ -649,7 +664,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                             `}
                           >
                             {day}
-                            {hasSchedules && !hasCupos && (
+                            {hasSchedules && !hasCupos && !isPastDate && (
                               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" 
                                     title="Sin cupos"
                               />

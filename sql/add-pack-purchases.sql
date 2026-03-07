@@ -12,8 +12,12 @@ CREATE TABLE IF NOT EXISTS pack_purchases (
   origin TEXT NOT NULL CHECK (origin IN ('mercado_pago', 'efectivo', 'manual')),
   payment_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  expires_at TIMESTAMP WITH TIME ZONE
 );
+
+-- Si la tabla ya existía sin expires_at, ejecutar:
+-- ALTER TABLE pack_purchases ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_pack_purchases_email ON pack_purchases(alumno_email);

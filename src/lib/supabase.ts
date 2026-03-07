@@ -65,4 +65,5 @@ export type PackPurchase = {
   origin: 'mercado_pago' | 'efectivo' | 'manual';
   payment_id?: string;
   created_at: string;
+  expires_at?: string | null;
 };

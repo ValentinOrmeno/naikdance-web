@@ -15,6 +15,25 @@ export async function createReservation(data: {
 }) {
   const source: ReservationSource = data.source ?? 'web';
 
+  // Evitar reserva duplicada:
+  // mismo email y mismo nombre (sin importar mayúsculas/minúsculas),
+  // mismo profesor y misma fecha, en estado pendiente o confirmada.
+  const emailTrim = data.email.trim();
+  const nombreTrim = data.nombre.trim();
+  const { data: existing } = await supabase
+    .from('reservations')
+    .select('id')
+    .ilike('email', emailTrim)
+    .ilike('nombre', nombreTrim)
+    .eq('teacher_id', data.teacher_id)
+    .eq('fecha', data.fecha)
+    .in('status', ['pendiente', 'confirmada'])
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    throw new Error('Ya tenés una reserva para esta clase con este email. Revisá tu correo o contactá al estudio.');
+  }
+
   // Calcular expires_at solo para reservas creadas por WhatsApp
   const expires_at =
     source === 'whatsapp'
