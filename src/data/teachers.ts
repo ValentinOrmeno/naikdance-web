@@ -62,7 +62,7 @@ export const teachers: Teacher[] = [
   {
     id: "mili-mereles",
     name: "Mili Mereles",
-    style: "Reggaeton / Waacking",
+    style: "Reggaeton",
     image: "/profes/mili-mereles.jpg",
     classes: ["Lunes 20:00 - Waacking", "Sabado 14:00 - Voguing"],
   },

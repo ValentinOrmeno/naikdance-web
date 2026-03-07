@@ -30,27 +30,27 @@ export default function About() {
 
   return (
     <section id="nosotros" className="py-20 px-4 bg-transparent relative z-10 scroll-mt-24">
-      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 items-center max-w-7xl mx-auto">
-        <ScrollReveal direction="left">
+      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 items-center max-w-7xl mx-auto w-full min-w-0">
+        <ScrollReveal direction="left" className="min-w-0 w-full">
           <div className="text-center md:text-left">
             <h2 className="font-bebas text-white text-5xl md:text-6xl uppercase text-center mb-12 tracking-wide">
               Somos <span className="text-naik-gold">Naik Dance</span>
             </h2>
-            <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto font-montserrat">
+            <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto md:mx-0 font-montserrat">
               Somos un estudio de danza urbana en Moreno donde la técnica, la
               energía y la comunidad van juntas. Entrenás, crecés y te subís al
               escenario con staff que te acompaña en cada paso.
             </p>
           </div>
         </ScrollReveal>
-        <ScrollReveal direction="right" delay={0.08}>
-          <div className="relative min-h-[280px] aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md">
+        <ScrollReveal direction="right" delay={0.08} className="min-w-0 w-full">
+          <div className="relative min-h-[280px] aspect-[4/3] md:aspect-video rounded-2xl overflow-hidden bg-naik-dark/70 border border-white/10 backdrop-blur-md w-full">
             <Image
               key={transitionKey}
               src={current.src}
               alt={current.alt}
               fill
-              className="object-cover animate-fade-in"
+              className="object-cover object-left animate-fade-in"
               sizes="(max-width: 768px) 100vw, 50vw"
               loading="lazy"
             />

@@ -43,7 +43,10 @@ const isTecnicaStyle = (cls: ClassSchedule) =>
 const isArabeTecnico = (cls: ClassSchedule) =>
   cls.name === 'Arabe' && cls.teacher === 'Indira Nahir';
 
-const isUrbanoAbruTecnico = (cls: ClassSchedule) =>
+const isCamiloGonzalezUrbano = (cls: ClassSchedule) =>
+  cls.teacher === 'Camilo Gonzalez' && cls.style === 'Urbano';
+
+const isAbruVillalbaUrbano = (cls: ClassSchedule) =>
   cls.teacher === 'Abru Villalba' && cls.style === 'Urbano';
 
 const isUrbanoStyle = (cls: ClassSchedule) =>
@@ -94,8 +97,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
         (isPrincipiante(cls) || isAllLevels(cls)) &&
         isTecnicaStyle(cls)
       ) ||
-      isArabeTecnico(cls) ||
-      isUrbanoAbruTecnico(cls),
+      isArabeTecnico(cls),
   },
   {
     id: 'juvUrbanas',
@@ -104,21 +106,24 @@ const AGE_CATEGORIES: AgeCategory[] = [
     description: 'Clases urbanas de reggaeton, urbano, k-pop y ritmos con mucho flow.',
     image: '/clases/juvenil.png',
     filter: (cls) =>
-      !isBabyLevel(cls) &&
-      !isInfantilLevel(cls) &&
-      !isInfMixLevel(cls) &&
-      !isJuvAdulto(cls) &&
-      (isPrincipiante(cls) || isAllLevels(cls)) &&
-      isUrbanoStyle(cls) &&
-      !isFemClass(cls) &&
-      cls.teacher !== 'Abru Villalba',
+      (
+        !isBabyLevel(cls) &&
+        !isInfantilLevel(cls) &&
+        !isInfMixLevel(cls) &&
+        !isJuvAdulto(cls) &&
+        (isPrincipiante(cls) || isAllLevels(cls)) &&
+        isUrbanoStyle(cls) &&
+        !isFemClass(cls)
+      ) ||
+      isCamiloGonzalezUrbano(cls) ||
+      isAbruVillalbaUrbano(cls),
   },
   {
     id: 'juvFem',
     title: 'Juveniles Femme Style',
     subtitle: '12 a 16 años',
     description: 'Clases de femme style y reggaeton femme con foco en presencia escénica y actitud.',
-    image: '/clases/juvenil.png',
+    image: '/estudio/estudio-4.jpg',
     filter: (cls) =>
       !isBabyLevel(cls) &&
       !isInfantilLevel(cls) &&
@@ -132,7 +137,7 @@ const AGE_CATEGORIES: AgeCategory[] = [
     title: 'Adultas y otras',
     subtitle: 'Juv-Adulto · +16 años',
     description: 'Clases para jóvenes y adultos (funcional, zumba, taekwondo, ritmos y más).',
-    image: '/profes/zuly-silveira.JPG',
+    image: '/estudio/adultos.jpg',
     filter: (cls) => isJuvAdulto(cls),
   },  
 ];
