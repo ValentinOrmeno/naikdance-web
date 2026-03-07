@@ -55,6 +55,12 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
   const emailValid = isValidEmail(email);
   const formValid = emailValid && nombre.trim().length >= 2 && selectedSchedule !== null;
 
+  const isPipi = teacher?.id === 'pipi-echeverria';
+  // En la clase de Pipi no se ofrece pack/cuponera; solo MP o efectivo
+  useEffect(() => {
+    if (isPipi && paymentMethod === 'pack') setPaymentMethod('mp');
+  }, [isPipi, paymentMethod]);
+
   // Actualizar al mes actual en el cliente
   useEffect(() => {
     const now = new Date();
@@ -739,18 +745,20 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                     <p className="text-xs text-gray-300 uppercase font-bold tracking-wide">
                       ¿Cómo vas a pagar esta clase?
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('pack')}
-                        className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${
-                          paymentMethod === 'pack'
-                            ? 'bg-naik-gold text-black border-naik-gold'
-                            : 'bg-transparent text-gray-300 border-white/20 hover:border-naik-gold/60'
-                        }`}
-                      >
-                        Tengo pack/cuponera
-                      </button>
+                    <div className={`grid gap-2 ${isPipi ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
+                      {!isPipi && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('pack')}
+                          className={`px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${
+                            paymentMethod === 'pack'
+                              ? 'bg-naik-gold text-black border-naik-gold'
+                              : 'bg-transparent text-gray-300 border-white/20 hover:border-naik-gold/60'
+                          }`}
+                        >
+                          Tengo pack/cuponera
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('mp')}
@@ -775,9 +783,13 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                       </button>
                     </div>
                     <p className="text-[11px] text-gray-400">
-                      - Si elegís <span className="font-bold text-naik-gold">pack/cuponera</span>, la reserva
-                      se descuenta de tu pack cuando el estudio la confirma.{' '}
-                      <br />
+                      {!isPipi && (
+                        <>
+                          - Si elegís <span className="font-bold text-naik-gold">pack/cuponera</span>, la reserva
+                          se descuenta de tu pack cuando el estudio la confirma.{' '}
+                          <br />
+                        </>
+                      )}
                       - Con <span className="font-bold text-[#009EE3]">Mercado Pago</span> pagás ahora la clase
                       suelta. <br />- Con <span className="font-bold">efectivo</span>, pagás en el estudio.
                     </p>
