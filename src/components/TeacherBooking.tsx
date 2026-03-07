@@ -795,7 +795,7 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                     </p>
                   </div>
                   
-                  {/* Info de precios y descuento en efectivo */}
+                  {/* Info de precios (y descuento en efectivo solo si aplica) */}
                   {selectedSchedule?.price && (
                     <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-[11px] md:text-xs text-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <p>
@@ -804,16 +804,18 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                           ${selectedSchedule.price.toLocaleString('es-AR')}
                         </span>
                       </p>
-                      <p>
-                        Pagando en efectivo en el estudio:{' '}
-                        <span className="font-bold text-naik-gold">
-                          $
-                          {Math.round(selectedSchedule.price * 0.9).toLocaleString('es-AR')}
-                        </span>{' '}
-                        <span className="text-[10px] text-green-400 font-bold">
-                          (10% de descuento)
-                        </span>
-                      </p>
+                      {!isPipi && (
+                        <p>
+                          Pagando en efectivo en el estudio:{' '}
+                          <span className="font-bold text-naik-gold">
+                            $
+                            {Math.round(selectedSchedule.price * 0.9).toLocaleString('es-AR')}
+                          </span>{' '}
+                          <span className="text-[10px] text-green-400 font-bold">
+                            (10% de descuento)
+                          </span>
+                        </p>
+                      )}
                     </div>
                   )}
 
