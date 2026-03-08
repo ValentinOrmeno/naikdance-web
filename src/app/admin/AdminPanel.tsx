@@ -1265,7 +1265,7 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <p className="text-xs text-gray-400 uppercase mb-1">Clase</p>
                     <p className="text-sm">{reservation.clase}</p>
@@ -1284,6 +1284,18 @@ export default function AdminPanel() {
                         : 'bg-red-500/20 text-red-400'
                     }`}>
                       {reservation.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase mb-1">Origen</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                      reservation.source === 'mercado_pago'
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : reservation.source === 'whatsapp'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-gray-500/20 text-gray-300'
+                    }`}>
+                      {reservation.source === 'mercado_pago' ? 'Mercado Pago' : reservation.source === 'whatsapp' ? 'WhatsApp' : 'Web'}
                     </span>
                   </div>
                 </div>
@@ -1999,6 +2011,18 @@ export default function AdminPanel() {
                               : 'bg-red-500/20 text-red-400'
                           }`}>
                             {reservation.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase mb-1">Origen</p>
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                            reservation.source === 'mercado_pago'
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : reservation.source === 'whatsapp'
+                              ? 'bg-green-500/20 text-green-400'
+                              : 'bg-gray-500/20 text-gray-300'
+                          }`}>
+                            {reservation.source === 'mercado_pago' ? 'Mercado Pago' : reservation.source === 'whatsapp' ? 'WhatsApp' : 'Web'}
                           </span>
                         </div>
                       </div>

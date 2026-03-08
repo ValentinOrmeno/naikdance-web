@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Calendar, ChevronDown, Home, Clock } from 'lucide-react';
 import { createReservation } from '@/lib/supabase-admin';
 import { getAllAvailability, getClassSchedules } from '@/lib/supabase-admin-extended';
@@ -806,7 +807,14 @@ export default function TeacherBooking({ teacher }: { teacher: any }) {
                         </>
                       )}
                       - Con <span className="font-bold text-[#009EE3]">Mercado Pago</span> pagás ahora la clase
-                      suelta. <br />- Con <span className="font-bold">efectivo</span>, pagás en el estudio.
+                      suelta. <br />                      - Con <span className="font-bold">efectivo</span>, pagás en el estudio.
+                    </p>
+                    <p className="text-[11px] text-gray-500 mt-2">
+                      Al reservar o pagar aceptás nuestra{' '}
+                      <Link href="/privacidad" className="text-naik-gold hover:text-yellow-400 underline">
+                        Política de privacidad
+                      </Link>
+                      .
                     </p>
                   </div>
                   

@@ -1,5 +1,6 @@
 import { FaInstagram, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 export default function Footer() {
@@ -35,6 +36,12 @@ export default function Footer() {
           >
             Aranceles
           </a>
+          <Link
+            href="/privacidad"
+            className="text-white no-underline uppercase text-xs tracking-widest opacity-80 hover:opacity-100 transition-opacity"
+          >
+            Privacidad
+          </Link>
         </div>
         <div className="flex flex-row gap-3">
           <a
