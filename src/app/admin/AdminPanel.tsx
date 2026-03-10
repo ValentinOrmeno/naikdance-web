@@ -44,12 +44,21 @@ import { teachers } from "@/data/teachers";
 type Tab = "dashboard" | "reservas" | "clases" | "creditos";
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+/** Si es false o no está definida, la pestaña "Alumnos y créditos" no se muestra (feature de pago). En Vercel no agregar la variable o poner false. */
+const CREDITOS_TAB_ENABLED = process.env.NEXT_PUBLIC_ADMIN_CREDITOS_ENABLED === "true";
 
 export default function AdminPanel() {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+
+  // Si la pestaña créditos está deshabilitada y estaba seleccionada, volver a dashboard
+  useEffect(() => {
+    if (!CREDITOS_TAB_ENABLED && activeTab === "creditos") {
+      setActiveTab("dashboard");
+    }
+  }, [activeTab]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -1000,12 +1009,16 @@ export default function AdminPanel() {
     );
   }
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
-    { id: 'reservas', label: 'Reservas', icon: Clock },
-    { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
-    { id: 'creditos', label: 'Alumnos y Créditos', icon: Users },
-  ] as const;
+  const tabs = useMemo(
+    () =>
+      [
+        { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
+        { id: 'reservas', label: 'Reservas', icon: Clock },
+        { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
+        ...(CREDITOS_TAB_ENABLED ? [{ id: 'creditos', label: 'Alumnos y Créditos', icon: Users }] as const : []),
+      ] as const,
+    []
+  );
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden min-w-0 p-3 sm:p-4 md:p-6 lg:p-8">
@@ -1333,8 +1346,8 @@ export default function AdminPanel() {
           </div>
         )}
 
-        {/* TAB: ALUMNOS Y CRÉDITOS (packs/cuponeras) */}
-        {activeTab === "creditos" && (
+        {/* TAB: ALUMNOS Y CRÉDITOS (packs/cuponeras) - visible solo si NEXT_PUBLIC_ADMIN_CREDITOS_ENABLED=true */}
+        {CREDITOS_TAB_ENABLED && activeTab === "creditos" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-xl font-black uppercase tracking-wide text-white">
