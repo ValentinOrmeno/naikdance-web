@@ -1009,16 +1009,13 @@ export default function AdminPanel() {
     );
   }
 
-  const tabs = useMemo(
-    () =>
-      [
-        { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
-        { id: 'reservas', label: 'Reservas', icon: Clock },
-        { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
-        ...(CREDITOS_TAB_ENABLED ? [{ id: 'creditos', label: 'Alumnos y Créditos', icon: Users }] as const : []),
-      ] as const,
-    []
-  );
+  const allTabs: { id: Tab; label: string; icon: typeof Users }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
+    { id: 'reservas', label: 'Reservas', icon: Clock },
+    { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
+    { id: 'creditos', label: 'Alumnos y Créditos', icon: Users },
+  ];
+  const tabs = CREDITOS_TAB_ENABLED ? allTabs : allTabs.filter((t) => t.id !== 'creditos');
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden min-w-0 p-3 sm:p-4 md:p-6 lg:p-8">
