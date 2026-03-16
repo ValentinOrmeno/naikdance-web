@@ -31,13 +31,14 @@ type SpecialClassModalState = {
   editingId: string | null;
   title: string;
   date_label: string;
-  audience: string;
+  nivel: string;
+  max_students: string;
+  nombre_profesor: string;
   price_label: string;
   price_amount: string;
   promo_note: string;
   valid_until: string;
   image_url: string;
-  whatsapp_message: string;
   imageFile: File | null;
 };
 
@@ -46,13 +47,14 @@ const initialModalState: SpecialClassModalState = {
   editingId: null,
   title: "",
   date_label: "",
-  audience: "",
+  nivel: "",
+  max_students: "",
+  nombre_profesor: "",
   price_label: "",
   price_amount: "",
   promo_note: "",
   valid_until: "",
   image_url: "",
-  whatsapp_message: "",
   imageFile: null,
 };
 
@@ -114,13 +116,14 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
       editingId: item.id,
       title: item.title,
       date_label: item.dateLabel,
-      audience: item.audience,
+      nivel: item.nivel ?? "",
+      max_students: item.maxStudents != null ? String(item.maxStudents) : "",
+      nombre_profesor: item.profesorNombre ?? "",
       price_label: item.priceLabel,
       price_amount: item.priceAmount != null ? String(item.priceAmount) : "",
       promo_note: item.promoNote ?? "",
       valid_until: item.validUntil ? item.validUntil.slice(0, 16) : "",
       image_url: item.image ?? "",
-      whatsapp_message: item.whatsappMessage,
       imageFile: null,
     });
   }, []);
@@ -158,15 +161,17 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
         imageUrl = url;
       }
       const priceAmountNum = m.price_amount.trim() ? parseInt(m.price_amount, 10) : null;
+      const maxStudentsNum = m.max_students.trim() ? parseInt(m.max_students, 10) : null;
       const body = {
         title: m.title.trim(),
         date_label: m.date_label.trim(),
-        audience: m.audience.trim(),
+        nivel: m.nivel.trim() || null,
+        max_students: maxStudentsNum && maxStudentsNum > 0 ? maxStudentsNum : null,
+        audience: m.nombre_profesor.trim() || '',
         price_label: m.price_label.trim(),
         price_amount: priceAmountNum && priceAmountNum > 0 ? priceAmountNum : null,
         promo_note: m.promo_note.trim() || null,
         image_url: imageUrl,
-        whatsapp_message: m.whatsapp_message.trim() || "",
         valid_until: m.valid_until ? new Date(m.valid_until).toISOString() : null,
       };
       if (m.editingId) {
@@ -395,17 +400,53 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
               </div>
               <div>
                 <label className="block text-sm font-bold uppercase mb-1 text-naik-gold">
-                  Público / niveles
+                  Nivel (badge en la home)
                 </label>
                 <input
                   type="text"
-                  value={specialClassModal.audience}
+                  value={specialClassModal.nivel}
                   onChange={(e) =>
-                    setSpecialClassModal((prev) => ({ ...prev, audience: e.target.value }))
+                    setSpecialClassModal((prev) => ({ ...prev, nivel: e.target.value }))
                   }
-                  placeholder="Ej: Todos los niveles · Juveniles / Adultos"
+                  placeholder="Ej: Todos los niveles · Avanzado · Principiantes"
                   className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Si lo completás, aparece como badge en la card de la home junto a &quot;Oferta&quot;.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-bold uppercase mb-1 text-naik-gold">
+                  Profesor
+                </label>
+                <input
+                  type="text"
+                  value={specialClassModal.nombre_profesor}
+                  onChange={(e) =>
+                    setSpecialClassModal((prev) => ({ ...prev, nombre_profesor: e.target.value }))
+                  }
+                  placeholder="Ej: Pipi Echeverria"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold uppercase mb-1 text-gray-400">
+                  Cupos (opcional)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={specialClassModal.max_students}
+                  onChange={(e) =>
+                    setSpecialClassModal((prev) => ({ ...prev, max_students: e.target.value }))
+                  }
+                  placeholder="Ej: 20"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Cantidad máxima de inscriptos. Si no lo completás, no se muestran.
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-bold uppercase mb-1 text-naik-gold">
@@ -465,20 +506,6 @@ export function AdminSpecialClassesSection({ adminPassword, loading, setLoading 
                     setSpecialClassModal((prev) => ({ ...prev, valid_until: e.target.value }))
                   }
                   className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold uppercase mb-1 text-naik-gold">
-                  Mensaje WhatsApp (al reservar)
-                </label>
-                <textarea
-                  value={specialClassModal.whatsapp_message}
-                  onChange={(e) =>
-                    setSpecialClassModal((prev) => ({ ...prev, whatsapp_message: e.target.value }))
-                  }
-                  placeholder="Hola! Vengo de la web. Quiero más info y reservar..."
-                  rows={3}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 resize-y"
                 />
               </div>
             </div>

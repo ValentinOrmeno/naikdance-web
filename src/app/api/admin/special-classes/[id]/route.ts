@@ -25,11 +25,12 @@ export async function PUT(
     const {
       title,
       date_label,
+      nivel,
+      max_students,
       audience,
       price_label,
       promo_note,
       image_url,
-      whatsapp_message,
       valid_until,
       sort_order,
       price_amount,
@@ -39,11 +40,12 @@ export async function PUT(
     const updates: Record<string, unknown> = {};
     if (title !== undefined) updates.title = String(title).trim();
     if (date_label !== undefined) updates.date_label = String(date_label).trim();
-    if (audience !== undefined) updates.audience = String(audience).trim();
+    if (nivel !== undefined) updates.nivel = nivel != null && String(nivel).trim() ? String(nivel).trim() : null;
+    if (max_students !== undefined) updates.max_students = typeof max_students === 'number' && max_students > 0 ? max_students : null;
+    if (audience !== undefined) updates.audience = audience != null ? String(audience).trim() : '';
     if (price_label !== undefined) updates.price_label = String(price_label).trim();
     if (promo_note !== undefined) updates.promo_note = promo_note != null ? String(promo_note).trim() : null;
     if (image_url !== undefined) updates.image_url = String(image_url).trim();
-    if (whatsapp_message !== undefined) updates.whatsapp_message = String(whatsapp_message).trim();
     if (valid_until !== undefined) updates.valid_until = valid_until || null;
     if (sort_order !== undefined) updates.sort_order = typeof sort_order === 'number' ? sort_order : 0;
     if (price_amount !== undefined) {

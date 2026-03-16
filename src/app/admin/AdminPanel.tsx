@@ -37,15 +37,14 @@ import {
   Plus,
   Trash2,
   CalendarClock,
+  ImageIcon,
 } from "lucide-react";
+import { AdminSpecialClassesSection } from "./AdminSpecialClassesSection";
 import { teachers } from "@/data/teachers";
-// Clases especiales: ver AdminSpecialClassesSection.tsx para integrar cuando sea necesario.
 
-type Tab = "dashboard" | "reservas" | "clases" | "creditos";
+type Tab = "dashboard" | "reservas" | "clases" | "creditos" | "especiales";
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-/** Si es false o no está definida, la pestaña "Alumnos y créditos" no se muestra (feature de pago). En Vercel no agregar la variable o poner false. */
-const CREDITOS_TAB_ENABLED = process.env.NEXT_PUBLIC_ADMIN_CREDITOS_ENABLED === "true";
 
 export default function AdminPanel() {
   const [password, setPassword] = useState("");
@@ -53,12 +52,6 @@ export default function AdminPanel() {
   const [loginError, setLoginError] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
-  // Si la pestaña créditos está deshabilitada y estaba seleccionada, volver a dashboard
-  useEffect(() => {
-    if (!CREDITOS_TAB_ENABLED && activeTab === "creditos") {
-      setActiveTab("dashboard");
-    }
-  }, [activeTab]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -67,6 +60,8 @@ export default function AdminPanel() {
   const [reservasSearch, setReservasSearch] = useState("");
   const [packPurchases, setPackPurchases] = useState<PackPurchase[]>([]);
   const [packSearch, setPackSearch] = useState("");
+  const [creditsView, setCreditsView] = useState<'packs' | 'alumnos'>('packs');
+  const [expandedAlumnos, setExpandedAlumnos] = useState<Set<string>>(new Set());
   const [packConfirmModal, setPackConfirmModal] = useState<{
     show: boolean;
     reservationId: string | null;
@@ -245,6 +240,27 @@ export default function AdminPanel() {
       );
     });
   }, [packPurchases, packSearch]);
+
+  const alumnoDirectory = useMemo(() => {
+    const term = packSearch.trim().toLowerCase();
+    const source = term
+      ? packPurchases.filter((p) => {
+          const n = (p.alumno_nombre || '').toLowerCase();
+          const e = (p.alumno_email || '').toLowerCase();
+          return n.includes(term) || e.includes(term);
+        })
+      : packPurchases;
+    const map = new Map<string, { nombre: string; email: string; telefono: string | null; packs: typeof packPurchases }>();
+    for (const pack of source) {
+      const key = pack.alumno_email.toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, { nombre: pack.alumno_nombre, email: pack.alumno_email, telefono: pack.alumno_telefono ?? null, packs: [] });
+      }
+      map.get(key)!.packs.push(pack);
+    }
+    return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [packPurchases, packSearch]);
+
   const [quickClassDays, setQuickClassDays] = useState<number[]>([]);
   const [scheduleDaysByKey, setScheduleDaysByKey] = useState<Record<string, { count: number; days: number[] }>>(
     {}
@@ -522,7 +538,6 @@ export default function AdminPanel() {
     
     if (pwd === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
-      setPassword('');
       loadData();
     } else {
       setLoginError('Contraseña incorrecta');
@@ -1014,8 +1029,9 @@ export default function AdminPanel() {
     { id: 'reservas', label: 'Reservas', icon: Clock },
     { id: 'clases', label: 'Clases y Horarios', icon: CalendarClock },
     { id: 'creditos', label: 'Alumnos y Créditos', icon: Users },
+    { id: 'especiales', label: 'Clases especiales', icon: ImageIcon },
   ];
-  const tabs = CREDITOS_TAB_ENABLED ? allTabs : allTabs.filter((t) => t.id !== 'creditos');
+  const tabs = allTabs;
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden min-w-0 p-3 sm:p-4 md:p-6 lg:p-8">
@@ -1343,13 +1359,31 @@ export default function AdminPanel() {
           </div>
         )}
 
-        {/* TAB: ALUMNOS Y CRÉDITOS (packs/cuponeras) - visible solo si NEXT_PUBLIC_ADMIN_CREDITOS_ENABLED=true */}
-        {CREDITOS_TAB_ENABLED && activeTab === "creditos" && (
+        {/* TAB: ALUMNOS Y CRÉDITOS */}
+        {activeTab === "creditos" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h2 className="text-xl font-black uppercase tracking-wide text-white">
-                Alumnos y créditos
-              </h2>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h2 className="text-xl font-black uppercase tracking-wide text-white">
+                  Alumnos y créditos
+                </h2>
+                <div className="flex bg-white/10 rounded-lg p-0.5 gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setCreditsView('packs')}
+                    className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all ${creditsView === 'packs' ? 'bg-naik-gold text-black' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    Packs
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCreditsView('alumnos')}
+                    className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all ${creditsView === 'alumnos' ? 'bg-naik-gold text-black' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    Alumnos
+                  </button>
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:items-center">
                 <button
                   type="button"
@@ -1374,7 +1408,7 @@ export default function AdminPanel() {
                 <div className="w-full sm:w-80">
                   <input
                     type="text"
-                    placeholder="Buscar por alumno, email o pack..."
+                    placeholder={creditsView === 'alumnos' ? 'Buscar por alumno o email...' : 'Buscar por alumno, email o pack...'}
                     value={packSearch}
                     onChange={(e) => setPackSearch(e.target.value)}
                     className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold focus:border-naik-gold"
@@ -1382,21 +1416,22 @@ export default function AdminPanel() {
                 </div>
               </div>
             </div>
-            {loading && (
+
+            {creditsView === 'packs' && loading && (
               <div className="text-center py-12 text-gray-400">
                 Cargando packs y cuponeras...
               </div>
             )}
 
-            {!loading && filteredPackPurchases.length === 0 && (
+            {creditsView === 'packs' && !loading && filteredPackPurchases.length === 0 && (
               <div className="text-center py-12 text-gray-400">
                 {packSearch.trim()
-                  ? "No se encontraron alumnos para ese término de búsqueda"
+                  ? "No se encontraron packs para ese término de búsqueda"
                   : "Todavía no hay compras de packs o cuponeras registradas"}
               </div>
             )}
 
-            {!loading &&
+            {creditsView === 'packs' && !loading &&
               filteredPackPurchases.map((pack) => {
                 const usadas = pack.clases_usadas;
                 const total = pack.clases_incluidas;
@@ -1617,8 +1652,123 @@ export default function AdminPanel() {
                   </div>
                 );
               })}
+
+            {creditsView === 'alumnos' && (
+              <>
+                {loading && (
+                  <div className="text-center py-12 text-gray-400">
+                    Cargando alumnos...
+                  </div>
+                )}
+                {!loading && alumnoDirectory.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    {packSearch.trim()
+                      ? "No se encontraron alumnos para ese término de búsqueda"
+                      : "Todavía no hay alumnos registrados"}
+                  </div>
+                )}
+                {!loading && alumnoDirectory.map((alumno) => {
+                  const isExpanded = expandedAlumnos.has(alumno.email.toLowerCase());
+                  const activosCount = alumno.packs.filter((p) => p.status === 'activo').length;
+                  const toggleExpand = () => {
+                    setExpandedAlumnos((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(alumno.email.toLowerCase())) next.delete(alumno.email.toLowerCase());
+                      else next.add(alumno.email.toLowerCase());
+                      return next;
+                    });
+                  };
+                  return (
+                    <div key={alumno.email} className="bg-[#111] border border-white/20 rounded-xl overflow-hidden hover:border-naik-gold/50 transition-all">
+                      <button
+                        type="button"
+                        onClick={toggleExpand}
+                        className="w-full flex items-center justify-between p-4 sm:p-5 text-left"
+                      >
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 rounded-full bg-naik-gold/20 border border-naik-gold/40 flex items-center justify-center text-naik-gold font-black text-base shrink-0 uppercase">
+                            {alumno.nombre.charAt(0)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-white truncate">{alumno.nombre}</p>
+                            <p className="text-xs text-gray-400 truncate">{alumno.email}</p>
+                            {alumno.telefono && (
+                              <p className="text-xs text-gray-500">Tel: {alumno.telefono}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0 ml-2">
+                          <div className="text-right">
+                            <p className="text-xs text-gray-400">{alumno.packs.length} {alumno.packs.length === 1 ? 'pack' : 'packs'}</p>
+                            {activosCount > 0 && (
+                              <span className="text-xs font-bold text-green-400">{activosCount} activo{activosCount > 1 ? 's' : ''}</span>
+                            )}
+                          </div>
+                          <span className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>▾</span>
+                        </div>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="border-t border-white/10 px-4 sm:px-5 py-3 space-y-2">
+                          {alumno.packs.map((pack) => {
+                            const usadas = pack.clases_usadas;
+                            const total = pack.clases_incluidas;
+                            const restantes = total === null ? '∞' : Math.max(total - usadas, 0).toString();
+                            return (
+                              <div key={pack.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white/5 rounded-lg p-3">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-bold text-naik-gold">{pack.pack_type} — {pack.pack_name}</p>
+                                  <p className="text-xs text-gray-400">
+                                    {total === null ? 'Ilimitadas' : `${usadas}/${total} clases`}
+                                    {total !== null && <span className="ml-1">(restan {restantes})</span>}
+                                    {pack.expires_at && (
+                                      <span className="ml-2 text-gray-500">
+                                        · Caduca {new Date(pack.expires_at).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 ${
+                                  pack.status === 'activo' ? 'bg-green-500/20 text-green-400' :
+                                  pack.status === 'completo' ? 'bg-blue-500/20 text-blue-400' :
+                                  'bg-red-500/20 text-red-400'
+                                }`}>
+                                  {pack.status.toUpperCase()}
+                                </span>
+                              </div>
+                            );
+                          })}
+                          {alumno.telefono && (
+                            <div className="pt-1">
+                              <a
+                                href={`https://wa.me/54${alumno.telefono.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/20 text-[#25D366] text-xs font-bold hover:bg-[#25D366]/30 transition-all"
+                              >
+                                WhatsApp
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         )}
+
+        {/* TAB: Clases especiales */}
+        {activeTab === "especiales" && (
+          <AdminSpecialClassesSection
+            adminPassword={password}
+            loading={loading}
+            setLoading={setLoading}
+          />
+        )}
+
       </div>
 
       {/* Modal Agregar pack / cuponera */}
@@ -1657,10 +1807,31 @@ export default function AdminPanel() {
                 <input
                   type="email"
                   value={addPackModal.alumno_email}
-                  onChange={(e) => setAddPackModal({ ...addPackModal, alumno_email: e.target.value })}
+                  onChange={(e) => {
+                    const newEmail = e.target.value;
+                    const match = packPurchases.find(
+                      (p) => p.alumno_email.toLowerCase() === newEmail.trim().toLowerCase()
+                    );
+                    setAddPackModal({
+                      ...addPackModal,
+                      alumno_email: newEmail,
+                      alumno_nombre: match && !addPackModal.alumno_nombre ? match.alumno_nombre : addPackModal.alumno_nombre,
+                      alumno_telefono: match && !addPackModal.alumno_telefono ? (match.alumno_telefono ?? '') : addPackModal.alumno_telefono,
+                    });
+                  }}
                   className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-naik-gold"
                   placeholder="maria@ejemplo.com"
                 />
+                {(() => {
+                  const match = packPurchases.find(
+                    (p) => p.alumno_email.toLowerCase() === addPackModal.alumno_email.trim().toLowerCase() && addPackModal.alumno_email.trim().length > 0
+                  );
+                  return match ? (
+                    <p className="mt-1.5 text-xs text-naik-gold flex items-center gap-1">
+                      <span>✓</span> Alumno reconocido: <span className="font-bold">{match.alumno_nombre}</span>
+                    </p>
+                  ) : null;
+                })()}
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Teléfono (opcional)</label>
@@ -1922,8 +2093,8 @@ export default function AdminPanel() {
 
       {/* Modal Ver clases (reservas del alumno del pack) */}
       {packClasesModal.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="bg-[#111] border border-white/20 rounded-xl max-w-md w-full p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-5 shadow-xl my-4 sm:my-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-white uppercase">
                 Clases en las que se anotó
@@ -2073,8 +2244,8 @@ export default function AdminPanel() {
 
       {/* Modal de Gestion de Horarios */}
       {scheduleModal.show && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden px-2 sm:px-4">
-          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-4xl flex flex-col p-3 sm:p-4 md:p-6 my-6 sm:my-10">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-white/20 rounded-xl w-full max-w-[min(95vw,56rem)] flex flex-col p-3 sm:p-4 md:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-3 sm:mb-4 md:mb-6 shrink-0">
               <div>
                 <h3 className="text-2xl font-black text-white uppercase">
@@ -2384,8 +2555,8 @@ export default function AdminPanel() {
 
       {/* Modal de Confirmacion */}
       {confirmModal.show && (
-<div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-x-hidden">
-        <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6">
+      <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+        <div className="bg-[#111] border border-white/20 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-black text-white uppercase">
                 {confirmModal.action === 'confirm' ? 'Confirmar Reserva' : 'Cancelar Reserva'}
@@ -2428,8 +2599,8 @@ export default function AdminPanel() {
 
       {/* Modal: sugerir descuento automático de pack */}
       {packConfirmModal.show && packConfirmModal.pack && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-x-hidden">
-          <div className="bg-[#111] border border-naik-gold/40 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto overflow-x-hidden">
+          <div className="bg-[#111] border border-naik-gold/40 rounded-xl max-w-[min(95vw,28rem)] w-full p-4 sm:p-6 my-4 sm:my-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-black text-white uppercase">
                 Usar crédito de pack
